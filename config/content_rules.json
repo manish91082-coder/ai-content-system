@@ -1,0 +1,68 @@
+{
+  "content_types": {
+    "youtube_short": {
+      "max_duration_seconds": 60,
+      "resolution": "720x1280",
+      "aspect_ratio": "9:16",
+      "max_title_length": 100,
+      "max_description_length": 5000,
+      "max_tags": 15,
+      "category_id": "22",
+      "language": "hi"
+    },
+    "youtube_long": {
+      "min_duration_seconds": 480,
+      "max_duration_seconds": 720,
+      "resolution": "1280x720",
+      "aspect_ratio": "16:9",
+      "max_title_length": 100,
+      "max_description_length": 5000,
+      "max_tags": 15,
+      "category_id": "22",
+      "language": "hi"
+    },
+    "instagram_reel": {
+      "max_duration_seconds": 90,
+      "resolution": "720x1280",
+      "aspect_ratio": "9:16",
+      "max_caption_length": 2200,
+      "max_hashtags": 30
+    },
+    "facebook_post": {
+      "max_description_length": 63000,
+      "max_hashtags": 10
+    }
+  },
+  "posting_schedule": {
+    "timezone": "Asia/Kolkata",
+    "times": {
+      "youtube_short": ["09:00", "17:00"],
+      "youtube_long": ["10:00"],
+      "instagram_reel": ["09:30", "18:00"],
+      "facebook_post": ["10:00", "19:00"]
+    }
+  },
+  "content_rules": {
+    "no_duplicate_within_days": 30,
+    "max_daily_posts_per_platform": 3,
+    "require_ai_disclosure": true,
+    "ai_disclosure_text": "यह content AI की मदद से बनाया गया है",
+    "min_content_quality_score": 0.7
+  },
+  "platforms": {
+    "youtube": {
+      "enabled": true,
+      "channel_name": "AI Hindi Content",
+      "default_privacy": "public",
+      "made_for_kids": false
+    },
+    "instagram": {
+      "enabled": true,
+      "post_types": ["reel", "image"]
+    },
+    "facebook": {
+      "enabled": true,
+      "post_types": ["video", "text"]
+    }
+  }
+}

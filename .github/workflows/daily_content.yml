@@ -1,0 +1,115 @@
+name: 🤖 Daily AI Content Pipeline
+
+on:
+  # Run every day at 9:00 AM IST (3:30 AM UTC)
+  schedule:
+    - cron: '30 3 * * *'
+  
+  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Run in test mode (no actual posting)'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.12'
+  TZ: 'Asia/Kolkata'
+
+jobs:
+  content-pipeline:
+    name: 🚀 Run Content Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    
+    steps:
+      # ─────────────────────────────────────────
+      # SETUP
+      # ─────────────────────────────────────────
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 🔧 Install System Dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg imagemagick fonts-noto-color-emoji
+          # Verify FFmpeg
+          ffmpeg -version | head -1
+          echo "✅ FFmpeg ready"
+
+      - name: 📦 Install Python Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          echo "✅ Python packages installed"
+
+      - name: 📁 Create Output Directories
+        run: |
+          mkdir -p output/images output/audio output/videos temp logs
+          echo "✅ Directories created"
+
+      # ─────────────────────────────────────────
+      # RUN PIPELINE
+      # ─────────────────────────────────────────
+      - name: 🤖 Run Daily Content Pipeline
+        env:
+          # AI APIs
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          
+          # Voice
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ secrets.AZURE_SPEECH_REGION }}
+          SARVAM_API_KEY: ${{ secrets.SARVAM_API_KEY }}
+          HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+          
+          # Database
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          
+          # Social Platforms
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          FACEBOOK_ACCESS_TOKEN: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          
+          # Storage & Notifications
+          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          
+          # Mode
+          TEST_MODE: ${{ inputs.test_mode }}
+        run: |
+          cd src
+          python main.py
+          echo "✅ Pipeline completed"
+
+      # ─────────────────────────────────────────
+      # SAVE LOGS
+      # ─────────────────────────────────────────
+      - name: 📊 Upload Logs as Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-logs-${{ github.run_number }}
+          path: logs/
+          retention-days: 7
+
+      - name: ✅ Pipeline Success
+        if: success()
+        run: echo "🎉 Daily content pipeline completed successfully!"
+
+      - name: ❌ Pipeline Failed
+        if: failure()
+        run: echo "💥 Pipeline failed! Check logs above."
