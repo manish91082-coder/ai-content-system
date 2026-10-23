@@ -14,14 +14,20 @@ class Database:
     def __init__(self):
         url = os.environ.get("SUPABASE_URL")
         key = os.environ.get("SUPABASE_KEY")
+        self.client = None
+        self._mock_data = {"topics": [], "content": [], "posts": []}
         
         if not url or not key:
             logger.warning("Supabase credentials not found — using mock mode")
-            self.client = None
-            self._mock_data = {"topics": [], "content": [], "posts": []}
+        elif key.startswith("sb_publishable_"):
+            logger.warning("SUPABASE_KEY is a publishable key — need anon/service_role JWT key. Using mock mode.")
+            logger.warning("Fix: Go to Supabase Dashboard > Settings > API > anon key")
         else:
-            self.client = create_client(url, key)
-            logger.success("Supabase connected")
+            try:
+                self.client = create_client(url, key)
+                logger.success("Supabase connected")
+            except Exception as e:
+                logger.warning(f"Supabase connection failed: {e} — using mock mode")
 
     # ─────────────────────────────────────────
     #  TOPICS
