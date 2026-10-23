@@ -13,19 +13,19 @@ from supabase import create_client, Client
 class Database:
     def __init__(self):
         url = os.environ.get("SUPABASE_URL")
-        key = os.environ.get("SUPABASE_KEY")
+        # Prefer service_role key for backend, fallback to anon key
+        key = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("SUPABASE_KEY")
         self.client = None
         self._mock_data = {"topics": [], "content": [], "posts": []}
         
         if not url or not key:
             logger.warning("Supabase credentials not found — using mock mode")
-        elif key.startswith("sb_publishable_"):
-            logger.warning("SUPABASE_KEY is a publishable key — need anon/service_role JWT key. Using mock mode.")
-            logger.warning("Fix: Go to Supabase Dashboard > Settings > API > anon key")
+        elif key.startswith("sb_publishable_") or key.startswith("sb_secret_"):
+            logger.warning("SUPABASE_KEY is new-format key — need JWT (eyJ...) key. Using mock mode.")
         else:
             try:
                 self.client = create_client(url, key)
-                logger.success("Supabase connected")
+                logger.success(f"Supabase connected (role: {'service_role' if 'service_role' in key else 'anon'})")
             except Exception as e:
                 logger.warning(f"Supabase connection failed: {e} — using mock mode")
 
