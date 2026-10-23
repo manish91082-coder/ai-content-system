@@ -18,8 +18,13 @@ from datetime import datetime, date, timedelta
 from loguru import logger
 
 # Supabase REST API config (direct HTTP fallback)
-_SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
-_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("SUPABASE_KEY", "")
+# GitHub Secrets sometimes injects a BOM (\ufeff) — strip it always
+def _clean_env(key: str, default: str = "") -> str:
+    val = os.environ.get(key, default) or default
+    return val.strip().lstrip('\ufeff').strip()
+
+_SUPABASE_URL = _clean_env("SUPABASE_URL")
+_SERVICE_KEY  = _clean_env("SUPABASE_SERVICE_KEY") or _clean_env("SUPABASE_KEY")
 _SSL_CTX = ssl.create_default_context()
 
 def _rest_request(method: str, table: str, data: dict = None, params: str = "") -> list:
@@ -47,8 +52,8 @@ class Database:
         self.use_rest = False
         self._mock_data = {"topics": [], "content": [], "posts": []}
 
-        url = os.environ.get("SUPABASE_URL")
-        key = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("SUPABASE_KEY")
+        url = _clean_env("SUPABASE_URL")
+        key = _clean_env("SUPABASE_SERVICE_KEY") or _clean_env("SUPABASE_KEY")
 
         if not url or not key:
             logger.warning("Supabase credentials not found — using mock mode")
