@@ -24,22 +24,21 @@ _SSL_CTX = ssl.create_default_context()
 
 def _rest_request(method: str, table: str, data: dict = None, params: str = "") -> list:
     """Direct Supabase REST API call — no SDK needed"""
-    url = f"{_SUPABASE_URL}/rest/v1/{table}{'?' + params if params else ''}"
+    base = _SUPABASE_URL.strip().rstrip('/')
+    url = f"{base}/rest/v1/{table}{'?' + params if params else ''}"
+    key = _SERVICE_KEY.strip()
     headers = {
-        "apikey": _SERVICE_KEY,
-        "Authorization": f"Bearer {_SERVICE_KEY}",
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
-    body = json.dumps(data).encode() if data else None
+    body = json.dumps(data).encode('utf-8') if data else None
     req = urllib.request.Request(url, data=body, headers=headers, method=method)
-    try:
-        with urllib.request.urlopen(req, context=_SSL_CTX, timeout=15) as resp:
-            return json.loads(resp.read()) if resp.read else []
-    except Exception:
-        with urllib.request.urlopen(req, context=_SSL_CTX, timeout=15) as resp:
-            content = resp.read()
-            return json.loads(content) if content else []
+    with urllib.request.urlopen(req, context=_SSL_CTX, timeout=15) as resp:
+        content = resp.read()
+        return json.loads(content) if content else []
+
 
 
 class Database:
@@ -72,9 +71,11 @@ class Database:
 
         # Try 2: Direct REST API (always works if URL + key are valid)
         try:
-            test_url = f"{url}/rest/v1/topics?limit=1"
-            headers = {"apikey": key, "Authorization": f"Bearer {key}"}
-            req = urllib.request.Request(test_url, headers=headers)
+            clean_url = url.strip().rstrip('/')
+            clean_key = key.strip()
+            test_url = f"{clean_url}/rest/v1/topics?limit=1"
+            req_headers = {"apikey": clean_key, "Authorization": f"Bearer {clean_key}"}
+            req = urllib.request.Request(test_url, headers=req_headers)
             with urllib.request.urlopen(req, context=_SSL_CTX, timeout=10) as resp:
                 resp.read()
             self.use_rest = True
