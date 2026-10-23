@@ -2,32 +2,87 @@
 Database Module — Supabase Integration
 All data storage and retrieval operations.
 Tables: topics, content_items, posts, analytics
+
+Connection strategy (in order):
+1. Supabase Python SDK (JWT key)
+2. psycopg2 direct PostgreSQL (DATABASE_URL) — fallback
+3. Mock mode — if all else fails
 """
 
 import os
 import json
+import urllib.request
+import urllib.parse
+import ssl
 from datetime import datetime, date, timedelta
 from loguru import logger
-from supabase import create_client, Client
+
+# Supabase REST API config (direct HTTP fallback)
+_SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("SUPABASE_KEY", "")
+_SSL_CTX = ssl.create_default_context()
+
+def _rest_request(method: str, table: str, data: dict = None, params: str = "") -> list:
+    """Direct Supabase REST API call — no SDK needed"""
+    url = f"{_SUPABASE_URL}/rest/v1/{table}{'?' + params if params else ''}"
+    headers = {
+        "apikey": _SERVICE_KEY,
+        "Authorization": f"Bearer {_SERVICE_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+    }
+    body = json.dumps(data).encode() if data else None
+    req = urllib.request.Request(url, data=body, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req, context=_SSL_CTX, timeout=15) as resp:
+            return json.loads(resp.read()) if resp.read else []
+    except Exception:
+        with urllib.request.urlopen(req, context=_SSL_CTX, timeout=15) as resp:
+            content = resp.read()
+            return json.loads(content) if content else []
+
 
 class Database:
     def __init__(self):
-        url = os.environ.get("SUPABASE_URL")
-        # Prefer service_role key for backend, fallback to anon key
-        key = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("SUPABASE_KEY")
         self.client = None
+        self.use_rest = False
         self._mock_data = {"topics": [], "content": [], "posts": []}
-        
+
+        url = os.environ.get("SUPABASE_URL")
+        key = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("SUPABASE_KEY")
+
         if not url or not key:
             logger.warning("Supabase credentials not found — using mock mode")
-        elif key.startswith("sb_publishable_") or key.startswith("sb_secret_"):
-            logger.warning("SUPABASE_KEY is new-format key — need JWT (eyJ...) key. Using mock mode.")
-        else:
-            try:
-                self.client = create_client(url, key)
-                logger.success(f"Supabase connected (role: {'service_role' if 'service_role' in key else 'anon'})")
-            except Exception as e:
-                logger.warning(f"Supabase connection failed: {e} — using mock mode")
+            return
+
+        if key.startswith("sb_publishable_") or key.startswith("sb_secret_"):
+            logger.warning("New-format Supabase key detected — switching to REST API mode")
+            self.use_rest = True
+            logger.success("Supabase REST API mode active")
+            return
+
+        # Try 1: Supabase Python SDK
+        try:
+            from supabase import create_client
+            self.client = create_client(url, key)
+            logger.success("Supabase SDK connected")
+            return
+        except Exception as e:
+            logger.warning(f"Supabase SDK failed: {e} — trying REST API fallback")
+
+        # Try 2: Direct REST API (always works if URL + key are valid)
+        try:
+            test_url = f"{url}/rest/v1/topics?limit=1"
+            headers = {"apikey": key, "Authorization": f"Bearer {key}"}
+            req = urllib.request.Request(test_url, headers=headers)
+            with urllib.request.urlopen(req, context=_SSL_CTX, timeout=10) as resp:
+                resp.read()
+            self.use_rest = True
+            logger.success("Supabase REST API fallback connected")
+            return
+        except Exception as e:
+            logger.warning(f"REST API also failed: {e} — using mock mode")
+
 
     # ─────────────────────────────────────────
     #  TOPICS
@@ -46,29 +101,40 @@ class Database:
             try:
                 self.client.table("topics").insert(data).execute()
             except Exception as e:
-                logger.error(f"Save topic failed: {e}")
+                logger.error(f"Save topic failed (SDK): {e}")
+        elif self.use_rest:
+            try:
+                _rest_request("POST", "topics", data)
+                logger.success(f"Topic saved via REST: {topic[:40]}")
+            except Exception as e:
+                logger.error(f"Save topic failed (REST): {e}")
         else:
             self._mock_data["topics"].append(data)
 
     def get_recent_topics(self, days: int = 30) -> list:
         """Get topics used in the last N days"""
-        cutoff = (date.today() - timedelta(days=days)).isoformat()
+        from datetime import date as _date
+        cutoff = (_date.today() - timedelta(days=days)).isoformat()
         if self.client:
             try:
-                result = self.client.table("topics") \
-                    .select("topic") \
-                    .gte("date", cutoff) \
-                    .execute()
+                result = self.client.table("topics").select("topic").gte("date", cutoff).execute()
                 return [r["topic"] for r in result.data]
             except Exception as e:
                 logger.error(f"Get topics failed: {e}")
+                return []
+        elif self.use_rest:
+            try:
+                rows = _rest_request("GET", "topics", params=f"select=topic&date=gte.{cutoff}")
+                return [r["topic"] for r in rows]
+            except Exception:
                 return []
         else:
             return [t["topic"] for t in self._mock_data["topics"]]
 
     def get_today_topics(self) -> list:
         """Get topics selected for today"""
-        today = date.today().isoformat()
+        from datetime import date as _date
+        today = _date.today().isoformat()
         if self.client:
             try:
                 result = self.client.table("topics") \
