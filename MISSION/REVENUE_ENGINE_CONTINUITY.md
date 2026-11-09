@@ -374,3 +374,17 @@ Initial public search found the following potentially relevant windows. Treat al
 
 ### Strategic implication
 The first route worth rapid qualification is not a storefront. It is a **portfolio of high-value, platform-native competitions/rewards with award dates before 2026-12-09**, paired with AI-native task/bounty marketplaces where the agent can independently deliver accepted work. Prioritize only those whose official rules allow the user to enter, whose required deliverable is feasible with available compute, and whose award/acceptance can occur before deadline. Competition prize pools are not individual earnings and must never be aggregated as if won.
+
+
+## 11. DEADLINE FLEXIBILITY — 30-DAY HARD TARGET, UP TO 90-DAY OUTER WINDOW (2026-11-09)
+
+The user has clarified the timing policy:
+
+- **Hard-coded primary goal:** ₹10 crore within the first 30 calendar days from Day 0 (2026-11-09; target date 2026-12-09). This remains the first and dominant objective. Do not quietly replace it with a 90-day target.
+- **Operational flexibility:** if a legitimate opportunity is substantially earned/accepted/confirmed within the first 30 days but its contractual award release, vesting, payout cycle, escrow release, or payment processing takes longer, continue to pursue it through Day 35, Day 60, and at most Day 90 (nominal outer date 2027-02-07, subject to exact calendar counting).
+- Use the shortest viable time window. Do not delay a 30-day opportunity merely because 90 days are available.
+- Keep two distinct scorecards: (A) value earned/accepted/vested/claimable by Day 30; (B) actual funds received/settled by Day 30, Day 35, Day 60 and Day 90. Report the gap between earned entitlement and cash settlement explicitly.
+- A confirmed award/payment is meaningful only when official evidence establishes the user's entitlement, amount or calculable share, acceptance status, and conditions. A submission, prize pool, verbal promise, unsigned contract, speculative pipeline, or unapproved claim is not confirmation.
+- Do not count a payment as guaranteed merely because someone says it will arrive. Record contractual payment date, approval/vesting conditions, refund/chargeback/appeal risks, escrow terms and counterparty/platform reliability.
+- The outer 90-day window is a contingency for settlement timing, not permission to accept low-quality, low-probability or unrelated work. The target remains ₹10 crore; do not lower the amount or drift into routine gig work.
+- When ranking opportunities, consider both expected earned value by Day 30 and probability-weighted settlement by Day 90. High-value opportunities with a credible, documented 35–90 day release can remain eligible even if they miss Day 30 cash receipt.
