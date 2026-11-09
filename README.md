@@ -11,7 +11,8 @@ This repository is an automation prototype, not a verified revenue-generating pr
 
 - Research workflow has completed successfully in an observed GitHub Actions run.
 - Daily content pipeline run #17 failed: Gemini authentication, Groq model/request, and daily-report defects were recorded.
-- Reliability and publishing-safety fixes are being developed on the isolated branch `revenue-engine/phase-1-safety-fixes`; they are not merged into `master` and the full GitHub Actions regression run is pending.
+- Reliability and publishing-safety fixes are on the isolated branch `revenue-engine/phase-1-safety-fixes`; CI run #10 passed all 13 tests and dependency/compile checks. Changes are not merged into `master`.
+- Groq credentials authenticate and the selected model is listed. The configured Gemini secret currently fails API authentication and must be replaced with a valid Google AI Studio API key.
 - No checkout, customer order/fulfilment, affiliate attribution, or bank-settlement ledger is implemented.
 - Verified settled revenue: **₹0** as of this audit. Views, generated assets, or pending payouts are not revenue.
 
@@ -113,7 +114,7 @@ Scheduled runs force test mode. Keep `PUBLISH_ENABLED` unset unless the account 
 - [x] Baseline repository audit
 - [x] Isolated reliability and publishing-safety remediation branch created
 - [x] Regression tests authored
-- [ ] Full regression workflow execution and review
+- [x] Full regression workflow execution and review (13 tests passed; provider status degraded because Gemini key is invalid)
 - [ ] Provider credentials and live free-tier inference verified
 - [ ] Source provenance and editorial quality gate implemented
 - [ ] Product offer, checkout, fulfilment, refund, and settlement ledger built
