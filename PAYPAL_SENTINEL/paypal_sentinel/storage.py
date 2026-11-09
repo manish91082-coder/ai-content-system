@@ -35,6 +35,7 @@ class Store:
                     amount TEXT NOT NULL, currency TEXT NOT NULL, state TEXT NOT NULL,
                     created_at INTEGER NOT NULL, capture_id TEXT
                 );
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_payments_plan_id ON payments(plan_id);
             """)
 
     def save_plan(self, payload: dict[str, Any], ttl: int = 600) -> str:
@@ -116,9 +117,20 @@ class Store:
         with self.lock:
             self.conn.execute("BEGIN IMMEDIATE")
             try:
+                existing = self.conn.execute(
+                    "SELECT state FROM payments WHERE plan_id=?", (plan_id,)
+                ).fetchone()
+                if existing:
+                    raise ValueError("this approved plan has already been used")
+                amount_decimal = Decimal(amount)
+                limit_decimal = Decimal(daily_limit)
+                if not amount_decimal.is_finite() or amount_decimal <= 0:
+                    raise ValueError("payment amount must be finite and positive")
+                if not limit_decimal.is_finite() or limit_decimal <= 0:
+                    raise ValueError("daily limit must be finite and positive")
                 rows = self._daily_amounts(day_start)
                 total = sum((Decimal(row["amount"]) for row in rows), Decimal("0"))
-                if total + Decimal(amount) > Decimal(daily_limit):
+                if total + amount_decimal > limit_decimal:
                     raise ValueError("daily spend limit exceeded")
                 self.conn.execute(
                     "INSERT INTO payments VALUES (?, ?, NULL, ?, ?, 'CREATING', ?, NULL)",
