@@ -264,3 +264,85 @@ The next shortlist must include, at minimum:
 Fast-payout creator storefronts, generic digital products, affiliate marketing, ads, inventory-based resale, grants and contests must not be treated as the default route. They may re-enter only if evidence demonstrates a superior path to cleared cash.
 
 **No primary revenue route has been selected yet.** This is deliberate: selecting a familiar model before the route census is complete would repeat the previous strategic error.
+
+
+---
+
+## 10. SECOND-PASS CHANNEL AND TRANSACTION MECHANISM AUDIT — 2026-11-09
+
+### A. Online business / software acquisition marketplaces
+
+**Acquire.com**
+- Provides marketplace discovery and a high-ticket transaction mechanism for existing startups/businesses.
+- Current published pricing: 8% closing fee below $250k, 7% from $250k to $1m, 6% above $1m; monthly listing fees $25/$50/$100 respectively.
+- The seller process explicitly includes buyer evaluation, access requests, NDAs, LOIs, exclusivity, due diligence, legal review, asset purchase agreement and escrow. The platform itself recommends buyer conversations and warns against LOIs without live calls.
+- Funds are released after buyer approves transferred assets during the inspection process.
+- Decision: high transaction value but incompatible with the strict no-calls/no-manual-sales requirement and unlikely to complete a fresh listing, diligence and transfer inside 30 days without an existing revenue-generating asset and ready buyer. Do not select as primary under current known facts.
+- Official sources:
+  - https://help.acquire.com/what-is-the-acquisition-process-for-sellers
+  - https://acquire.com/seller-pricing/
+  - https://help.acquire.com/how-does-escrow-work-2
+
+**Flippa**
+- A real marketplace for websites, apps, domains and online businesses. Its current terms (updated 22 October 2026) confirm that sellers list assets and buyers contact/negotiate; Flippa does not itself buy or sell the asset.
+- Listing fee is charged whether or not the asset sells. A buyer-interest guarantee can refund listing fees if no qualified buyer contact occurs within 30 days, but qualified contact may consist of NDA requests, proof-of-funds submissions, meetings or calls. That is not a guarantee of a completed transaction.
+- Escrow.com releases funds only after transfer and buyer acceptance or expiry of inspection period; standard inspection periods are 7 days for websites/businesses, 3 days for apps and 2 days for domains. Identity verification and international bank/wire compatibility apply. International wire fee is stated as $20 for a seller bank outside the US in the Flippa escrow help article, in addition to relevant fees.
+- Decision: has buyer discovery but a new sale is not self-serve or guaranteed; negotiation, asset ownership proof, legal agreement, transfer and inspection make 30-day settlement uncertain. Could be reconsidered only if the user has a verified transferable asset and agrees to the platform's transaction process; do not invent an asset or list without approval.
+- Official sources:
+  - https://flippa.com/terms-of-service/
+  - https://support.flippa.com/hc/en-us/articles/202469614-Escrow
+  - https://support.flippa.com/hc/en-us/articles/202470084-Payment-options
+
+### B. API marketplace monetisation
+
+**RapidAPI**
+- Provider payouts occur after all charges for a month are consolidated and processed at the end of the following month. RapidAPI pays providers through PayPal only; the current provider fee page states a 25% marketplace fee for API Hub payments from 15 November 2025 (a legacy/versioned page still shows 20%, so the current 25% page is the controlling source for current planning).
+- Decision: exclude from the 30-day bank-settlement primary path. It also does not solve buyer acquisition and requires a useful API with demand.
+- Official source: https://docs.rapidapi.com/docs/payouts-and-finance
+
+**AWS Marketplace India**
+- This is a more credible India-native software marketplace route than RapidAPI for payout configuration, but it is heavily gated.
+- Seller registration requires a standalone AWS account, legal business identity, GSTIN, PAN, seller signature, GST e-invoicing enabled, matching legal name/address and Indian bank account. The public seller profile is stated to be approved in 1–3 business days, after which tax verification is required.
+- India sellers can sell only to India buyers; public listings are priced in USD, private offers may be INR or USD; product types include SaaS, AMI, containers, professional services, ML and AWS Data Exchange.
+- Seller can choose daily or monthly INR disbursement preference; however, the FAQ says disbursement timing aligns with standard AWS Marketplace disbursement practices. A daily preference is not proof that a new seller's first captured customer payment will reach the bank on the same day. Confirm account-specific timing and holds before relying on it.
+- Decision: conditional candidate only if an eligible legal business with active GSTIN/e-invoicing and a relevant product already exists or can be built very quickly, and a buyer-discovery path can be demonstrated. Do not build a SaaS merely to enter AWS Marketplace. The requirement for GSTIN and India-only buyers sharply narrows the path.
+- Official sources:
+  - https://docs.aws.amazon.com/marketplace/latest/userguide/getting-started-seller-india.html
+  - https://docs.aws.amazon.com/marketplace/latest/userguide/india-seller-faq.html
+
+### C. Bug bounty payment mechanisms
+
+**HackerOne**
+- Current official payment guide (updated 2 October 2026) requires identity verification, valid payment method and approved tax form before payment. Daily processing can be selected, but payments are only for useful, valid, resolved reports that receive an awarded bounty. Payment processing time varies by method; the page specifies 1–2 days for PayPal and crypto-wallet payouts, not necessarily Indian bank credit.
+- Decision: payout can be relatively quick after award, but reward discovery and acceptance are unpredictable. This is not a reliable 30-day high-value income engine from zero evidence. Any research must be strictly authorized, scoped and manually validated; do not submit speculative AI-generated findings.
+- Official source: https://docs.hackerone.com/en/articles/8395720-payment-preferences
+
+**Bugcrowd**
+- Official payment documentation says weekly Wednesday payments for rewards submitted by Tuesday midnight PST. This is payout cadence after the reward is due, not evidence that a vulnerability will be accepted or paid.
+- Decision: high variance, specialist route, not a primary target route without demonstrable authorized findings.
+- Official source: https://docs.bugcrowd.com/researchers/payments/viewing-payments/
+
+**Intigriti**
+- India-resident researchers can use UPI; wire transfer may be the shortest delay. Some programs restrict payout method, and bounty payment follows acceptance/compliance.
+- Decision: useful payout rail if an eligible bounty is actually awarded, but no predictable demand or reward volume. Side experiment only.
+- Official source: https://kb.intigriti.com/en/articles/3379502-payout-methods
+
+### D. Revised initial route classification
+
+| Route | Buyer/reward discovery | High ticket potential | First settlement within 30 days | Zero capital | No-human-sales compatibility | Preliminary verdict |
+|---|---|---:|---:|---:|---:|---|
+| Acquire.com asset sale | Yes, marketplace buyer access | High | Low/uncertain; due diligence + calls + escrow | No, listing fee | Low | Reject as primary unless pre-existing asset and buyer |
+| Flippa asset sale | Yes, marketplace buyer contact | High | Low/uncertain; listing, negotiation, escrow, inspection | No, listing fee | Low | Conditional only for already-owned asset |
+| AWS Marketplace India | Marketplace and procurement | Medium/high | Unverified for first seller payout; daily preference exists | Potentially low cash, but GST/legal setup | Medium | Conditional; GSTIN/e-invoice hard gate |
+| RapidAPI | Developer marketplace | Low/medium initially | No; following-month payout | Low | High fulfilment autonomy | Exclude for deadline |
+| HackerOne / Bugcrowd / Intigriti | Program-native bounty opportunities | Highly variable | Possible after accepted reward; not predictable | Yes | Medium/high, but research/validation is expert-dependent | Small controlled side experiment only |
+| High-ticket direct licensing | No marketplace proof yet | High | Uncertain | Potentially | Low if buyer diligence requires human involvement | Investigate only if an existing owned asset is verified |
+| Self-serve automated service | Must find marketplace/native demand | Medium | Depends on platform/payment rail | Potentially | High if fully automated | Research further; not yet selected |
+
+### E. Updated conclusion
+
+No currently researched marketplace provides a verified combination of (1) high-value buyer discovery, (2) new-seller access from ₹0, (3) no manual sales/calls, (4) autonomous fulfilment, and (5) cleared Indian bank settlement before 2026-12-09.
+
+The strongest *conditional* route family at present is not generic product sales; it is a **marketplace-mediated transaction where the payer already has intent and the payment rail has a short, verified settlement path**. AWS Marketplace India is worth deeper investigation only if the GSTIN/e-invoicing and existing-product gates pass. Bounty platforms have quicker payout mechanics after a reward but very low predictability. Asset marketplaces offer high ticket sizes but require ownership of an existing asset and human deal work.
+
+**No primary route is selected yet.** Next research must test additional transaction categories and determine whether any existing user-owned asset/business/IP can lawfully be monetised without assuming ownership, valuation, revenue, or customer demand. If that cannot be verified from available information, it remains an unproven path.
