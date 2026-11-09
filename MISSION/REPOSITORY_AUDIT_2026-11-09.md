@@ -36,15 +36,16 @@ Latest observed Daily AI Content Pipeline run #17 failed on 2026-11-08. Its logs
 - Full source links: `MISSION/AI_PROVIDER_RESEARCH_2026-11-09.md`.
 
 ## Verification status
-- GitHub Actions CI run #3 succeeded: requirements installed, Python compile checks passed, all 10 regression tests passed. Run: https://github.com/manish91082-coder/ai-content-system/actions/runs/42648302328
-- CI runs #1 and #2 exposed the HTTPX dependency mismatch; it was resolved by upgrading Supabase from 2.9.1 to 2.34.1 and setting HTTPX 0.28.1.
+- GitHub Actions CI run #10 succeeded: dependencies installed, compile checks passed, all 13 regression tests passed, and metadata-only provider checks completed. Run: https://github.com/manish91082-coder/ai-content-system/actions/runs/42649140264
+- CI runs #1 and #2 exposed dependency conflicts; these were resolved by upgrading Supabase to 2.34.1, HTTPX to 0.28.1, and Groq SDK to 1.7.0.
+- Provider check confirms Groq key authentication and target model availability. Gemini secret exists but fails with HTTP 401 `UNAUTHENTICATED` / `ACCESS_TOKEN_TYPE_UNSUPPORTED`; the key value was never accessed.
 
 - No production publish action was attempted.
 - The repository variable `PUBLISH_ENABLED` was not enabled.
 - No changes from this branch have been merged into `master`.
 
 ## Remaining risks / blockers
-- Gemini authentication still requires a valid account key; the Groq model ID was updated but live API inference remains unverified. Secret values must never be printed.
+- Gemini key must be replaced by the account owner. Groq authentication and model catalogue are verified; actual inference remains untested to avoid unknown paid-tier charges. Secret values must never be printed.
 - Telegram delivery remains unavailable until configured by the account owner.
 - RSS headlines need source provenance and fact-checking before content generation.
 - Supabase schema contains broad RLS policies and must be redesigned before production use.
