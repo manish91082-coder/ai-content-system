@@ -51,6 +51,11 @@ jobs:
           pip install -r requirements.txt
           echo "✅ Python packages installed"
 
+      - name: 🧪 Run Safety and Regression Tests
+        run: |
+          python -m compileall -q src tests
+          python -m unittest discover -s tests -v
+
       - name: 📁 Create Output Directories
         run: |
           mkdir -p output/images output/audio output/videos temp logs
