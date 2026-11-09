@@ -7,6 +7,7 @@ import secrets
 import sqlite3
 import threading
 import time
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
@@ -91,6 +92,23 @@ class Store:
                 self.conn.execute("ROLLBACK")
                 raise
 
+    def _daily_amounts(self, day_start: int):
+        return self.conn.execute(
+            "SELECT amount FROM payments WHERE created_at>=? "
+            "AND state IN ('CREATING','CREATED','CAPTURING','CAPTURE_UNKNOWN','COMPLETED')",
+            (day_start,),
+        ).fetchall()
+
+    def daily_reserved(self) -> Decimal:
+        now = int(time.time())
+        day_start = now - (now % 86400)
+        with self.lock:
+            rows = self._daily_amounts(day_start)
+        try:
+            return sum((Decimal(row["amount"]) for row in rows), Decimal("0"))
+        except InvalidOperation as exc:
+            raise RuntimeError("payment ledger contains invalid amount") from exc
+
     def reserve_payment(self, plan_id: str, amount: str, currency: str, daily_limit: str) -> str:
         payment_id = secrets.token_urlsafe(18)
         now = int(time.time())
@@ -98,12 +116,9 @@ class Store:
         with self.lock:
             self.conn.execute("BEGIN IMMEDIATE")
             try:
-                row = self.conn.execute(
-                    "SELECT COALESCE(SUM(CAST(amount AS REAL)), 0) AS total FROM payments "
-                    "WHERE created_at>=? AND state IN ('CREATING','CREATED','COMPLETED')",
-                    (day_start,),
-                ).fetchone()
-                if float(row["total"]) + float(amount) > float(daily_limit):
+                rows = self._daily_amounts(day_start)
+                total = sum((Decimal(row["amount"]) for row in rows), Decimal("0"))
+                if total + Decimal(amount) > Decimal(daily_limit):
                     raise ValueError("daily spend limit exceeded")
                 self.conn.execute(
                     "INSERT INTO payments VALUES (?, ?, NULL, ?, ?, 'CREATING', ?, NULL)",
@@ -136,9 +151,35 @@ class Store:
             ).fetchone()
         return dict(row) if row else None
 
+    def begin_capture(self, order_id: str) -> bool:
+        with self.lock:
+            self.conn.execute("BEGIN IMMEDIATE")
+            try:
+                row = self.conn.execute(
+                    "SELECT state FROM payments WHERE order_id=?", (order_id,)
+                ).fetchone()
+                valid = bool(row and row["state"] == "CREATED")
+                if valid:
+                    self.conn.execute(
+                        "UPDATE payments SET state='CAPTURING' WHERE order_id=? AND state='CREATED'",
+                        (order_id,),
+                    )
+                self.conn.execute("COMMIT")
+                return valid
+            except Exception:
+                self.conn.execute("ROLLBACK")
+                raise
+
+    def mark_capture_unknown(self, order_id: str) -> None:
+        with self.lock:
+            self.conn.execute(
+                "UPDATE payments SET state='CAPTURE_UNKNOWN' WHERE order_id=? AND state='CAPTURING'",
+                (order_id,),
+            )
+
     def complete_payment(self, order_id: str, capture_id: str) -> None:
         with self.lock:
             self.conn.execute(
-                "UPDATE payments SET state='COMPLETED', capture_id=? WHERE order_id=? AND state='CREATED'",
+                "UPDATE payments SET state='COMPLETED', capture_id=? WHERE order_id=? AND state='CAPTURING'",
                 (capture_id, order_id),
             )
