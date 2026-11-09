@@ -26,6 +26,7 @@ from video_creator import VideoCreator
 from publisher import Publisher
 from telegram_bot import TelegramBot
 from database import Database
+from pipeline_safety import publishing_is_enabled
 
 # Setup logging
 Path("logs").mkdir(exist_ok=True)
@@ -48,6 +49,8 @@ def run_daily_pipeline():
     
     all_publish_results = {}
     all_topics = []
+    publish_enabled = publishing_is_enabled()
+    logger.warning(f"LIVE PUBLISHING GATE ENABLED: {publish_enabled}")
     
     try:
         # ─────────────────────────────────────────
@@ -130,27 +133,36 @@ def run_daily_pipeline():
                 # ─────────────────────────────────────────
                 logger.info("STEP 3: Publishing to all platforms...")
                 
-                if video_paths:
+                if video_paths and publish_enabled:
                     publish_results = publisher.publish_all(
                         content_package=content_package,
                         video_paths=video_paths,
                         image_paths=image_paths
                     )
                     all_publish_results[topic_name[:30]] = publish_results
-                    
-                    # Log published posts to DB
+
+                    # Log only actual publisher responses; never infer a successful post.
                     for platform, result in publish_results.items():
-                        db.save_post(
-                            content_id=content_id,
-                            platform=platform,
-                            post_url=result.get("url", ""),
-                            post_id=result.get("post_id", ""),
-                            status="success" if result.get("success") else "failed"
-                        )
+                        if isinstance(result, dict):
+                            db.save_post(
+                                content_id=content_id,
+                                platform=platform,
+                                post_url=result.get("url", ""),
+                                post_id=result.get("post_id", ""),
+                                status="success" if result.get("success") is True else "failed"
+                            )
+                elif video_paths:
+                    logger.warning("Publishing blocked by safety gate; generated assets retained.")
+                    all_publish_results[topic_name[:30]] = {
+                        "publishing": {
+                            "success": False,
+                            "error": "Publishing disabled: set PUBLISH_ENABLED=true and TEST_MODE=false after explicit authorization."
+                        }
+                    }
                 else:
                     logger.warning(f"No video created for: {topic_name}")
                     all_publish_results[topic_name[:30]] = {
-                        "skipped": {"success": False, "error": "No video created"}
+                        "pipeline": {"success": False, "error": "No video created"}
                     }
                 
                 # Rate limiting between topics
