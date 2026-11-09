@@ -272,11 +272,7 @@ mod tests {
     fn oversized_memo_is_rejected() {
         let mut contract = setup();
         context(account("worker.testnet"), 1);
-        let _ = contract.pay(
-            account("vendor.testnet"),
-            U128(1),
-            "x".repeat(257),
-        );
+        let _ = contract.pay(account("vendor.testnet"), U128(1), "x".repeat(257));
     }
 
     #[test]
