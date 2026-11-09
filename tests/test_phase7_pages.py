@@ -50,6 +50,5 @@ class Phase7Tests(unittest.TestCase):
         self.assertNotIn("<img", content)
 
 
-if (typeof module !== "undefined") module.exports = {};
 if __name__ == "__main__":
     unittest.main()
