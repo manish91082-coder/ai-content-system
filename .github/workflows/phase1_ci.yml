@@ -5,12 +5,12 @@ on:
     branches:
       - revenue-engine/phase-1-safety-fixes
       - revenue-engine/phase-3-editorial-review
-      - revenue-engine/phase-5-order-core
+      - revenue-engine/phase-5-order-core\n      - revenue-engine/phase-6-coaching-kit
     paths:
       - "src/**"
       - "tests/**"
       - "scripts/**"
-      - "config/**"
+      - "config/**"\n      - "product/**"\n      - "MISSION/**"
       - "requirements.txt"
       - ".github/workflows/phase1_ci.yml"
   workflow_dispatch:
