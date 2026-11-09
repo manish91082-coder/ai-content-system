@@ -10,7 +10,7 @@ import time
 import random
 from loguru import logger
 from tenacity import retry, stop_after_attempt, wait_exponential
-import google.generativeai as genai
+from google import genai
 from groq import Groq
 
 # ─────────────────────────────────────────
@@ -18,6 +18,8 @@ from groq import Groq
 # ─────────────────────────────────────────
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+GEMINI_MODEL_ID = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
+GROQ_MODEL_ID = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 
 CONTENT_TYPES = {
     "youtube_short": {
@@ -46,75 +48,103 @@ CONTENT_TYPES = {
     }
 }
 
-# Anti-AI-detection: randomize writing style
+# Writing styles vary presentation; never attempt to evade platform detection.
 WRITING_STYLES = [
     "conversational_storytelling",
     "practical_tips_list",
     "question_and_answer",
-    "personal_experience",
+    "first_person_explainer",
     "news_style"
 ]
 
 class ContentGenerator:
     def __init__(self):
+        self.gemini_client = None
+        self.groq_client = None
+        self._last_provider = None
         self._setup_gemini()
         self._setup_groq()
 
     def _setup_gemini(self):
-        """Initialize Gemini client"""
-        if GEMINI_API_KEY:
-            genai.configure(api_key=GEMINI_API_KEY)
-            self.gemini_model = genai.GenerativeModel('gemini-2.0-flash-exp')
-            logger.success("Gemini initialized")
-        else:
-            self.gemini_model = None
+        """Initialize the maintained Google GenAI SDK client."""
+        if not GEMINI_API_KEY:
             logger.warning("Gemini API key not found")
+            return
+        try:
+            self.gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+            logger.success(f"Gemini client initialized (model={GEMINI_MODEL_ID})")
+        except Exception as e:
+            logger.error(f"Gemini client initialization failed ({type(e).__name__}): {self._redact_error(e, GEMINI_API_KEY)}")
 
     def _setup_groq(self):
-        """Initialize Groq client"""
-        if GROQ_API_KEY:
-            self.groq_client = Groq(api_key=GROQ_API_KEY)
-            logger.success("Groq initialized")
-        else:
-            self.groq_client = None
+        """Initialize Groq client."""
+        if not GROQ_API_KEY:
             logger.warning("Groq API key not found")
+            return
+        try:
+            self.groq_client = Groq(api_key=GROQ_API_KEY)
+            logger.success(f"Groq client initialized (model={GROQ_MODEL_ID})")
+        except Exception as e:
+            logger.error(f"Groq client initialization failed ({type(e).__name__}): {self._redact_error(e, GROQ_API_KEY)}")
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+    @staticmethod
+    def _redact_error(error: Exception, secret: str = None) -> str:
+        message = str(error)
+        if secret:
+            message = message.replace(secret, "[REDACTED]")
+        return message[:500]
+
     def _call_gemini(self, prompt: str) -> str:
-        """Call Gemini API"""
-        response = self.gemini_model.generate_content(prompt)
+        """Call Gemini using the maintained Google GenAI SDK."""
+        response = self.gemini_client.models.generate_content(
+            model=GEMINI_MODEL_ID,
+            contents=prompt
+        )
+        if not response.text:
+            raise RuntimeError("Gemini returned an empty text response")
         return response.text.strip()
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
     def _call_groq(self, prompt: str) -> str:
-        """Call Groq API (backup)"""
+        """Call a currently listed Groq free-plan model as backup."""
         completion = self.groq_client.chat.completions.create(
-            model="llama-3.1-70b-versatile",
+            model=GROQ_MODEL_ID,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.8,
             max_tokens=2000
         )
-        return completion.choices[0].message.content.strip()
+        content = completion.choices[0].message.content
+        if not content:
+            raise RuntimeError("Groq returned an empty text response")
+        return content.strip()
 
     def _call_ai(self, prompt: str) -> str:
-        """Call AI with Gemini first, Groq as fallback"""
-        if self.gemini_model:
+        """Call Gemini first, then Groq; preserve actionable error classes."""
+        errors = []
+        if self.gemini_client:
             try:
                 result = self._call_gemini(prompt)
-                logger.debug("Used: Gemini")
+                self._last_provider = f"Gemini:{GEMINI_MODEL_ID}"
+                logger.debug(f"Used {self._last_provider}")
                 return result
             except Exception as e:
-                logger.warning(f"Gemini failed: {e}. Trying Groq...")
-        
+                summary = self._redact_error(e, GEMINI_API_KEY)
+                errors.append(f"Gemini {type(e).__name__}: {summary}")
+                logger.warning(f"Gemini failed ({type(e).__name__}): {summary}. Trying Groq fallback.")
+
         if self.groq_client:
             try:
                 result = self._call_groq(prompt)
-                logger.debug("Used: Groq (backup)")
+                self._last_provider = f"Groq:{GROQ_MODEL_ID}"
+                logger.debug(f"Used {self._last_provider}")
                 return result
             except Exception as e:
-                logger.error(f"Both AI APIs failed: {e}")
-        
-        raise Exception("All AI APIs failed")
+                summary = self._redact_error(e, GROQ_API_KEY)
+                errors.append(f"Groq {type(e).__name__}: {summary}")
+                logger.error(f"Groq failed ({type(e).__name__}): {summary}")
+
+        if not errors:
+            raise RuntimeError("No AI provider configured. Add valid provider keys as GitHub Actions secrets.")
+        raise RuntimeError("All configured AI providers failed. " + " | ".join(errors))
 
     def generate_title(self, topic: str, content_type: str) -> str:
         """Generate catchy Hindi title"""
@@ -264,7 +294,7 @@ Example format: "A professional Indian person looking amazed at a glowing smartp
             "metadata": {
                 "word_count": len(script.split()),
                 "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "ai_model": "gemini-2.0-flash or groq-llama-3.1"
+                "ai_model": self._last_provider or "provider_not_recorded"
             }
         }
         
