@@ -67,19 +67,19 @@ ai-content-system/
 └── README.md                   ← This file
 ```
 
-## ⚡ Tech Stack (100% Free, No Downloads)
+## ⚡ Components (free tiers and external-service limits apply)
 
 | Component | Tool | Cost |
 |-----------|------|------|
 | Automation | GitHub Actions | FREE |
 | Text AI | Gemini 3.5 Flash-Lite | Free tier, account quota applies |
 | Text Backup | Groq GPT-OSS 120B | Free plan, model-specific quota applies |
-| Images | Pollinations.ai | FREE, no key |
-| Voice | Azure Speech | FREE 500K/month |
+| Images | Pollinations.ai | External service; availability/terms may change |
+| Voice | gTTS (online) + pyttsx3 fallback | No paid API configured |
 | Video | FFmpeg (in Actions) | FREE |
-| Database | Supabase | FREE 500MB |
+| Database | Supabase | Free tier subject to current project limits |
 | Notifications | Telegram Bot | FREE |
-| Storage | Google Drive API | FREE 15GB |
+| Storage | Google Drive API | Uses the connected Google account's quota |
 
 ## 🔐 Required Secrets (Add in GitHub → Settings → Secrets)
 
