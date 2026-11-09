@@ -11,6 +11,7 @@ import random
 from loguru import logger
 from google import genai
 from groq import Groq
+from editorial_qa import build_editorial_context, build_source_metadata
 
 # ─────────────────────────────────────────
 #  CONFIG
@@ -186,7 +187,7 @@ Return ONLY the title, nothing else.
         logger.info(f"Generated title: {title}")
         return title
 
-    def generate_script(self, topic: str, title: str, content_type: str) -> str:
+    def generate_script(self, topic: str, title: str, content_type: str, topic_data: dict = None) -> str:
         """Generate full Hindi script"""
         config = CONTENT_TYPES.get(content_type, CONTENT_TYPES["youtube_short"])
         style = random.choice(WRITING_STYLES)
@@ -200,6 +201,9 @@ Duration: {config['duration']}
 Word count: {config['script_length']}
 Format: {config['format']}
 Writing style: {style}
+
+Editorial evidence instructions:
+{build_editorial_context(topic_data or {"topic": topic, "category": "general"})}
 
 Requirements:
 - Pure Hindi with Devanagari script (English technical words allowed)
@@ -289,7 +293,7 @@ Example format: "A professional Indian person looking amazed at a glowing smartp
         title = self.generate_title(topic, content_type)
         time.sleep(1)  # Rate limiting
         
-        script = self.generate_script(topic, title, content_type)
+        script = self.generate_script(topic, title, content_type, topic_data=topic_data)
         time.sleep(1)
         
         description = self.generate_description(topic, title, content_type)
@@ -312,7 +316,8 @@ Example format: "A professional Indian person looking amazed at a glowing smartp
             "metadata": {
                 "word_count": len(script.split()),
                 "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "ai_model": self._last_provider or "provider_not_recorded"
+                "ai_model": self._last_provider or "provider_not_recorded",
+                **build_source_metadata(topic_data)
             }
         }
         
