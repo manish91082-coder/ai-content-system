@@ -54,7 +54,7 @@ async function loadPayPalButton() {
   if (!paypalLoaded) {
     await new Promise(function(resolve, reject) {
       const script = document.createElement("script");
-      script.src = "https://www.paypal.com/sdk/js?client-id=" + encodeURIComponent(config.paypal_client_id) + "&currency=USD&intent=capture";
+      script.src = "https://www.paypal.com/sdk/js?client-id=" + encodeURIComponent(config.paypal_client_id) + "&components=buttons&currency=USD&intent=capture";
       script.onload = resolve;
       script.onerror = reject;
       document.head.appendChild(script);
