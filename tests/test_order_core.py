@@ -61,7 +61,7 @@ class OrderCoreTests(unittest.TestCase):
     def test_failed_event_after_capture_cannot_regress_order(self):
         self.process(self.event("evt-captured", "payment.captured"))
         result = self.process(self.event("evt-failed-late", "payment.failed"))
-        self.assertEqual(result["result"], "payment_failed")
+        self.assertEqual(result["result"], "ignored_non_forward_transition")
         order = self.core.get_order(self.order["order_id"])
         self.assertEqual(order["payment_status"], "captured")
         self.assertEqual(order["status"], "paid")
