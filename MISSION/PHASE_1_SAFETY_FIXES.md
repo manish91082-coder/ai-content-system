@@ -13,7 +13,7 @@ Changes made:
 - `src/main.py`: records publishing as blocked when the safety gate is closed; does not call `publisher.publish_all` in that state; only records actual publisher result dictionaries.
 - `src/pipeline_safety.py`: publishing requires both `PUBLISH_ENABLED=true` and `TEST_MODE=false`. Missing or malformed values block publishing.
 - `.github/workflows/daily_content.yml`: scheduled executions force test mode; live publishing additionally requires the repository variable `PUBLISH_ENABLED` to be explicitly set to true.
-- `tests/test_pipeline_safety_and_reports.py`: eight regression tests cover default-deny behavior, explicit gate conditions, nested/legacy reporting, malformed payloads, and HTML escaping.
+- `tests/test_pipeline_safety_and_reports.py`: nine regression tests cover default-deny behavior, explicit gate conditions, nested/legacy reporting, malformed payloads, and HTML escaping.
 - Workflow now runs Python compile checks and unit tests before the content pipeline.
 
 ## 2. Safety semantics
