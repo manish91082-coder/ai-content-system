@@ -67,9 +67,18 @@ The target is a stretch objective, not a guarantee. Count only cleared, reconcil
 
 **Decision status:** market evidence supports testing the category, but no buyer interview, paid order, or customer conversion has yet been verified. The proposed ₹9,900 pilot is a test price, not validated willingness-to-pay.
 
+## Phase 3 — Buyer-facing offer assets
+
+- [x] Created fixed-scope service definition: `OFFER/AI_PIPELINE_RELIABILITY_SPRINT.md`.
+- [x] Created Fiverr listing draft and package-price hypotheses: `OFFER/FIVERR_GIG_DRAFT.md`.
+- [x] Created no-secrets client intake template: `OFFER/CLIENT_INTAKE_NO_SECRETS.md`.
+- [x] Created delivery acceptance and evidence checklist: `OFFER/DELIVERY_ACCEPTANCE_CHECKLIST.md`.
+- [ ] Publish a marketplace listing: pending seller account identity/payout onboarding and operator approval.
+- [ ] Validate the offer with a paid pilot: not yet done.
+
 ## Next execution phase
 
-Phase 3 — Create the buyer-facing proof asset and service listing package. Build a sanitized case study from the Phase 1 reliability work, a fixed-scope offer brief, acceptance checklist, and a no-secrets intake template. Keep the production branch unchanged.
+Phase 4 — Build a sanitized technical case study and a compact portfolio page/file. Then prepare the marketplace listing in the user's chosen account after identity and payout setup. Keep all secrets out of chat and repository; keep `master` unchanged until full pipeline integration is verified.
 
 ## Operating rule
 
