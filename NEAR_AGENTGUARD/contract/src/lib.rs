@@ -72,7 +72,10 @@ impl AgentGuard {
     pub fn set_limits(&mut self, max_single: U128, daily_limit: U128) {
         self.assert_owner();
         assert!(max_single.0 > 0, "max_single must be positive");
-        assert!(daily_limit.0 >= max_single.0, "daily_limit must cover max_single");
+        assert!(
+            daily_limit.0 >= max_single.0,
+            "daily_limit must cover max_single"
+        );
         self.max_single = max_single.0;
         self.daily_limit = daily_limit.0;
     }
