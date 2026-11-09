@@ -22,3 +22,5 @@ jobs:
           components: rustfmt
       - run: cargo fmt -- --check
       - run: cargo test
+      - run: rustup target add wasm32-unknown-unknown
+      - run: cargo build --target wasm32-unknown-unknown --release
