@@ -1,0 +1,23 @@
+name: AgentGuard CI
+on:
+  push:
+    paths:
+      - 'NEAR_AGENTGUARD/**'
+  pull_request:
+    paths:
+      - 'NEAR_AGENTGUARD/**'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: NEAR_AGENTGUARD
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e ".[dev]"
+      - run: pytest -q
+      - run: python demo/run_attack_demo.py
