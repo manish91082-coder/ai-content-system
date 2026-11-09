@@ -173,10 +173,12 @@ class OrderCore:
                              (now, order_id))
                 result = "payment_pending"
             elif event_type == "payment.failed":
-                if order["payment_status"] not in ("captured", "refunded", "disputed"):
+                if order["payment_status"] in ("captured", "refunded", "disputed"):
+                    result = "ignored_non_forward_transition"
+                else:
                     conn.execute("""UPDATE orders SET payment_status='failed',
                         status='payment_failed', updated_at=? WHERE order_id=?""", (now, order_id))
-                result = "payment_failed"
+                    result = "payment_failed"
             elif event_type == "payment.captured":
                 if order["payment_status"] in ("captured", "refunded", "disputed"):
                     result = "ignored_non_forward_transition"
