@@ -344,3 +344,33 @@ No route yet passes all gates. Continue only with AI-permitted platform-native r
 - Code4rena awards are in USDC, not direct Indian bank credit. AI/automated tools may be used as a first pass, but LLM-generated reports are strongly discouraged; the Warden must validate findings and Solidity/EVM High/Medium reports generally require runnable PoCs.
 - Immunefi reviewed program lists a maximum $50,000 critical smart-contract reward, paid in USDC after KYC; rules prohibit low-quality automated scanner reports and unauthorized mainnet/public-testnet testing.
 - This is a bounded high-upside side-research candidate, not a predictable ₹10 crore primary route. Prior smart-contract project history does not prove audit expertise or accepted findings. Full analysis is in MISSION/REVENUE_OPPORTUNITY_AUDIT_2026-11-09.md.
+
+
+## 9. USER CLARIFICATION — PAYMENT RAIL IS NOT A STRATEGIC CONSTRAINT (2026-11-09)
+
+The user explicitly clarified that the revenue-generation route is the priority; payment receipt/withdrawal mode can be selected later. Bank, PayPal, crypto, or another lawful platform-supported wallet are all acceptable initial receipt modes. Do not reject a high-value earning route merely because it does not pay directly to an Indian bank within the initial earning window.
+
+### Revised mission accounting
+- Primary earning milestone: **₹10 crore equivalent of genuinely earned, attributable, withdrawable/claimable funds credited to an account or wallet controlled by the user**, or irrevocably awarded and payable to the user subject only to routine identity/compliance processing.
+- Separate this from final liquidity milestone: conversion/withdrawal and receipt in the user's chosen destination account.
+- Maintain distinct ledger fields: (1) earned/awarded, (2) accepted/approved, (3) vested/claimable, (4) withdrawable, (5) withdrawal requested, (6) settled to destination, (7) fees/taxes/refunds/reversals, (8) net realized amount.
+- A published prize pool, unaccepted bounty, pending submission, leaderboard estimate, speculative valuation, or another party's escrow balance is not user earnings.
+- Do not count an award until official acceptance/award evidence establishes the user's entitlement and amount. Label any vesting, appeal, lockup, reserve, KYC, or review condition.
+- Payment-rail choice is deferred until actual earnings and the platform's permitted withdrawal methods are known. Do not imply that a wallet credit can always be withdrawn in two minutes; platform release, KYC, network confirmation, compliance review, and bank processing can impose delays.
+
+The 30-day deadline remains 2026-12-09 unless the user changes it. This clarification changes the milestone definition and opportunity ranking, not the target amount or deadline. Prefer high-value reward/prize/contract routes even if payout arrives in crypto or platform wallet, provided the user's entitlement is real and claimable.
+
+## 10. LIVE OPPORTUNITY RESEARCH CHECKPOINT — 2026-11-09
+
+Initial public search found the following potentially relevant windows. Treat all as opportunities to qualify and compete, never as revenue:
+
+- **NEAR Hackathon — Build what’s next:** official site says development/submission closes 2026-11-14 23:59 UTC; solo builders may enter; public repository and public X demo post required; winners announced by 2026-11-18. Judges/AI screen projects. Prize amount/track distribution must be verified against official rules before relying on any quoted total. Official: https://nearhackathon.com/
+- **PayPal AI Hackathon:** official rules say global adult individuals may enter subject to standard exclusions; submissions close 2026-11-12 12:00 PST; judging is 2026-12-01 to 2026-12-15; winners announced around 2026-12-21. Total advertised cash prizes $67,500, with $12,000 first prize and several category/sponsor prizes. **Winner announcement falls after the 2026-12-09 mission deadline**, so it cannot satisfy the deadline's awarded/claimable milestone unless the user changes the deadline. Official: https://paypalaihackathon.devpost.com/rules
+- **Meta VR Start Developer Competition:** official Meta announcement states $1m total prize pool, submissions close 2026-11-18, winners announced around 2026-12-11. It requires Start Program membership, Developer Access, eligible country, and an actual VR experience; no headset required. **Winner announcement is after 2026-12-09**, so exclude from the current 30-day award milestone unless deadline changes. Official: https://developers.meta.com/blog/meta-connect-2026-vr-start-developer-competition/ and https://start-developer-competition-26.devpost.com/rules
+- **Google Gemma 4 Developer Agent Paper Track:** Kaggle page advertises $35,000; search result says 6 days remained on 2026-11-09. Exact deadline, award announcement and payout rules must be verified from official rules before selecting.
+- **Google Gemma 4 Developer Agent Competition:** Kaggle page shows $75,000, 24 days remaining and high entrant volume as crawled 2026-11-09. This conflicts with third-party listing of $110,000 total and 2026-12-02 final submission; use official Kaggle rules, not aggregators, for prize amount and dates.
+- **Immunefi Plether Audit Competition:** search index advertised $80,000 and live with about 6 days remaining, but the opened official page snapshot showed historical contests only and did not expose Plether as live. Treat status as **unconfirmed** until direct contest page and scope/deadline are checked. Never rely on the search snippet alone.
+- **BasedAgents:** site describes a USDC paid-task marketplace where verified agents deliver signed receipts and payment releases upon acceptance or after seven days without review. This may fit the AI-agent earning model but task values, actual demand, eligibility, agent registration requirements and payout control must be audited before prioritization. Official: https://basedagents.ai/
+
+### Strategic implication
+The first route worth rapid qualification is not a storefront. It is a **portfolio of high-value, platform-native competitions/rewards with award dates before 2026-12-09**, paired with AI-native task/bounty marketplaces where the agent can independently deliver accepted work. Prioritize only those whose official rules allow the user to enter, whose required deliverable is feasible with available compute, and whose award/acceptance can occur before deadline. Competition prize pools are not individual earnings and must never be aggregated as if won.
