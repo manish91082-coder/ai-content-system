@@ -552,3 +552,38 @@ Verified earned/awarded/claimable/settled revenue remains ₹0. CI success and p
 4. For PayPal, user must create/confirm sandbox app and Gemini key, then set them locally; no secrets in chat.
 5. For NEAR, deploy only after test + WASM CI pass, on testnet with faucet funds and reviewed scoped FunctionCall access key.
 6. Final public video, X post, Devpost form, wallet address, and legal attestations require the user's actual account and truthful identity/ownership details.
+
+
+
+## 2026-11-10 EXECUTION CHECKPOINT — CI VERIFIED
+
+### AgentGuard latest branch checkpoint
+Branch: near-hackathon/agentguard-v0
+Latest verified source commit: 73cd52792b06b7ed0da27fd2d0b06446c5aacae5
+Project: https://github.com/manish91082-coder/ai-content-system/tree/near-hackathon/agentguard-v0/NEAR_AGENTGUARD
+
+Latest GitHub Actions evidence:
+- Python CI: 14 passed; attack demo reports benign intent ALLOW and blocked prompt-injection intent BLOCK before the simulated signer.
+- Rust contract CI: 11 passed, 0 failed.
+- Rust WASM release build: cargo build --target wasm32-unknown-unknown --release completed successfully.
+- Contract still not deployed to NEAR testnet. No wallet credentials or funds used.
+- This is a verified build/test milestone, not a production security audit or hackathon award.
+
+### PayPal Sentinel latest branch checkpoint
+Branch: paypal-hackathon/paypal-sentinel-v1
+Latest verified source commit: 94249610e13743d9d435c5c6bb1bdc1b2015d224
+Project: https://github.com/manish91082-coder/ai-content-system/tree/paypal-hackathon/paypal-sentinel-v1/PAYPAL_SENTINEL
+
+Latest GitHub Actions evidence:
+- Python compileall passed.
+- 9 tests passed.
+- Sandbox-only API path is implemented but not end-to-end tested with PayPal sandbox credentials or Gemini API key.
+- A public draft PR was created for review; it is intentionally not merged until a real sandbox checkout demo is verified.
+- Demo recording script: PAYPAL_SENTINEL/DEMO_RECORDING_SCRIPT.md.
+- User must create their own PayPal sandbox REST app and Gemini API key and set them locally. Do not share credentials in chat.
+
+### Execution policy update
+The user explicitly granted full permission and delegated execution decisions. Remote engineering commits and ordinary project setup are authorized. Do not take custody of user assets, request private keys/secrets in chat, make real-money transactions, bypass KYC, or fabricate public claims. Public X posts, public YouTube upload, wallet address entry, Devpost submission, and legal declarations require the user's actual account and truthful participation details.
+
+### Current revenue ledger
+Verified revenue, awarded prizes, claimable awards and settled payments remain ₹0. Code, passing CI, draft PRs and hackathon entry preparation are not income.
