@@ -150,3 +150,14 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 - Python compilation passed and all 49 regression tests passed.
 - Provider metadata check remains degraded: Groq authenticated/model listed (`openai/gpt-oss-120b`); Gemini API key returns 401 invalid/unsupported. No inference prompt is implied by the metadata check.
 - Two earlier Phase 7 CI attempts failed only on test assertions that did not match the bilingual landing-page copy; assertions were corrected, then run #39 passed. No product runtime failure was reported by those tests.
+
+
+## Phase 7B — Ujjain Interview Readiness (9 Nov 2026)
+
+- Added `product/interview-scorecard.html`: mobile-friendly Hindi-first anonymous discovery worksheet; consent gate; local-browser-only storage; CSV export; no backend/network submission; no owner/student/parent personal data fields.
+- Added `MISSION/PHASE_7B_UJJAIN_PILOT_CANDIDATES.md`: five Ujjain coaching-centre candidates from public local business listings, addresses and listing links, with sampling logic and permission-first opening script. Candidate status only; no contact has been made, no endorsement or buying intent implied. Public listing ratings are not demand evidence.
+- Added `tests/test_phase7b_interview.py` covering controls, consent/privacy wording, no network submission, and shortlist stop rules.
+- CI run #44 passed: 52 tests, Python compilation. https://github.com/manish91082-coder/ai-content-system/actions/runs/42664239867
+- Provider check remains degraded: Groq authenticated/model listed; Gemini key invalid (401). No inference prompt sent by metadata check.
+- No interview, outreach, lead conversion, paid pilot, captured payment, bank settlement or revenue is claimed.
+- Next evidence action: user/authorized operator must voluntarily approach up to three listed institutes, obtain consent, conduct interviews, and enter anonymized findings. Stop immediately on refusal.
