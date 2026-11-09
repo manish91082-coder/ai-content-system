@@ -456,3 +456,40 @@ Official sources:
 - Do not create a second project merely to use the second-entry allowance.
 - BasedAgents is not to be registered or claimed until live open funded tasks can be inspected and at least one high-value task fits our capabilities and no-human-work constraints.
 - Revenue remains **₹0 verified**. No award, task, wallet or payout has been earned or received.
+
+
+## 17. AGENTGUARD PROTOTYPE STARTED — 2026-11-09
+
+### Selected execution concept
+AgentGuard — Policy-Bound Agent Payments, targeted at NEAR HACKATHON tracks Agent Economy + AI Security & Defense. It implements a deterministic ALLOW/WARN/BLOCK gateway before an autonomous agent can reach a signer boundary, including recipient allow/block lists, transaction/daily caps, contract/method allowlists, first-interaction and counterparty-age warnings, a prompt-injection attack demo, and SHA-256 hash-chained decision receipts.
+
+### Repository execution
+- Repository: manish91082-coder/ai-content-system
+- Isolated branch: near-hackathon/agentguard-v0
+- Project directory: NEAR_AGENTGUARD/
+- Latest branch commit after scaffold and corrections: fc5b7e0e64028638150e1927c939458f94acfd40
+- Files created: README, Python policy engine, payment gateway with non-broadcasting signer stub, hash-chain receipt log with verification, prompt-injection demo, pytest suite, pyproject config, CI workflow.
+- Subsequent fixes: unknown/non-allowlisted recipients now WARN; blocked counterparties fail before signer; UTC day rollover resets demo spend counter; receipt-chain tamper test added.
+- CI workflow added at .github/workflows/agentguard-ci.yml, but no GitHub Actions run was visible at the time of this checkpoint. Do not claim tests/CI passed. The code has not yet been independently run in this environment.
+- This is a scaffold/local simulation, not a deployed NEAR contract or live payment product. No real transaction, funds, wallet or user credential has been used.
+
+### Critical NEAR Agent API safety finding
+Official NEAR Agent API docs state it is an experimental mainnet-only beta, warn users may lose assets/access, and the quickstart explicitly uses real funds (~10 USDC); there is no testnet version. Do not connect this mission to the Agent API or request funding. Preferred next architecture is a NEAR testnet contract that holds only testnet funds and enforces the policy itself, invoked by a narrowly scoped FunctionCall access key. This is a design decision, not yet implemented. A FunctionCall key cannot perform native transfers or replace account keys; contract-side enforcement is required.
+
+Official references:
+- https://docs.agentsonintents.com/integration/agent-api/overview
+- https://docs.agentsonintents.com/integration/agent-api/concepts
+- https://docs.agentsonintents.com/integration/agent-api/quickstart/introduction
+- https://github.com/nearai/near-hackathon-prompt-examples/blob/main/tracks/06-security.md
+- https://github.com/nearai/near-hackathon-prompt-examples/blob/main/tracks/07-agents.md
+- https://docs.near.org/protocol/accounts-contracts/access-keys
+
+### Next engineering gate
+1. Retrieve the live HACKATHON.md before final submission; exact official prize payment terms, IP terms and participant eligibility remain unverified.
+2. Add a NEAR testnet smart contract implementing owner-registered agent policy, recipient allowlist/blocklist, per-payment/daily limits, freeze, and contract-held testnet transfers.
+3. Add tests for allowed payment, blocked destination, daily cap, frozen agent, unauthorized caller, and prompt-injection attempt.
+4. Add a testnet deployment/demo path only after contract tests and access-key scope are verified. No mainnet money.
+5. Run GitHub Actions and inspect logs before claiming a pass. Create public repo and X demo post only after complete demo; user must authorize/publish X post and supply/confirm NEAR payout address in the secure official form.
+
+### Revenue status
+₹0 verified. No task accepted, award won, wallet credited or payout received. NEAR is a competition opportunity only, not a revenue guarantee. The ₹10 crore mission target and Day-30 primary / Day-90 contingency clocks remain unchanged.
