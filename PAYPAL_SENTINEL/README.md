@@ -15,9 +15,9 @@ The AI model may propose a cart but never sets the payable amount, changes the c
 3. Deterministic policy checks the SKU against the catalog and calculates the price using server-side Decimal values.
 4. The policy returns ALLOW, WARN or BLOCK.
 5. WARN requires a one-time approval token stored by hash in SQLite.
-6. The backend creates a PayPal Orders v2 sandbox order.
+6. The backend reserves daily spend and creates a PayPal Orders v2 sandbox order using an idempotency key.
 7. The buyer approves the payment in PayPal Checkout.
-8. The backend captures the order and verifies COMPLETED status, currency and exact amount before marking it complete.
+8. The backend atomically moves the order into a capture-in-progress state, captures it, and verifies COMPLETED status, currency and exact amount. An uncertain capture is frozen for reconciliation rather than retried blindly.
 
 ## Run locally
 
@@ -32,11 +32,10 @@ python -m pip install -e ".[dev]"
 copy .env.example .env
 ~~~
 
-Fill the following variables in the local .env file:
+Fill these variables in the local .env file:
 - PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET from a PayPal Developer SANDBOX REST app.
 - GEMINI_API_KEY from Google AI Studio.
 - GEMINI_MODEL defaults to gemini-3.8-flash.
-- APPROVAL_SECRET must be at least 32 random characters.
 
 Start the server:
 
@@ -53,6 +52,7 @@ Open http://127.0.0.1:8000.
 - The PayPal buyer must approve the checkout.
 - Orders and approvals are bound to stored server-side plans.
 - Captures are checked against the approved amount and currency.
+- A capture with an uncertain outcome is not automatically retried.
 
 ## Test
 
