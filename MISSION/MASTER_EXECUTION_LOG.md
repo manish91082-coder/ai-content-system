@@ -26,6 +26,9 @@ Autonomous Internet Revenue Engine. Target: ₹10 crore actual settled revenue w
 - [x] Scheduled workflow executions force TEST_MODE=true.
 - [x] Added compile and unittest steps before the daily pipeline.
 - [x] Added nine regression tests.
+- [x] Migrated Gemini to maintained Google GenAI SDK and current free-tier model.
+- [x] Replaced obsolete Groq model with current free-plan model.
+- [x] Added official provider research and data-use constraints.
 - [x] Created phase report and preserved mission constitution.
 
 ## Commits
