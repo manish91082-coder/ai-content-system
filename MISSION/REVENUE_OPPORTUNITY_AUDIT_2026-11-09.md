@@ -555,3 +555,31 @@ Track the following separately: earned/awarded; accepted/approved; vested/claima
 
 ### Immediate decision rule
 Prioritize opportunities with (a) entry open to India-based individual; (b) official rules permit the planned AI-assisted workflow; (c) one high-quality submission can be produced without user calls/manual sales; (d) judging/award/acceptance before Dec 9; (e) real award entitlement rather than a large pool headline. The next research phase must inspect official rulebooks and build one focused deliverable only after qualification. No product-storefront work should displace this route-first evaluation.
+
+
+## FOLLOW-UP AUDIT — LIVE AGENT / PRIZE ROUTES (2026-11-09)
+
+### NEAR Hackathon — official requirements
+Official page https://nearhackathon.com/ lists Agent Economy, AI Security & Defense and Real-World Money tracks. Agent Economy explicitly targets agents that earn, spend, negotiate, hire other agents and pay for APIs/compute/data. AI Security & Defense targets spending limits, policy engines, sandboxed wallets, reputation and scam detection. Solo entry is allowed; up to two independent projects per person, each cross-referencing the other in its README. Submission requires a working prototype, public repo, public X demo post tagged @NEARProtocol and #NEARHackathon, and form submission by 14 Nov 2026 23:59 UTC. Results by 18 Nov 2026 23:59 UTC. Initial Claude Code/Codex screening checks whether the project runs and matches its README, followed by human judging.
+
+The official page snapshot did not expose the complete prize table. Secondary reference https://www.loops.house/near-hackathon reports $250,000 total, $55,000 grand prize, and per-track $10,000/$3,000/$2,000, paid in NEAR. Treat this prize breakdown as provisional until official HACKATHON.md / submission form is inspected. No entry or award is claimed.
+
+### BasedAgents — verified mechanism, unverified supply
+Official docs https://basedagents.ai/docs/agents describe agent registration, user-controlled Base USDC wallet, open-task browsing, claiming, signed delivery, acceptance and escrow release. A delivered task is auto-accepted after seven days without review. Docs say browse/post are free and no platform fee is taken; default escrow temporarily holds funded bounty. The indexed marketplace showed a 0.10 USDC pilot task, but live funded inventory, median bounty and meaningful task volume could not be verified from the accessible public API snapshot. Decision: low-cost optional route only; do not equate task marketplace existence with high-value demand. Do not register, claim or set wallet without an appropriate funded task and user authorization for key/wallet setup.
+
+Sources: https://basedagents.ai/docs/agents ; https://basedagents.ai/docs/getting-started ; https://basedagents.ai/about ; https://basedagents.ai/tasks ; https://github.com/maxfain/basedagents
+
+### Immunefi Plether — Day-30 excluded, Day-90 candidate
+Official contest page https://immunefi.com/audit-competition/plether/information/ showed live competition ending 16 Nov 2026 10:00 UTC; pool categories $56,000 primary, $16,000 All Stars, $8,000 podium; USDC on Ethereum; runnable PoC required. Milestones: results published 17 Dec and payment complete 18 Dec 2026. Thus it cannot produce a confirmed award/payment by 9 Dec; only 90-day contingency. Total pool is not individual earnings. Scope and code quality gate must be met; no unauthorized testing or unverified AI reports.
+
+### Google Gemma 4 — official Kaggle reconciliation
+Official main competition page https://www.kaggle.com/competitions/gemma-4-developer-agent/overview states entry deadline 25 Nov, final submission 2 Dec, main prizes $65,000 ($37k/$18k/$10k). Paper track https://www.kaggle.com/competitions/gemma-4-developer-agent-paper/overview/submission-requirements has 12 Nov 23:59 UTC deadline and $35,000 prize pool. Another prizes page lists an additional $10,000 small-model bonus; do not add it to a headline total unless exact eligibility is met. Main benchmark requires a 12-hour agent run that patches real repositories and passes validation. No award date before Dec 9 was verified; paper track is only worth pursuing if original research already exists. Main agent competition is 90-day contingency, not Day-30 confirmed revenue.
+
+### Ranking and decision
+1. NEAR Hackathon: strongest opportunity for a decision by Nov 18; official prize table and full rules still need verification.
+2. BasedAgents: task-level immediate USDC possibility, but current funded task inventory and payout scale remain unverified.
+3. Gemma 4 main: high-value but technically difficult and award/settlement timing uncertain; contingency only.
+4. Immunefi Plether: verified live, but results/payment Dec 17–18; 90-day contingency only.
+5. Gemma Paper: deadline Nov 12, award timing unverified; pursue only if original research already exists.
+
+Revenue remains ₹0 verified. No competition entry, accepted task, award, wallet credit or payout has been earned.
