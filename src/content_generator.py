@@ -1,6 +1,6 @@
 """
 Content Generator — Module 3a
-Uses Gemini 2.0 Flash (primary) + Groq Llama 3.1 (backup)
+Uses Gemini 3.5 Flash-Lite (primary) + Groq GPT-OSS 120B (backup)
 Generates Hindi content: titles, scripts, descriptions, hashtags
 """
 
@@ -9,7 +9,6 @@ import json
 import time
 import random
 from loguru import logger
-from tenacity import retry, stop_after_attempt, wait_exponential
 from google import genai
 from groq import Groq
 
