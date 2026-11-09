@@ -25,6 +25,7 @@ class AppAudit(HTMLParser):
 
 
 class ProductKitTests(unittest.TestCase):
+    # Phase 6 pilot package regression checks.
     def test_html_parses_and_has_required_controls(self):
         content = APP.read_text(encoding="utf-8")
         parser = AppAudit()
