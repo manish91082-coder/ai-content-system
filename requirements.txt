@@ -1,6 +1,6 @@
 google-genai==2.33.0
 groq==0.11.0
-supabase==2.9.1
+supabase==2.34.1
 requests==2.32.3
 python-telegram-bot==21.6
 google-auth>=2.56.0,<3.0.0
