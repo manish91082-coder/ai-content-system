@@ -166,7 +166,7 @@ class Database:
             "content_type": content_type,
             "title": title,
             "script": script,
-            "metadata": json.dumps(metadata),
+            "metadata": metadata,
             "status": "generated",
             "created_at": datetime.utcnow().isoformat()
         }
@@ -177,6 +177,13 @@ class Database:
                 return result.data[0]["id"]
             except Exception as e:
                 logger.error(f"Save content failed: {e}")
+                return "mock_id"
+        elif self.use_rest:
+            try:
+                result = _rest_request("POST", "content_items", data)
+                return result[0]["id"] if result else "mock_id"
+            except Exception as e:
+                logger.error(f"Save content failed (REST): {e}")
                 return "mock_id"
         else:
             import uuid
@@ -190,7 +197,7 @@ class Database:
         """Update content status (generated/published/failed)"""
         data = {"status": status, "updated_at": datetime.utcnow().isoformat()}
         if file_paths:
-            data["file_paths"] = json.dumps(file_paths)
+            data["file_paths"] = file_paths
         
         if self.client:
             try:
@@ -198,6 +205,12 @@ class Database:
                     .update(data).eq("id", content_id).execute()
             except Exception as e:
                 logger.error(f"Update content failed: {e}")
+        elif self.use_rest:
+            try:
+                query = urllib.parse.urlencode({"id": f"eq.{content_id}"})
+                _rest_request("PATCH", "content_items", data, params=query)
+            except Exception as e:
+                logger.error(f"Update content failed (REST): {e}")
 
     def get_pending_content(self) -> list:
         """Get content ready for publishing"""
@@ -210,6 +223,15 @@ class Database:
                 return result.data
             except Exception as e:
                 logger.error(f"Get pending content failed: {e}")
+                return []
+        elif self.use_rest:
+            try:
+                query = urllib.parse.urlencode({
+                    "select": "*", "status": "eq.ready_to_publish"
+                })
+                return _rest_request("GET", "content_items", params=query)
+            except Exception as e:
+                logger.error(f"Get pending content failed (REST): {e}")
                 return []
         return []
 
