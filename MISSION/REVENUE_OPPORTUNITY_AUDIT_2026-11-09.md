@@ -583,3 +583,14 @@ Official main competition page https://www.kaggle.com/competitions/gemma-4-devel
 5. Gemma Paper: deadline Nov 12, award timing unverified; pursue only if original research already exists.
 
 Revenue remains ₹0 verified. No competition entry, accepted task, award, wallet credit or payout has been earned.
+
+
+## NEAR HACKATHON PROTOTYPE / API SAFETY ADDENDUM (2026-11-09)
+
+A new isolated branch was created in the user's repository: near-hackathon/agentguard-v0, project path NEAR_AGENTGUARD/, latest commit fc5b7e0e64028638150e1927c939458f94acfd40. AgentGuard is a policy-bound agent payment gateway for the Agent Economy + AI Security & Defense tracks. Current scaffold includes deterministic ALLOW/WARN/BLOCK policy checks, spending/recipient controls, signer stub that does not broadcast, prompt-injection demo, SHA-256 receipt chain, pytest tests, and a GitHub Actions workflow. It is not yet run, deployed or integrated with NEAR. No CI pass is claimed.
+
+Important official docs finding: NEAR Agent API is experimental and mainnet-only; the quickstart requires real funds (~10 USDC) and there is no testnet version. The docs warn of asset loss. It is therefore excluded from our build until explicit owner authorization and a rigorous safety review; no real funds will be used. Preferred proof-of-concept path is a custom NEAR testnet contract that holds only testnet funds and enforces the policy, called via a narrowly scoped FunctionCall key. This requires implementation and testnet validation; it is not yet built.
+
+Official docs: https://docs.agentsonintents.com/integration/agent-api/overview ; https://docs.agentsonintents.com/integration/agent-api/quickstart/introduction ; https://docs.near.org/protocol/accounts-contracts/access-keys
+
+No award/task/revenue has been earned. ₹0 verified.
