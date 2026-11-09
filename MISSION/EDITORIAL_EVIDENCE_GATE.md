@@ -16,6 +16,13 @@ Prevent the automated pipeline from treating a headline or trend signal as suffi
 - Description prompts prohibit invented links, timestamps, and social handles.
 - The main orchestrator records an editorial block result instead of silently generating content from unsupported news/trend headlines.
 
+## Mandatory human approval gate
+- Every generated package is created with editorial_status=pending_review, editorial_approved=false, and editorial_approval_required=true.
+- The orchestrator saves assets with database status pending_editorial_review.
+- Publisher.publish_all independently requires editorial_approved=true, a non-empty approved_by identity, and a non-empty approved_at timestamp, in addition to the publishing safety gate.
+- A generated model response cannot self-approve. No automatic approval is granted.
+- The manual approval interface and secure approval mutation workflow are not yet implemented. Until that workflow exists, all generated assets remain pending review and publishing stays blocked even if the environment publishing flags are accidentally enabled.
+
 ## Important distinction
 This is a **provenance and eligibility gate**, not a full independent fact-checking system:
 - A supplied RSS excerpt may be incomplete or inaccurate.
