@@ -38,7 +38,10 @@ def build_plan(ai_result: dict[str, Any], user_prompt: str, daily_reserved: Deci
     sku = ai_result.get("sku")
     quantity = ai_result.get("quantity")
     rationale = str(ai_result.get("rationale", "AI parsed purchase request"))[:500]
-    flags = tuple(sorted({str(x).lower() for x in ai_result.get("risk_flags", []) if isinstance(x, str)}))
+    raw_flags = ai_result.get("risk_flags", [])
+    if not isinstance(raw_flags, list):
+        raw_flags = []
+    flags = tuple(sorted({x.lower() for x in raw_flags if isinstance(x, str)}))
     reasons: list[str] = []
 
     if not isinstance(sku, str) or sku not in CATALOG:
