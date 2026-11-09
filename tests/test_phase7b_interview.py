@@ -30,7 +30,7 @@ class Phase7BTests(unittest.TestCase):
             self.assertIn(required, parser.ids)
         self.assertIn("localStorage", content)
         self.assertIn("CSV", content)
-        self.assertIn("no data network", content)
+        self.assertIn("network पर नहीं भेजा जाता", content)
 
     def test_no_network_submission_or_remote_dependencies(self):
         content = PAGE.read_text(encoding="utf-8").lower()
