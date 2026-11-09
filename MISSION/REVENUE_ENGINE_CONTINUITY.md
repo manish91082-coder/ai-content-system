@@ -224,3 +224,67 @@ Any new ChatGPT thread continuing this mission must:
 - Be maximally ambitious in execution and rigorously truthful in reporting.
 
 **End of canonical continuity contract.**
+
+
+---
+
+## 11. STRATEGY CORRECTION AND REPOSITORY RESET — 2026-11-09
+
+### User correction acknowledged
+
+The user clarified that the mission must not be anchored to product selling, digital products, videos, content, SaaS, resale, or any other predetermined model. These are possible instruments only. The assistant must first identify and compare the full set of lawful online economic/revenue mechanisms, then decide the fastest evidence-backed route to ₹10 crore of actual bank-settled funds by 2026-12-09.
+
+The previous product-first framing was incorrect and is superseded.
+
+### Operating decision
+
+**Route-first, not product-first. Transaction-first, not code-first. Settlement-first, not vanity metrics.**
+
+Before building or listing anything:
+1. Census the full route universe: licensing/IP transfer, online asset sales, brokerage/transaction commission, resale/arbitrage, affiliate/referral, APIs/data/software marketplaces, automated self-serve services, security bounties, AI/data task platforms, grants/prizes, advertising/sponsorship, financial-market trading, capital raising, public procurement and any additional lawful route discovered.
+2. Identify who pays, why they pay, transaction size, buyer discovery mechanism, platform eligibility, payout timeline and unavoidable human steps.
+3. Apply hard disqualification gates for late settlement, working-capital needs, manual sales/outreach, no buyer discovery, legal/IP/privacy issues or platform restrictions.
+4. Score surviving routes by probability-weighted net bank-settled cash before deadline.
+5. Select one primary route and at most two complementary backups.
+6. Only then build/acquire the minimum asset or automation required to execute the chosen route.
+
+No product is to be built merely because it is easy to generate. No route is to be chosen because the assistant is familiar with it.
+
+### Quantitative requirement
+
+₹10 crore over 30 calendar days requires approximately ₹33.33 lakh of settled cash per day. At illustrative average transaction sizes, the target requires 10 transactions of ₹1 crore, 40 of ₹25 lakh, 100 of ₹10 lakh, 1,000 of ₹1 lakh, or 10,000 of ₹10,000. This makes transaction value and buyer discovery central to the decision.
+
+The target remains an extreme stretch outcome, not a forecast or guarantee. Only bank-confirmed cleared funds count.
+
+### Current research status
+
+The expanded cross-category audit is recorded in:
+MISSION/REVENUE_OPPORTUNITY_AUDIT_2026-11-09.md
+
+Initial findings:
+- Amazon Associates India has approximately 60-day payout timing and is unsuitable for new 30-day cash generation.
+- Amazon seller standard payment eligibility is seven days after delivery, but inventory, working capital, fulfilment and returns remain blockers at ₹0.
+- SuperProfile advertises T+1 India payout after KYC but is checkout/creator monetisation, not verified independent buyer acquisition.
+- AWS Marketplace India supports INR disbursement and daily preferences, with payment only after customer funds are collected; listing/discovery is not guaranteed.
+- Microsoft Marketplace generally pays monthly and can include 30-day card-payment maturity.
+- Bug bounty has a no-inventory, high-upside mechanism; Intigriti lists UPI for India and HackerOne allows daily payment processing subject to conditions, but rewards require valid, accepted, in-scope findings and AI-generated unverified reports are prohibited.
+- Startup awards/grants can have meaningful advertised amounts, but current official schedules may fall outside the 30-day deadline.
+- High-ticket acquisition/licensing can have larger transaction values, but buyer diligence, negotiation and escrow make it human-dependent unless a truly self-serve platform route is proven.
+
+These are preliminary filters, not a final revenue-route selection.
+
+### Repository reset completed
+
+On 2026-11-09, the default branch master working tree was reset to exactly two canonical files:
+- MISSION/REVENUE_ENGINE_CONTINUITY.md
+- MISSION/REVENUE_OPPORTUNITY_AUDIT_2026-11-09.md
+
+Reset commit: e44eaa6f0177a4b2a7d4c7c380c8961e3d8bdbdd
+
+Audit expansion commit: 7dd41894855ff717732560195940e55cf20a2647
+
+The current master tree was verified after the reset. Old Git history remains intact. Other draft PR branches were not deleted or merged; do not assume they disappeared. Keep the two canonical files as the continuity source and do not reintroduce unrelated code or product experiments without a selected revenue route.
+
+### Next task
+
+Complete the full route census and evidence-backed scorecard. Do not begin product development, generic content production, storefront setup, or user-facing selling until the route decision is made. Then execute the selected path directly, requiring the user only for unavoidable KYC/account/authorization gates.
