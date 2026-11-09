@@ -221,23 +221,24 @@ Script:
         logger.success(f"Script generated: {len(script)} chars")
         return script
 
-    def generate_description(self, topic: str, title: str, 
-                              content_type: str) -> str:
+    def generate_description(self, topic: str, title: str,
+                              content_type: str, topic_data: dict = None) -> str:
         """Generate YouTube/platform description"""
         prompt = f"""
 Write an SEO-optimized Hindi description for a {content_type} about "{topic}".
 Title: {title}
 
-Include:
-- First 2 lines: most important keywords (shown in search)
-- Main description in Hindi (200-300 words)
-- Chapters/timestamps if long video
-- 3-5 relevant links (describe as [LINK: description])
-- Social media handles: @AIContentHindi
-- Call to action: Like + Subscribe करें
-- 5-10 Hindi hashtags at the end
+Editorial evidence instructions:
+{build_editorial_context(topic_data or {"topic": topic, "category": "general"})}
 
-Return formatted description ready to paste in YouTube.
+Include:
+- A concise, accurate Hindi description
+- Chapters/timestamps only when actual timestamps are supplied
+- Cite only source URLs supplied in the evidence context; never invent links or social handles
+- Call to action only as a neutral invitation, without invented account names
+- 3-5 relevant hashtags only if genuinely relevant
+
+Do not add factual claims that are not supported by the supplied source excerpts. Return formatted description ready to paste in YouTube.
 """
         return self._call_ai(prompt)
 
@@ -296,7 +297,7 @@ Example format: "A professional Indian person looking amazed at a glowing smartp
         script = self.generate_script(topic, title, content_type, topic_data=topic_data)
         time.sleep(1)
         
-        description = self.generate_description(topic, title, content_type)
+        description = self.generate_description(topic, title, content_type, topic_data=topic_data)
         time.sleep(1)
         
         hashtags = self.generate_hashtags(topic, "youtube")
