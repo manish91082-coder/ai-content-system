@@ -1,6 +1,6 @@
 """
 Content Generator — Module 3a
-Uses Gemini 2.0 Flash (primary) + Groq Llama 3.1 (backup)
+Uses Gemini Flash (primary) + Groq GPT-OSS (backup), selected via environment
 Generates Hindi content: titles, scripts, descriptions, hashtags
 """
 
@@ -18,6 +18,8 @@ from groq import Groq
 # ─────────────────────────────────────────
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 
 CONTENT_TYPES = {
     "youtube_short": {
@@ -46,13 +48,13 @@ CONTENT_TYPES = {
     }
 }
 
-# Anti-AI-detection: randomize writing style
+# Editorial formats: vary structure for reader usefulness, not detector evasion
 WRITING_STYLES = [
     "conversational_storytelling",
     "practical_tips_list",
     "question_and_answer",
-    "personal_experience",
-    "news_style"
+    "case_study_analysis",
+    "news_explainer"
 ]
 
 class ContentGenerator:
@@ -64,7 +66,7 @@ class ContentGenerator:
         """Initialize Gemini client"""
         if GEMINI_API_KEY:
             genai.configure(api_key=GEMINI_API_KEY)
-            self.gemini_model = genai.GenerativeModel('gemini-2.0-flash-exp')
+            self.gemini_model = genai.GenerativeModel(GEMINI_MODEL)
             logger.success("Gemini initialized")
         else:
             self.gemini_model = None
@@ -89,7 +91,7 @@ class ContentGenerator:
     def _call_groq(self, prompt: str) -> str:
         """Call Groq API (backup)"""
         completion = self.groq_client.chat.completions.create(
-            model="llama-3.1-70b-versatile",
+            model=GROQ_MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.8,
             max_tokens=2000
@@ -104,7 +106,7 @@ class ContentGenerator:
                 logger.debug("Used: Gemini")
                 return result
             except Exception as e:
-                logger.warning(f"Gemini failed: {e}. Trying Groq...")
+                logger.warning(f"Gemini failed ({type(e).__name__}): {e}. Trying Groq...")
         
         if self.groq_client:
             try:
@@ -112,7 +114,7 @@ class ContentGenerator:
                 logger.debug("Used: Groq (backup)")
                 return result
             except Exception as e:
-                logger.error(f"Both AI APIs failed: {e}")
+                logger.error(f"Groq failed ({type(e).__name__}): {e}")
         
         raise Exception("All AI APIs failed")
 
@@ -155,7 +157,9 @@ Writing style: {style}
 
 Requirements:
 - Pure Hindi with Devanagari script (English technical words allowed)
-- Natural, conversational tone — not like AI, like a real person talking
+- Natural, conversational tone that is clear, specific, and useful
+- Do not invent first-person personal experiences, quotations, statistics, or sources
+- If evidence is missing, state uncertainty instead of filling gaps with invented details
 - Start with a strong hook in first 3 seconds
 - Provide genuine value and accurate information
 - End with clear call-to-action (like, subscribe, comment)
@@ -264,7 +268,7 @@ Example format: "A professional Indian person looking amazed at a glowing smartp
             "metadata": {
                 "word_count": len(script.split()),
                 "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "ai_model": "gemini-2.0-flash or groq-llama-3.1"
+                "ai_model": f"{GEMINI_MODEL} or {GROQ_MODEL}"
             }
         }
         
