@@ -22,6 +22,8 @@ Use Gemini Developer API's free-tier `gemini-3.5-flash-lite` as primary and Groq
 - Gemini SDK migrated to `google-genai==2.33.0`.
 - Gemini default model changed to `gemini-3.5-flash-lite`, overridable through `GEMINI_MODEL`.
 - Groq default model changed to `openai/gpt-oss-120b`, overridable through `GROQ_MODEL`.
+- Groq Python SDK upgraded from 0.11.0 to 1.7.0 after the 0.11.0 client failed against HTTPX 0.28.1 with an unexpected `proxies` argument.
+- Metadata-only API verification confirmed the Groq key authenticates and the target model is listed. No inference call was made.
 - Error logs now include exception class and a bounded, redacted message rather than collapsing every provider error into a generic failure.
 - Provider selection is configurable without editing code.
 
@@ -42,7 +44,8 @@ Use Gemini Developer API's free-tier `gemini-3.5-flash-lite` as primary and Groq
 - Groq billing FAQ: https://console.groq.com/docs/billing-faqs
 
 ## Limits of this verification
-- Provider account credentials and live account quotas were not accessed.
+- Provider account billing tier and live inference quota were not accessed.
+- Gemini key authentication was tested without exposing the secret; the configured secret returns 401 `UNAUTHENTICATED` with reason `ACCESS_TOKEN_TYPE_UNSUPPORTED`. Replace it with a Gemini Developer API key created in Google AI Studio, not an OAuth access token.
 - No API key value was read or printed.
 - No provider inference request was made from this environment.
 - A successful SDK import or client construction is not proof of valid authentication or model entitlement.
