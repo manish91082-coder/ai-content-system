@@ -21,3 +21,4 @@ jobs:
       - run: python -m pip install -e ".[dev]"
       - run: pytest -q
       - run: python demo/run_attack_demo.py
+      - run: bash -n scripts/deploy_testnet.sh
