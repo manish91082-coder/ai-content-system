@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - revenue-engine/phase-1-safety-fixes
+      - revenue-engine/phase-3-editorial-review
     paths:
       - "src/**"
       - "tests/**"
