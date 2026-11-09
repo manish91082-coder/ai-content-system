@@ -143,3 +143,124 @@ Next task: conduct a product/opportunity discovery sprint against real marketpla
 Then build the highest-ranked asset and its self-serve distribution/checkout path. Update this report and `MISSION/REVENUE_ENGINE_CONTINUITY.md` with the selected experiments, actual account gates, and evidence.
 
 **No product format is predetermined. The ₹10 crore / 30-day bank-settlement objective is the only North Star.**
+
+
+---
+
+## 9. EXPANDED REVENUE-PATH CENSUS — 2026-11-09
+
+### Corrected strategic interpretation
+
+The mission is **not a digital-product-selling project**. No revenue format is preselected. The decision problem is to find the fastest lawful mechanism that converts an economic value exchange into cleared bank cash by 2026-12-09, while requiring no routine owner-led sales or operations.
+
+The strategy is therefore **route-first, transaction-first, and settlement-first**. Building a product is only one possible execution instrument after a route has passed demand, distribution, payout and automation tests.
+
+### Full route universe
+
+| Route family | Economic mechanism | Main advantage | Main blocker under current constraints | Current disposition |
+|---|---|---|---|---|
+| IP / software / technology licensing | One-time licence, recurring royalty, source-code or usage rights | Potentially high transaction value without physical inventory | No verified buyer discovery channel; enterprise diligence and negotiation commonly need humans | Investigate as high-ticket path, do not assume self-serve |
+| Online asset / business transfer | Sale of an existing app, website, domain, data asset or operating business | One transaction may be large | Requires an asset with defensible ownership and proof; buyer diligence, negotiation and escrow transfer | Investigate only if an existing transferable asset is verified |
+| Brokerage / transaction commission | Fee or percentage for matching and completing a transaction | Can monetize third-party inventory or capacity without owning it | Needs both sides, trust, legal role clarity and transaction closure; no manual outreach allowed | Investigate platform-native self-serve mechanisms only |
+| Resale / retail arbitrage / dropship | Buy low, sell high, supplier fulfilment | Existing buyer demand may exist on marketplaces | Working capital, seller eligibility, fulfilment, returns, customer service and policy restrictions | Low priority at ₹0; do not assume dropshipping is compliant or cashless |
+| Affiliate / referral | Commission for attributable third-party sale or signup | No inventory and can be automated after distribution exists | Audience/discovery requirement, approval, attribution lock and payout delays | Secondary only where exact payout is within deadline |
+| Digital assets / downloadable files | One-time purchase and automatic delivery | Fast creation and low marginal fulfilment cost | Checkout is not discovery; generic assets have weak differentiation | Do not build absent a proven buyer-intent signal |
+| SaaS / software subscriptions | Recurring usage or licence revenue | Scalable and automatable | Build time, trust, customer acquisition, onboarding and marketplace payout maturity | Only if a marketplace already has relevant buyers |
+| APIs / data licensing | Usage-based or fixed licence for data/API access | Self-serve technical fulfilment; can serve global buyers | Data rights, quality, buyer discovery, marketplace eligibility and payout maturity | Strong research candidate; test demand before build |
+| Automated self-serve service | Paid computation, report, transformation or workflow completed by software | Can be fully automated and differentiated | Must solve a real urgent problem and acquire buyers without calls | Strong research candidate, not yet selected |
+| Security research / bug bounty | Reward for accepted, reproducible in-scope vulnerability | No inventory; program-native submission and reward mechanism | Very low hit-rate, validation/triage dependency, expertise, scope and automation limits | High-upside side experiment only; never mass-submit AI guesses |
+| AI/data microtasks | Payment per accepted annotation, evaluation or task | Low entry barrier on some platforms | Low ceiling, human task quotas, account availability and payout terms | Cannot support ₹10 crore target; exclude as primary |
+| Grants / contests / innovation prizes | Award paid after selection and compliance | No customer sales needed | Competitive selection, eligibility, delayed award dates and low award size relative to target | Opportunistic only; not a 30-day core route |
+| Advertising / sponsorship | Revenue from impressions, watch time, audience or brand placement | Scalable after distribution | Requires established traffic/audience and payout threshold/cycle | Exclude as primary from zero audience |
+| Trading / market arbitrage | Price movement, spreads, funding or execution advantage | Potentially fast settlement in liquid markets | Requires risk capital, fees, execution infrastructure and loss tolerance; ₹0 start makes this non-viable without unsafe leverage | Exclude as a zero-capital plan |
+| Capital raising / investment | Equity, debt, grant or strategic capital | Potentially large bank credit | Not operating revenue; due diligence, legal process, investor interaction and negotiation | Keep separate from revenue; do not count as earned revenue |
+| Public procurement / tenders | Contract award and milestone payments | Large ticket sizes | Qualification, bid security, delivery, human approvals and long payment cycles | Exclude from 30-day automated core |
+| Cloud / software marketplaces | Marketplace transaction or metered consumption | Native procurement and sometimes configurable disbursement | Seller onboarding, customer payment collection, marketplace visibility and enterprise billing cycle | Investigate only where buyer intent and first payout can be verified |
+
+### Evidence-based route filters
+
+A route is disqualified from the primary plan if any hard gate fails:
+1. It cannot legally be used by the relevant India-based person/entity.
+2. First bank settlement is structurally after 2026-12-09.
+3. It requires upfront working capital that is unavailable.
+4. It depends on calls, meetings, visits, manual prospecting, manual sales or manual demos.
+5. It has no credible buyer-discovery or demand mechanism.
+6. It relies on fabricated transactions, policy evasion, spam, unauthorized access, IP infringement or unlicensed data.
+7. It cannot fulfil or support the transaction lawfully and reliably.
+
+### Route scorecard
+
+Candidates that pass hard gates will be scored out of 100:
+- 25 points — probability of cleared bank settlement by 2026-12-09.
+- 20 points — real buyer demand and discovery without owner-led outreach.
+- 20 points — realistic transaction value / gross contribution and volume required.
+- 15 points — zero-capital launch and working-capital requirement.
+- 10 points — degree of autonomous AI fulfilment and operations.
+- 10 points — India eligibility, legal/IP/privacy/platform compliance and payout certainty.
+
+A route with a high advertised prize, large TAM, high theoretical margin or impressive technology does not score highly unless it has an actionable path to a buyer and an actual bank payout within the deadline.
+
+### New official evidence reviewed
+
+1. **Amazon India seller payments:** standard sellers become eligible seven days after delivery, and Amazon states weekly bank deposits; this does not remove inventory, delivery, returns or working-capital requirements.  
+   https://sell.amazon.in/sell-online/faq  
+   https://sell.amazon.in/fees-and-pricing
+
+2. **Amazon Associates India:** monthly payment approximately 60 days after month-end; NEFT threshold ₹1,000. This is outside the mission's 30-day cash window for newly generated commissions.  
+   https://affiliate-program.amazon.in/help/node/topic/G63DR893K4DH55XZ  
+   https://affiliate-program.amazon.in/help/operating/agreement
+
+3. **SuperProfile India:** official product pages describe KYC-gated T+1 bank settlement and a paid plan for selling; it is a checkout and creator-monetisation tool, not evidence of independent marketplace buyer acquisition.  
+   https://superprofile.bio/products  
+   https://superprofile.bio/products/digital-products
+
+4. **AWS Marketplace India:** Indian sellers can receive INR disbursements and select daily or monthly preferences. AWS says daily disbursements occur when funds become available; funds are disbursed only after collected from the customer, and bank arrival is approximately 1–2 business days after disbursement. This is a candidate payout rail, not proof that a new listing will acquire buyers.  
+   https://docs.aws.amazon.com/marketplace/latest/userguide/getting-started-seller-india.html  
+   https://docs.aws.amazon.com/marketplace/latest/userguide/managing-disbursements.html
+
+5. **Microsoft Marketplace:** payments are generally monthly, usually sent by the 15th and then take additional business days; credit-card earnings have a 30-day maturity/escrow hold.  
+   https://learn.microsoft.com/en-us/partner-center/marketplace-offers/marketplace-get-paid  
+   https://learn.microsoft.com/en-us/partner-center/marketplace-offers/payout-faq
+
+6. **HackerOne:** daily payment processing can be configured subject to thresholds and account conditions; this applies only after a qualifying reward exists. AI-assisted work remains the researcher's responsibility, and AI-generated low-signal or unverified reports are prohibited.  
+   https://docs.hackerone.com/en/articles/8395720-payment-preferences  
+   https://www.hackerone.com/policies/code-of-conduct
+
+7. **Bugcrowd:** cash rewards require a valid in-scope vulnerability, reproducible by the program's triage team, and first valid submission.  
+   https://docs.bugcrowd.com/researchers/receiving-rewards/getting-rewarded/
+
+8. **Intigriti:** India-resident researchers can select UPI; identity verification and payout compliance states apply, and bounty payout is created after acceptance.  
+   https://kb.intigriti.com/en/articles/3379502-payout-methods  
+   https://kb.intigriti.com/en/articles/13653510-payouts
+
+9. **DPIIT National Startup Awards 6.0:** category winners are advertised at ₹25 lakh, but the official page schedules winner announcements for 16 January 2027, beyond the 30-day mission deadline.  
+   https://www.startupindia.gov.in/content/sih/en/nsa2026.html
+
+10. **Acquire.com acquisition process:** the process includes buyer evaluation, information access, LOI negotiation, due diligence, asset purchase agreement, escrow and asset transfer. It can facilitate a high-value sale but is not a passive, one-click, no-human transaction.  
+    https://help.acquire.com/what-is-the-acquisition-process-for-sellers  
+    https://help.acquire.com/how-does-acquire.com-work
+
+### Mathematical implication
+
+The target requires approximately ₹33.33 lakh of settled funds per calendar day. Examples of required completed transactions:
+- 10 × ₹1 crore
+- 40 × ₹25 lakh
+- 100 × ₹10 lakh
+- 1,000 × ₹1 lakh
+- 10,000 × ₹10,000
+
+No current evidence establishes a buyer cohort, existing distribution asset, transferable asset valuation, or accepted bounty pipeline capable of supporting these quantities. The target remains an extreme stretch outcome; it must not be converted into a fabricated forecast.
+
+### Strategic decision as of this checkpoint
+
+**Decision:** Do not build or list a product yet. First finish the cross-category route census and rank routes by probability-weighted net bank-settled cash before the deadline.
+
+The next shortlist must include, at minimum:
+- High-ticket licensing / existing IP or asset transfer, if a legitimate asset and platform-native buyer discovery are verified.
+- API/data/software marketplace monetisation, only after buyer demand and onboarding/payout gates are verified.
+- Automated self-serve transaction/service models with real marketplace discovery.
+- A strictly scoped, AI-assisted bug-bounty research experiment only if safe, authorized scope and human validation are available.
+
+Fast-payout creator storefronts, generic digital products, affiliate marketing, ads, inventory-based resale, grants and contests must not be treated as the default route. They may re-enter only if evidence demonstrates a superior path to cleared cash.
+
+**No primary revenue route has been selected yet.** This is deliberate: selecting a familiar model before the route census is complete would repeat the previous strategic error.
