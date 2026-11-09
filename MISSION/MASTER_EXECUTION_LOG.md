@@ -9,7 +9,8 @@ Autonomous Internet Revenue Engine. Stretch target: ₹10 crore in actual settle
 - Phase 3 branch is based on the unmerged Phase 1/2 PR head; PR #1 remains open and unmerged.
 - Repository: https://github.com/manish91082-coder/ai-content-system
 - Default branch: master
-- Draft PR #1: https://github.com/manish91082-coder/ai-content-system/pull/1
+- Draft PR #1 (Phase 1/2): https://github.com/manish91082-coder/ai-content-system/pull/1
+- Draft PR #2 (Phase 3, stacked on Phase 1 branch): https://github.com/manish91082-coder/ai-content-system/pull/2
 - PR is unmerged. No production deployment and no live publishing have occurred.
 
 ## Phase 0 — repository audit
@@ -47,12 +48,19 @@ Detailed documents:
 - MISSION/REPOSITORY_AUDIT_2026-11-09.md
 
 ## Automated verification
-GitHub Actions CI run #24 passed:
+GitHub Actions CI run #29 passed on the Phase 3 branch:
+https://github.com/manish91082-coder/ai-content-system/actions/runs/42652645914
+
+- Dependencies installed; Python compilation passed for src, tests and scripts.
+- 30 regression tests passed, including Supabase REST JSONB persistence, review fingerprint integrity, service-key rejection and static SQL security checks.
+- Provider metadata check completed in degraded state: Groq authenticated/model listed; Gemini still returns 401. No inference prompt was sent.
+
+Earlier Phase 1/2 verification (run #24) passed:
 https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 
 - Dependencies installed.
 - Python source and tests compiled.
-- 21 regression tests passed.
+- 21 regression tests passed in run #24.
 - Provider metadata check completed in degraded state.
 - Groq credential authenticated and openai/gpt-oss-120b model listed.
 - Gemini credential failed with HTTP 401 UNAUTHENTICATED / ACCESS_TOKEN_TYPE_UNSUPPORTED. Google reports the configured API key is invalid or unsupported. The secret value was not exposed.
@@ -69,7 +77,7 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 1. Account owner must replace the invalid GEMINI_API_KEY secret if Gemini is to be used. Do not paste secrets into chat.
 2. Confirm Groq account billing tier and available free quota before controlled inference.
 3. Add source authority scoring, article retrieval and cross-source corroboration; complete the private asset review/fulfilment workflow.
-4. Redesign Supabase RLS before production data use.
+4. Apply and verify the Phase 3 review SQL and redesign legacy Supabase RLS before production data use.
 5. Build product catalogue, checkout, order lifecycle, automated fulfilment, refund handling, affiliate attribution and settlement reconciliation.
 6. Validate one narrow customer offer with a real paid pilot.
 
