@@ -273,8 +273,8 @@ class ResearchEngine:
         
         # 3. YouTube Trending
         yt_topics = self.get_youtube_trending()
-        for t in yt_topics:
-            all_topics.append({"topic": t, "source": "youtube", "category": "trending"})
+        for item in yt_topics:
+            all_topics.append(item)
         
         # 4. Add some evergreen topics as fillers
         for _ in range(5):
