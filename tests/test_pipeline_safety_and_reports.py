@@ -7,6 +7,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from pipeline_safety import publishing_is_enabled
 from telegram_bot import TelegramBot
+from publisher import Publisher
 
 
 class PublishingSafetyTests(unittest.TestCase):
@@ -30,6 +31,12 @@ class PublishingSafetyTests(unittest.TestCase):
         self.assertFalse(publishing_is_enabled({
             "PUBLISH_ENABLED": "sometimes", "TEST_MODE": "false"
         }))
+
+    def test_publisher_itself_blocks_live_calls_by_default(self):
+        publisher = object.__new__(Publisher)
+        result = publisher.publish_all({}, {}, {})
+        self.assertFalse(result["publishing"]["success"])
+        self.assertIn("PUBLISH_ENABLED", result["publishing"]["error"])
 
 
 class TelegramReportTests(unittest.TestCase):
