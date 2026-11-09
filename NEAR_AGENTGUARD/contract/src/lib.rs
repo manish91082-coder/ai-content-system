@@ -242,3 +242,24 @@ mod tests {
         let _ = contract.pay(account("vendor.testnet"), U128(1), "test".into());
     }
 }
+
+
+    #[test]
+    #[should_panic(expected = "agent not registered")]
+    fn revoked_agent_cannot_pay() {
+        let mut contract = setup();
+        context(account("owner.testnet"), 1);
+        contract.revoke_agent(account("worker.testnet"));
+        context(account("worker.testnet"), 1);
+        let _ = contract.pay(account("vendor.testnet"), U128(1), "revoked".into());
+    }
+
+    #[test]
+    fn daily_limit_resets_on_next_utc_day() {
+        let mut contract = setup();
+        context(account("worker.testnet"), 1);
+        let _ = contract.pay(account("vendor.testnet"), U128(10), "day-one".into());
+        context(account("worker.testnet"), NANOS_PER_DAY + 1);
+        let _ = contract.pay(account("vendor.testnet"), U128(10), "day-two".into());
+        assert_eq!(contract.spent_today, 10);
+    }
