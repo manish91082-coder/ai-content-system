@@ -121,3 +121,13 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 - Provider status from that run: Groq authenticated and model listed (`openai/gpt-oss-120b`); Gemini key still returns 401 UNAUTHENTICATED. No inference prompt sent by provider metadata check.
 - No checkout, live gateway, webhook endpoint, customer delivery, bank reconciliation, Supabase deployment, publishing, PR merge or revenue collection activated.
 - Next implementation gate: provider sandbox adapter only after owner merchant-account/KYC and webhook contract are available; then private asset delivery and settlement reconciliation. Live payments require explicit owner authorization.
+
+## Phase 6 — First Product Pilot: Admission Desk Lite (9 Nov 2026)
+
+- Branch: `revenue-engine/phase-6-coaching-kit`, based on Phase 5 order core.
+- Market hypothesis: small coaching institutes/tuition centres need a low-cost, easy-to-use way to record enquiries, track stage and schedule follow-up. Evidence reviewed includes India SME Forum 2025 survey of 7,835 MSMEs (53.8% at least one digital tool; 52.6% report difficulty identifying suitable tools), Google/India SME Forum/Deloitte-reported skill and budget constraints, and listed education CRM alternatives. These are category/context signals, not proof of demand or willingness to pay for this product.
+- Built `product/admission-desk-lite.html`: standalone offline-first Hindi/English enquiry tracker, local browser storage, pipeline, follow-up due summary, search/filter, CSV import/export and consent-gated WhatsApp draft. No external JS, analytics, server, automatic message sending or paid API.
+- Added `product/QUICK_START.md`, `product/MESSAGE_TEMPLATES.md`, and `MISSION/PHASE_6_MARKET_VALIDATION.md` with limitations, privacy boundaries and validation thresholds.
+- Added `tests/test_product_kit.py`; CI now watches Phase 6 branch, product and mission paths.
+- Product is an unvalidated pilot. No customer interview, paid order, public listing, checkout or distribution has been completed. Do not claim product-market fit or revenue.
+- Next: pass CI, then create a demo with fictional records and run a small, legitimate customer-validation experiment before selecting price or activating payment.
