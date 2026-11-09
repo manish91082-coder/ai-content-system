@@ -117,11 +117,25 @@ class PaymentGateway:
         self.signer = signer
         self.receipts = ReceiptLog(receipt_path)
         self.approval_authority = approval_authority
-        self.spent_today = Decimal("0")
         self._spend_day = datetime.now(timezone.utc).date()
         self._lock = threading.RLock()
+        self.spent_today = self._restore_daily_spend(self._spend_day)
+
+    def _restore_daily_spend(self, day) -> Decimal:
         if not self.receipts.verify():
             raise RuntimeError("receipt log integrity check failed; gateway startup refused")
+        total = Decimal("0")
+        for timestamp, event in self.receipts.events():
+            try:
+                event_day = datetime.fromisoformat(timestamp).astimezone(timezone.utc).date()
+                if event_day == day and event.get("signer_called") is True:
+                    amount = Decimal(event["amount"])
+                    if not amount.is_finite() or amount <= 0 or event.get("asset") != "NEAR":
+                        raise ValueError("invalid settled-intent receipt")
+                    total += amount
+            except (ValueError, TypeError, KeyError) as exc:
+                raise RuntimeError("receipt contains invalid spend history") from exc
+        return total
 
     def authorize(
         self,
@@ -132,7 +146,7 @@ class PaymentGateway:
         with self._lock:
             today = datetime.now(timezone.utc).date()
             if today != self._spend_day:
-                self.spent_today = Decimal("0")
+                self.spent_today = self._restore_daily_spend(today)
                 self._spend_day = today
 
             result = evaluate(intent, self.policy, self.spent_today, signals)
