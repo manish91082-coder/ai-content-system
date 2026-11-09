@@ -1,0 +1,25 @@
+name: PayPal Sentinel CI
+on:
+  push:
+    paths:
+      - 'PAYPAL_SENTINEL/**'
+      - '.github/workflows/paypal-sentinel-ci.yml'
+  pull_request:
+    paths:
+      - 'PAYPAL_SENTINEL/**'
+      - '.github/workflows/paypal-sentinel-ci.yml'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: PAYPAL_SENTINEL
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m compileall -q paypal_sentinel
+      - run: pytest -q
