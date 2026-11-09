@@ -1,4 +1,5 @@
 import sys
+import os
 import unittest
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from pipeline_safety import publishing_is_enabled
 from telegram_bot import TelegramBot
 from publisher import Publisher
 from content_generator import ContentGenerator
-from editorial_qa import topic_is_generation_eligible, build_editorial_context, build_source_metadata
+from editorial_qa import topic_is_generation_eligible, build_editorial_context, build_source_metadata, editorial_package_approved
 
 
 class PublishingSafetyTests(unittest.TestCase):
@@ -116,6 +117,33 @@ class EditorialEvidenceTests(unittest.TestCase):
         self.assertEqual(metadata["evidence_status"],
                          "source_excerpt_supplied_not_independently_verified")
         self.assertEqual(metadata["sources"][0]["url"], "https://example.org/story")
+
+    def test_editorial_approval_requires_human_identity_and_timestamp(self):
+        self.assertFalse(editorial_package_approved({
+            "metadata": {"editorial_approved": True}
+        }))
+        self.assertTrue(editorial_package_approved({
+            "metadata": {
+                "editorial_approved": True,
+                "approved_by": "human-reviewer",
+                "approved_at": "2026-11-09T12:00:00Z"
+            }
+        }))
+
+    def test_publisher_blocks_even_when_live_gate_is_open_without_editorial_approval(self):
+        publisher = object.__new__(Publisher)
+        package = {
+            "title": "Test", "description": "Test", "metadata": {
+                "editorial_status": "pending_review",
+                "editorial_approved": False
+            }
+        }
+        with unittest.mock.patch.dict(os.environ, {
+            "PUBLISH_ENABLED": "true", "TEST_MODE": "false"
+        }, clear=False):
+            result = publisher.publish_all(package, {}, {})
+        self.assertFalse(result["editorial_approval"]["success"])
+        self.assertEqual(result["editorial_approval"]["status"], "pending_review")
 
 
 class TelegramReportTests(unittest.TestCase):
