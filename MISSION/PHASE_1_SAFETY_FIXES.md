@@ -13,7 +13,7 @@ Changes made:
 - `src/main.py`: records publishing as blocked when the safety gate is closed; does not call `publisher.publish_all` in that state; only records actual publisher result dictionaries.
 - `src/pipeline_safety.py`: publishing requires both `PUBLISH_ENABLED=true` and `TEST_MODE=false`. Missing or malformed values block publishing.
 - `.github/workflows/daily_content.yml`: scheduled executions force test mode; live publishing additionally requires the repository variable `PUBLISH_ENABLED` to be explicitly set to true.
-- `tests/test_pipeline_safety_and_reports.py`: nine regression tests cover default-deny behavior, explicit gate conditions, nested/legacy reporting, malformed payloads, and HTML escaping.
+- `tests/test_pipeline_safety_and_reports.py`: ten regression tests cover default-deny behavior, explicit gate conditions, nested/legacy reporting, malformed payloads, and HTML escaping.
 - Workflow now runs Python compile checks and unit tests before the content pipeline.
 
 ## 2. Safety semantics
@@ -26,13 +26,18 @@ Scheduled runs force `TEST_MODE=true`. The repository variable has not been enab
 
 ## 3. Verification status
 
+- Dedicated GitHub Actions CI run #3 succeeded: dependency installation, Python source/test compilation, and all 10 regression tests passed. Run: https://github.com/manish91082-coder/ai-content-system/actions/runs/42648302328
+- The first two CI attempts exposed real dependency conflicts: Google GenAI required HTTPX >=0.28.1 while Supabase 2.9.1 required HTTPX <0.28. The dependency set was reconciled by moving to Supabase 2.34.1 and HTTPX 0.28.1. The successful third run installed the full requirements set cleanly.
+
+## 4. Verification status
+
 - Source changes committed to the isolated branch.
-- Eight equivalent logic/report sanity checks were exercised in the assistant's local analysis environment and passed.
-- Full repository test suite and GitHub Actions execution have **not yet been run**. The execution environment could not clone the public GitHub repository because network DNS resolution failed. The new workflow test step will run on the next authorized GitHub Actions execution.
+- GitHub Actions CI run #3 passed all 10 regression tests and Python compile checks.
+- Full automated CI test suite has now run successfully on the isolated branch. No live provider inference or social publishing has been run.
 - No PR merged; no changes deployed to `master`.
 - No production API credentials were inspected or changed.
 
-## 4. Known remaining blockers
+## 5. Known remaining blockers
 
 - Gemini authentication failure from run #17 remains unresolved pending a valid key check. The obsolete Groq model ID has been replaced, but a live inference request is still pending.
 - Telegram credentials were absent in the observed run; reporting is now safer but delivery remains unconfigured.
@@ -40,7 +45,7 @@ Scheduled runs force `TEST_MODE=true`. The repository variable has not been enab
 - Supabase schema's broad RLS policies need security redesign before production use.
 - No checkout, product catalogue, order/fulfilment, affiliate attribution, refunds, or settlement ledger exists yet.
 
-## 5. Provider migration findings
+## 6. Provider migration findings
 
 - Gemini's previous model ID `gemini-2.0-flash-exp` is no longer a suitable default; Google's current catalogue recommends newer model IDs. The legacy `google-generativeai` Python SDK is deprecated/not actively maintained.
 - Gemini SDK migrated to `google-genai==2.33.0`; default model is `gemini-3.5-flash-lite`, which Google's current pricing page lists as free on the Free Tier.
@@ -49,7 +54,7 @@ Scheduled runs force `TEST_MODE=true`. The repository variable has not been enab
 - Google unpaid-tier content may be used to improve Google products and reviewed by human reviewers. Do not submit confidential or personal data.
 - Full details and official source links: `MISSION/AI_PROVIDER_RESEARCH_2026-11-09.md`.
 
-## 6. Next gate
+## 7. Next gate
 
 1. Run the regression workflow on this branch and inspect exact test results.
 2. Diagnose the provider failures with current official provider documentation and non-secret configuration checks.
