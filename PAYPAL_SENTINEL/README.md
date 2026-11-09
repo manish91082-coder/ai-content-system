@@ -29,7 +29,10 @@ python -m venv .venv
 # Linux / WSL:
 # source .venv/bin/activate
 python -m pip install -e ".[dev]"
-copy .env.example .env
+# Windows PowerShell:
+Copy-Item .env.example .env
+# Linux / WSL:
+cp .env.example .env
 ~~~
 
 Fill these variables in the local .env file:
