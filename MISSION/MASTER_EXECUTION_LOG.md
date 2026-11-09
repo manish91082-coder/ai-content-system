@@ -143,3 +143,10 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 - No personal information is collected or transmitted by these pages. No telemetry, backend, payment checkout, contact form, live payment, public hosting, or automated fulfilment is configured.
 - This is a demo/validation asset release, not a completed customer-acquisition experiment. No owner interviews, qualified leads, orders, captured payments, bank settlements, or revenue are claimed.
 - Next evidence gate: run a small number of genuine coaching-centre owner interviews/usability sessions. A stated willingness to pay is not a sale; settled revenue requires bank reconciliation.
+
+
+### Phase 7 CI verification update
+- GitHub Actions run #39 passed on commit `a0b4b275843b9172d5a18c40bdc2e599c2cc36ff`: https://github.com/manish91082-coder/ai-content-system/actions/runs/42662677257
+- Python compilation passed and all 49 regression tests passed.
+- Provider metadata check remains degraded: Groq authenticated/model listed (`openai/gpt-oss-120b`); Gemini API key returns 401 invalid/unsupported. No inference prompt is implied by the metadata check.
+- Two earlier Phase 7 CI attempts failed only on test assertions that did not match the bilingual landing-page copy; assertions were corrected, then run #39 passed. No product runtime failure was reported by those tests.
