@@ -145,6 +145,8 @@ async def capture_paypal_order(order_id: str):
         if result.get("status") != "COMPLETED":
             raise PayPalError("PayPal did not report COMPLETED")
         unit = result["purchase_units"][0]
+        if unit.get("custom_id") != payment["plan_id"]:
+            raise PayPalError("Captured order reference does not match approved plan")
         capture = unit["payments"]["captures"][0]
         captured_amount = capture["amount"]
         if captured_amount["currency_code"] != payment["currency"] or captured_amount["value"] != payment["amount"]:
