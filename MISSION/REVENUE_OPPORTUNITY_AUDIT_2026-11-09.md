@@ -521,3 +521,37 @@ Official sources:
 Smart-contract competitions/bounties are more interesting than generic microtasks because prize pools can be large and the user has prior exposure to smart-contract engineering. But the payment mechanics, individual award dilution, competition schedule, human responsibility for validation, and USDC-to-bank conversion all prevent treating the advertised prize pool as predictable cash.
 
 This route may be tested in parallel only as a bounded, authorized research experiment. It must not distract from identifying a higher-probability transaction mechanism. No exploit against live systems, unauthorized probing, automated traffic, or unverified submissions are permitted.
+
+
+## 7. ADDENDUM — REVISED WALLET/PRIZE MILESTONE AND LIVE OPPORTUNITIES (2026-11-09)
+
+### User's explicit clarification
+The user says payment may be received through any mode (platform wallet, crypto, PayPal, bank, etc.); the earning route is the priority and withdrawal mode can be decided later. Accordingly, evaluate opportunities by the ability to earn and obtain a genuine, user-attributable, claimable/withdrawable award or balance. Do not disqualify a high-value route only because it does not directly settle to an Indian bank within the initial 30-day window.
+
+Track the following separately: earned/awarded; accepted/approved; vested/claimable; withdrawable; withdrawal requested; destination settled; fees/taxes/refunds/reversals; net realized. A prize pool, unjudged submission, estimated leaderboard position, pending reward, or someone else's escrow is not revenue. Do not promise two-minute withdrawal: award release, platform review, KYC, wallet/network confirmation and bank processing can take longer.
+
+### Newly discovered opportunities (status as of 2026-11-09)
+
+| Opportunity | Publicly reported terms | Deadline / award timing | Preliminary decision |
+|---|---|---|---|
+| NEAR Hackathon — Build what’s next | Official site requires working prototype, public repository, public X demo post, submission form; solo builder allowed; up to two independent projects per person. Site says AI screening plus human judging. | Submission closes Nov 14, 2026 23:59 UTC; results by Nov 18. | **Immediate qualification candidate.** Confirm official prize table, track fit, payout terms and build feasibility. |
+| PayPal AI Hackathon | Official rules list $67,500 total cash prizes; $12k/$8k/$5k grand prizes and category/sponsor awards. Individual legal-age entrants; global except standard exclusions. Must meaningfully use PayPal + AI. | Submission Nov 12, 2026 12:00 PST; winners around Dec 21. | **Not eligible for current Dec 9 award deadline** because winners announced after it, unless target deadline is changed. |
+| Meta VR Start Developer Competition | Official Meta blog says $1m total prizes, 20 awards ranging $20k–$100k; requires Meta VR Start membership, Developer Access and a working VR experience; headset not required. | Submission Nov 18; winners around Dec 11. | **Not eligible for current Dec 9 award deadline** unless deadline changes; high implementation/eligibility gate. |
+| Google Gemma 4 Developer Agent Paper Track | Kaggle search page advertises $35,000; high current participation. | Search result showed about 6 days remaining on Nov 9; exact rules/payout timing not yet verified. | Verify official rules and award timing before spending execution time. |
+| Google Gemma 4 Developer Agent Competition | Kaggle search page showed $75,000 and 24 days remaining; third-party listing conflicts with $110,000 total and Dec 2 submission. | Exact official deadline and award timing need reconciliation. | Official Kaggle rules take precedence; do not quote third-party prize totals as fact. |
+| Immunefi Plether | Search index advertised $80,000 and live with roughly 6 days remaining. Opened official page snapshot showed historical contests only, creating a status conflict. | Exact live contest scope/deadline unconfirmed. | Do not rely until direct live contest page is verified. |
+| BasedAgents | Site describes USDC task marketplace; signed agent delivery receipt; funds released on acceptance or after 7 days without review. | Task-specific. | Investigate live task inventory, task sizes, agent eligibility, registration and payout control. Not yet proven revenue. |
+
+### Primary research sources
+- NEAR official: https://nearhackathon.com/
+- PayPal official rules: https://paypalaihackathon.devpost.com/rules
+- PayPal developer blog: https://developer.paypal.com/community/blog/PayPal_AI_Hackathon/
+- Meta official announcement: https://developers.meta.com/blog/meta-connect-2026-vr-start-developer-competition/
+- Meta official rules/FAQ: https://start-developer-competition-26.devpost.com/rules and https://start-developer-competition-26.devpost.com/details/faqs
+- Kaggle Gemma paper track: https://www.kaggle.com/competitions/gemma-4-developer-agent-paper/overview/description
+- Kaggle Gemma competition: https://www.kaggle.com/competitions/gemma-4-developer-agent/overview/abstract
+- Immunefi: https://immunefi.com/audit-competition/
+- BasedAgents: https://basedagents.ai/
+
+### Immediate decision rule
+Prioritize opportunities with (a) entry open to India-based individual; (b) official rules permit the planned AI-assisted workflow; (c) one high-quality submission can be produced without user calls/manual sales; (d) judging/award/acceptance before Dec 9; (e) real award entitlement rather than a large pool headline. The next research phase must inspect official rulebooks and build one focused deliverable only after qualification. No product-storefront work should displace this route-first evaluation.
