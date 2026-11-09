@@ -493,3 +493,7 @@ Official references:
 
 ### Revenue status
 ₹0 verified. No task accepted, award won, wallet credited or payout received. NEAR is a competition opportunity only, not a revenue guarantee. The ₹10 crore mission target and Day-30 primary / Day-90 contingency clocks remain unchanged.
+
+
+### AgentGuard checkpoint correction — latest branch state
+The test file's JSONL newline fixture was corrected after re-reading the committed file. Latest AgentGuard branch commit is now d31b6347e393c3d7a39ccb5c2f9e2143271cee7f. This is a source correction only; no tests have yet been executed and no CI run is visible. Treat all AgentGuard tests as unverified until a real run and logs are inspected.
