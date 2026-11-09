@@ -104,21 +104,38 @@ class ResearchEngine:
             return []
 
     def get_rss_topics(self) -> list:
-        """Fetch latest topics from Hindi RSS feeds"""
+        """Fetch RSS topic records while preserving provenance and available evidence."""
         topics = []
         for feed_url in HINDI_RSS_FEEDS:
             try:
                 feed = feedparser.parse(feed_url)
                 for entry in feed.entries[:5]:
-                    title = entry.get('title', '').strip()
-                    if title and len(title) > 10:
-                        topics.append(title)
+                    title = str(entry.get("title", "")).strip()
+                    if not title or len(title) <= 10:
+                        continue
+                    summary = str(entry.get("summary", "") or entry.get("description", "")).strip()
+                    if not summary and entry.get("content"):
+                        summary = " ".join(
+                            str(part.get("value", "")) for part in entry.get("content", [])
+                        ).strip()
+                    topics.append({
+                        "topic": title,
+                        "source": "rss",
+                        "category": "news",
+                        "source_url": str(entry.get("link", "")).strip(),
+                        "source_title": title,
+                        "source_summary": summary[:5000],
+                        "published_at": str(
+                            entry.get("published", "") or entry.get("updated", "")
+                        ).strip(),
+                        "feed_url": feed_url,
+                    })
                 logger.info(f"RSS: Got {len(feed.entries)} articles from {feed_url}")
             except Exception as e:
-                logger.warning(f"RSS feed failed ({feed_url}): {e}")
+                logger.warning(f"RSS feed failed ({feed_url}): {type(e).__name__}: {e}")
                 continue
-        
-        logger.success(f"Total RSS topics: {len(topics)}")
+
+        logger.success(f"Total RSS topic records: {len(topics)}")
         return topics[:20]
 
     def get_youtube_trending(self) -> list:
@@ -127,7 +144,15 @@ class ResearchEngine:
             # YouTube trending via RSS (India)
             url = "https://www.youtube.com/feeds/videos.xml?chart=mostpopular&regionCode=IN&hl=hi"
             feed = feedparser.parse(url)
-            topics = [entry.title for entry in feed.entries[:10]]
+            topics = [{
+                "topic": str(entry.get("title", "")).strip(),
+                "source": "youtube",
+                "category": "trending",
+                "source_url": str(entry.get("link", "")).strip(),
+                "source_title": str(entry.get("title", "")).strip(),
+                "source_summary": str(entry.get("summary", "")).strip()[:5000],
+                "published_at": str(entry.get("published", "")).strip()
+            } for entry in feed.entries[:10] if entry.get("title")]
             logger.success(f"YouTube trending: {len(topics)} topics")
             return topics
         except Exception as e:
@@ -198,7 +223,13 @@ class ResearchEngine:
                 "topic": topic,
                 "source": source,
                 "score": score,
-                "category": item.get("category", "general")
+                "category": item.get("category", "general"),
+                "source_url": item.get("source_url", ""),
+                "source_title": item.get("source_title", ""),
+                "source_summary": item.get("source_summary", ""),
+                "published_at": item.get("published_at", ""),
+                "feed_url": item.get("feed_url", ""),
+                "evidence_status": item.get("evidence_status", "source_metadata_only")
             })
         
         # Sort by score descending
@@ -237,8 +268,8 @@ class ResearchEngine:
         
         # 2. RSS Feeds
         rss_topics = self.get_rss_topics()
-        for t in rss_topics:
-            all_topics.append({"topic": t, "source": "rss", "category": "news"})
+        for item in rss_topics:
+            all_topics.append(item)
         
         # 3. YouTube Trending
         yt_topics = self.get_youtube_trending()
