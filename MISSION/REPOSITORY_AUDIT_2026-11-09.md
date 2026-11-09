@@ -25,7 +25,14 @@ Latest observed Daily AI Content Pipeline run #17 failed on 2026-11-08. Its logs
 3. `src/publisher.py`: duplicates the gate inside `publish_all` to prevent bypass through a direct publisher call.
 4. `src/main.py`: does not call publisher while gate is closed; reports blocked publishing distinctly.
 5. `.github/workflows/daily_content.yml`: scheduled runs force test mode; explicit repository variable gates live publishing; compile and unit tests run before pipeline.
-6. `tests/test_pipeline_safety_and_reports.py`: nine regression tests.
+7. `tests/test_pipeline_safety_and_reports.py`: nine regression tests.
+
+## Provider research
+- Gemini: maintained `google-genai` SDK and `gemini-3.5-flash-lite` selected from current official model/pricing docs.
+- Groq: `openai/gpt-oss-120b` selected from current official model catalogue and free-plan rate-limit table.
+- Gemini authentication failure still requires a valid account key; no secret was read. Provider quota and actual model access are not yet runtime-verified.
+- Gemini free-tier content may be used for product improvement and human review; do not send sensitive or confidential material.
+- Full source links: `MISSION/AI_PROVIDER_RESEARCH_2026-11-09.md`.
 
 ## Verification status
 - Eight equivalent gate/report sanity checks passed in local analysis.
