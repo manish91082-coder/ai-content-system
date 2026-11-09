@@ -97,3 +97,17 @@ def build_source_metadata(topic_data):
             for source in sources
         ],
     }
+
+
+def editorial_package_approved(content_package):
+    """Require explicit human approval metadata; AI generation cannot self-approve."""
+    if not isinstance(content_package, dict):
+        return False
+    metadata = content_package.get("metadata")
+    if not isinstance(metadata, dict):
+        return False
+    return (
+        metadata.get("editorial_approved") is True
+        and bool(str(metadata.get("approved_by") or "").strip())
+        and bool(str(metadata.get("approved_at") or "").strip())
+    )
