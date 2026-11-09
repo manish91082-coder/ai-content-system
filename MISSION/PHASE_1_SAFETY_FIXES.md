@@ -34,7 +34,7 @@ Scheduled runs force `TEST_MODE=true`. The repository variable has not been enab
 
 ## 4. Known remaining blockers
 
-- Gemini authentication and Groq request errors from run #17 remain unresolved. Current provider/model identifiers and credential validity require separate verification.
+- Gemini authentication failure from run #17 remains unresolved pending a valid key check. The obsolete Groq model ID has been replaced, but a live inference request is still pending.
 - Telegram credentials were absent in the observed run; reporting is now safer but delivery remains unconfigured.
 - Research source verification, fact-checking and provenance need implementation.
 - Supabase schema's broad RLS policies need security redesign before production use.
