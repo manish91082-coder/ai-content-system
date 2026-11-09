@@ -164,3 +164,22 @@ def test_gateway_refuses_corrupted_receipt_log():
         path.write_text("{corrupted}\n")
         with pytest.raises(RuntimeError):
             PaymentGateway(default_demo_policy(), DemoSigner(), path)
+
+
+def test_daily_spend_is_restored_after_gateway_restart():
+    from dataclasses import replace
+
+    policy = replace(default_demo_policy(), human_approval_above=Decimal("5"))
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "receipts.jsonl"
+        first = PaymentGateway(policy, DemoSigner(), path)
+        signals = RiskSignals(account_age_days=90, first_interaction=False)
+        assert first.authorize(scoped_intent(amount="4"), signals).signer_called
+        restarted = PaymentGateway(policy, DemoSigner(), path)
+        assert restarted.spent_today == Decimal("4")
+        assert restarted.authorize(scoped_intent(amount="4"), signals).signer_called
+        restarted_again = PaymentGateway(policy, DemoSigner(), path)
+        blocked = restarted_again.authorize(scoped_intent(amount="3"), signals)
+        assert blocked.decision == "BLOCK"
+        assert blocked.reasons == ("daily_spend_limit_exceeded",)
+        assert blocked.signer_called is False
