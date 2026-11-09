@@ -40,7 +40,16 @@ Scheduled runs force `TEST_MODE=true`. The repository variable has not been enab
 - Supabase schema's broad RLS policies need security redesign before production use.
 - No checkout, product catalogue, order/fulfilment, affiliate attribution, refunds, or settlement ledger exists yet.
 
-## 5. Next gate
+## 5. Provider migration findings
+
+- Gemini's previous model ID `gemini-2.0-flash-exp` is no longer a suitable default; Google's current catalogue recommends newer model IDs. The legacy `google-generativeai` Python SDK is deprecated/not actively maintained.
+- Gemini SDK migrated to `google-genai==2.33.0`; default model is `gemini-3.5-flash-lite`, which Google's current pricing page lists as free on the Free Tier.
+- Groq's previous hard-coded model ID `llama-3.1-70b-versatile` was replaced with `openai/gpt-oss-120b`, which is in the current model catalogue and free-plan rate-limit table.
+- Gemini's previous `Unauthenticated` response remains a credential issue until a valid API key is confirmed. No secret value was inspected. If authentication still fails, the owner must verify/replace the GitHub secret privately.
+- Google unpaid-tier content may be used to improve Google products and reviewed by human reviewers. Do not submit confidential or personal data.
+- Full details and official source links: `MISSION/AI_PROVIDER_RESEARCH_2026-11-09.md`.
+
+## 6. Next gate
 
 1. Run the regression workflow on this branch and inspect exact test results.
 2. Diagnose the provider failures with current official provider documentation and non-secret configuration checks.
