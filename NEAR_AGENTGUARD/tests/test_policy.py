@@ -59,3 +59,31 @@ def test_prompt_injection_cannot_override_blocklist():
         )
         assert result.decision == "BLOCK"
         assert result.signer_called is False
+
+
+def test_unknown_recipient_requires_review():
+    result = evaluate(
+        PaymentIntent("agent", "new.vendor.near", Decimal("1")),
+        default_demo_policy(),
+        Decimal("0"),
+        RiskSignals(account_age_days=30, first_interaction=False),
+    )
+    assert result.decision == Decision.WARN
+    assert "recipient_not_allowlisted" in result.reasons
+
+
+def test_receipt_hash_chain_detects_tampering():
+    import json
+    import tempfile
+    from pathlib import Path
+    from agentguard.receipts import ReceiptLog
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "receipts.jsonl"
+        log = ReceiptLog(path)
+        log.append({"decision": "BLOCK", "recipient": "bad.actor.near"})
+        assert log.verify() is True
+        row = json.loads(path.read_text())
+        row["event"]["recipient"] = "attacker.near"
+        path.write_text(json.dumps(row) + "\\n")
+        assert log.verify() is False
