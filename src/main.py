@@ -27,6 +27,7 @@ from publisher import Publisher
 from telegram_bot import TelegramBot
 from database import Database
 from pipeline_safety import publishing_is_enabled
+from editorial_qa import topic_is_generation_eligible
 
 # Setup logging
 Path("logs").mkdir(exist_ok=True)
@@ -79,7 +80,20 @@ def run_daily_pipeline():
             safe_name = f"content_{datetime.now().strftime('%Y%m%d')}_{i+1:02d}"
             
             logger.info(f"\n📍 Processing topic {i+1}/3: {topic_name}")
-            
+
+            if not topic_is_generation_eligible(topic_data):
+                logger.warning(
+                    f"Editorial gate rejected current/news topic without adequate source evidence: {topic_name}"
+                )
+                all_publish_results[topic_name[:30]] = {
+                    "editorial_qa": {
+                        "success": False,
+                        "status": "blocked",
+                        "error": "Insufficient source evidence: no valid source URL with a useful excerpt."
+                    }
+                }
+                continue
+
             try:
                 # ─────────────────────────────────────────
                 # STEP 2: GENERATE CONTENT
