@@ -60,7 +60,13 @@ Scheduled runs force `TEST_MODE=true`. The repository variable has not been enab
 - Google unpaid-tier content may be used to improve Google products and reviewed by human reviewers. Do not submit confidential or personal data.
 - Full details and official source links: `MISSION/AI_PROVIDER_RESEARCH_2026-11-09.md`.
 
-## 7. Next gate
+## 7. Pull request status
+
+- Draft PR #1: https://github.com/manish91082-coder/ai-content-system/pull/1
+- Base: `master`; head: `revenue-engine/phase-1-safety-fixes`.
+- GitHub reports the draft PR as clean/mergeable. It remains unmerged and no production deployment has occurred.
+
+## 8. Next gate
 
 1. Run the regression workflow on this branch and inspect exact test results.
 2. Diagnose the provider failures with current official provider documentation and non-secret configuration checks.
