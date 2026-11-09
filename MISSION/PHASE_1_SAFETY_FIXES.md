@@ -14,7 +14,9 @@ Changes made:
 - `src/pipeline_safety.py`: publishing requires both `PUBLISH_ENABLED=true` and `TEST_MODE=false`. Missing or malformed values block publishing.
 - `.github/workflows/daily_content.yml`: scheduled executions force test mode; live publishing additionally requires the repository variable `PUBLISH_ENABLED` to be explicitly set to true.
 - `tests/test_pipeline_safety_and_reports.py`: ten regression tests cover default-deny behavior, explicit gate conditions, nested/legacy reporting, malformed payloads, and HTML escaping.
-- Workflow now runs Python compile checks and unit tests before the content pipeline.
+- Workflow now runs Python compile checks, unit tests, and metadata-only provider credential/model checks before the content pipeline.
+- `groq` SDK upgraded to 1.7.0 after CI exposed `Client.__init__() got an unexpected keyword argument 'proxies'` in 0.11.0 with HTTPX 0.28.1.
+- Provider circuit breaker disables a provider for the remainder of a run after permanent 401/403/404 or model-not-found failures, avoiding repeated failed calls.
 
 ## 2. Safety semantics
 
@@ -26,6 +28,10 @@ Scheduled runs force `TEST_MODE=true`. The repository variable has not been enab
 
 ## 3. Verification status
 
+- GitHub Actions CI run #10 succeeded: full dependencies installed, compile checks passed, all 13 tests passed, and provider catalogue check completed. Run: https://github.com/manish91082-coder/ai-content-system/actions/runs/42649140264
+- Groq credential authentication and `openai/gpt-oss-120b` model listing were confirmed using metadata-only API calls.
+- Gemini secret exists but is invalid for the Gemini Developer API: HTTP 401 `UNAUTHENTICATED`, reason `ACCESS_TOKEN_TYPE_UNSUPPORTED`. No key value was exposed. This appears to be an OAuth token or otherwise unsupported/invalid key type; replace with a valid Google AI Studio API key.
+
 - Dedicated GitHub Actions CI run #3 succeeded: dependency installation, Python source/test compilation, and all 10 regression tests passed. Run: https://github.com/manish91082-coder/ai-content-system/actions/runs/42648302328
 - The first two CI attempts exposed real dependency conflicts: Google GenAI required HTTPX >=0.28.1 while Supabase 2.9.1 required HTTPX <0.28. The dependency set was reconciled by moving to Supabase 2.34.1 and HTTPX 0.28.1. The successful third run installed the full requirements set cleanly.
 
@@ -35,11 +41,11 @@ Scheduled runs force `TEST_MODE=true`. The repository variable has not been enab
 - GitHub Actions CI run #3 passed all 10 regression tests and Python compile checks.
 - Full automated CI test suite has now run successfully on the isolated branch. No live provider inference or social publishing has been run.
 - No PR merged; no changes deployed to `master`.
-- No production API credentials were inspected or changed.
+- No production API secret values were inspected or changed. Secret names were present; only provider API responses were observed.
 
 ## 5. Known remaining blockers
 
-- Gemini authentication failure from run #17 remains unresolved pending a valid key check. The obsolete Groq model ID has been replaced, but a live inference request is still pending.
+- Gemini authentication remains unresolved and requires the account owner to replace the invalid `GEMINI_API_KEY` secret. Groq key and target model are verified at catalogue/authentication level; no inference request was made.
 - Telegram credentials were absent in the observed run; reporting is now safer but delivery remains unconfigured.
 - Research source verification, fact-checking and provenance need implementation.
 - Supabase schema's broad RLS policies need security redesign before production use.
