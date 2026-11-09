@@ -9,6 +9,7 @@ from pipeline_safety import publishing_is_enabled
 from telegram_bot import TelegramBot
 from publisher import Publisher
 from content_generator import ContentGenerator
+from editorial_qa import topic_is_generation_eligible, build_editorial_context, build_source_metadata
 
 
 class PublishingSafetyTests(unittest.TestCase):
@@ -69,6 +70,52 @@ class PublishingSafetyTests(unittest.TestCase):
         result = publisher.publish_all({}, {}, {})
         self.assertFalse(result["publishing"]["success"])
         self.assertIn("PUBLISH_ENABLED", result["publishing"]["error"])
+
+
+class EditorialEvidenceTests(unittest.TestCase):
+    def test_news_without_source_is_blocked(self):
+        self.assertFalse(topic_is_generation_eligible({
+            "topic": "Breaking headline", "category": "news", "source": "rss"
+        }))
+
+    def test_news_with_url_but_short_excerpt_is_blocked(self):
+        self.assertFalse(topic_is_generation_eligible({
+            "topic": "Breaking headline", "category": "news",
+            "source_url": "https://example.org/story",
+            "source_summary": "Too short"
+        }))
+
+    def test_news_with_url_and_useful_excerpt_is_eligible(self):
+        self.assertTrue(topic_is_generation_eligible({
+            "topic": "Breaking headline", "category": "news",
+            "source_url": "https://example.org/story",
+            "source_title": "Original report",
+            "source_summary": "A sufficiently detailed source excerpt. " * 5
+        }))
+
+    def test_trending_without_source_is_blocked(self):
+        self.assertFalse(topic_is_generation_eligible({
+            "topic": "Trending phrase", "category": "trending"
+        }))
+
+    def test_evergreen_without_source_is_limited_to_general_education(self):
+        topic = {"topic": "Basic computer concepts", "category": "technology"}
+        self.assertTrue(topic_is_generation_eligible(topic))
+        instructions = build_editorial_context(topic)
+        self.assertIn("NO SOURCE EXCERPT", instructions)
+        self.assertIn("Do not state current events", instructions)
+
+    def test_source_metadata_marks_not_independently_verified(self):
+        topic = {
+            "topic": "Story", "category": "news",
+            "source_url": "https://example.org/story",
+            "source_title": "Report",
+            "source_summary": "Evidence excerpt " * 15
+        }
+        metadata = build_source_metadata(topic)
+        self.assertEqual(metadata["evidence_status"],
+                         "source_excerpt_supplied_not_independently_verified")
+        self.assertEqual(metadata["sources"][0]["url"], "https://example.org/story")
 
 
 class TelegramReportTests(unittest.TestCase):
