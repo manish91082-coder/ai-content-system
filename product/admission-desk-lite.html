@@ -42,7 +42,7 @@ button.secondary,.button.secondary{background:#e9eef6;color:#1e3557}button.dange
 <input type="hidden" id="lead-id">
 <label for="guardian">Parent / Contact name *</label><input id="guardian" maxlength="80" required autocomplete="name" placeholder="अभिभावक का नाम">
 <label for="phone">Contact number *</label><input id="phone" inputmode="tel" maxlength="18" required placeholder="10 digit mobile number">
-<div class="hint">सिर्फ उस व्यक्ति का नंबर दर्ज करें जिसने संपर्क की अनुमति दी है।</div>
+<div class="hint">सिर्फ अनुमति प्राप्त contact दर्ज करें। 10-digit Indian mobile पर WhatsApp link में +91 जोड़ा जाएगा।</div>
 <label for="course">Course / Class *</label><input id="course" maxlength="100" required placeholder="जैसे Class 10 Maths">
 <label for="source">Enquiry source</label><select id="source"><option>Walk-in</option><option>Phone</option><option>WhatsApp</option><option>Referral</option><option>Social media</option><option>Other</option></select>
 <label for="stage">Current stage</label><select id="stage"><option value="New">New / नई</option><option value="Contacted">Contacted / संपर्क हुआ</option><option value="Demo Scheduled">Demo Scheduled / Demo तय</option><option value="Demo Attended">Demo Attended / Demo हुआ</option><option value="Considering">Considering / विचाराधीन</option><option value="Enrolled">Enrolled / Admission</option><option value="Not Interested">Not Interested / रुचि नहीं</option></select>
@@ -116,7 +116,7 @@ function editLead(id){const x=leads.find(v=>v.id===id);if(!x)return;
 function deleteLead(id){if(!confirm("इस enquiry को delete करना है?"))return;leads=leads.filter(x=>x.id!==id);persist()}
 function openWhatsApp(x){if(!x.consent){alert("पहले contact consent की पुष्टि करें।");return}
  const msg="नमस्ते "+x.guardian+" जी, आपने "+x.course+" के बारे में enquiry की थी। क्या हम course details या demo class के लिए आपकी सहायता कर सकते हैं? यदि आप आगे संदेश नहीं चाहते, कृपया बता दें।";
- const number=safePhone(x.phone);window.open("https://wa.me/"+number+"?text="+encodeURIComponent(msg),"_blank","noopener,noreferrer");
+ let number=safePhone(x.phone);if(number.length===10)number="91"+number;window.open("https://wa.me/"+number+"?text="+encodeURIComponent(msg),"_blank","noopener,noreferrer");
 }
 $("reset-btn").addEventListener("click",reset);$("search").addEventListener("input",render);$("filter-stage").addEventListener("change",render);
 $("export-btn").addEventListener("click",()=>{
