@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PayPal Sentinel | AI Checkout Firewall</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div class="brandmark">PS</div>
+      <div><h1>PayPal Sentinel</h1><p>AI checkout firewall for agentic commerce</p></div>
+      <span class="sandbox">SANDBOX ONLY</span>
+    </header>
+    <section class="hero">
+      <p class="eyebrow">TRUST BEFORE TRANSACTION</p>
+      <h2>Let an AI agent shop.<br><span>Keep payment authority human.</span></h2>
+      <p class="intro">Gemini parses the request. Deterministic policy checks the catalog, amount and risk. PayPal sandbox handles the buyer-approved checkout.</p>
+    </section>
+    <section class="panel">
+      <label for="prompt">Tell the shopping agent what to buy</label>
+      <textarea id="prompt" rows="3" placeholder="Buy one AI Pro monthly plan"></textarea>
+      <button id="analyse">Analyse purchase</button>
+      <p class="micro">The AI can propose a cart. It cannot authorize or capture a payment.</p>
+    </section>
+    <section id="result" class="panel hidden" aria-live="polite">
+      <div class="result-head"><h3>Purchase assessment</h3><span id="decision" class="decision"></span></div>
+      <div id="details"></div>
+      <p id="rationale" class="rationale"></p>
+      <p id="reasons" class="reasons"></p>
+      <button id="approve" class="secondary hidden">Approve this exact purchase</button>
+      <div id="paypal-button-container"></div>
+      <p id="status" class="status"></p>
+    </section>
+    <footer><span>MIT licensed prototype</span><span>No real funds. No live PayPal mode.</span></footer>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
