@@ -484,3 +484,40 @@ No route yet passes all hard gates simultaneously. The gap is not a lack of idea
 **Decision:** continue only with routes where AI can do the core value-producing work under the platform's rules and where the platform already exposes genuine buyers/reward issuers. Do not disguise human gig work as automation. Do not use the user's time as a hidden input. Do not start a product build to compensate for missing distribution.
 
 The next and final discovery pass should focus on legitimate platform-native reward/competition programs that explicitly permit AI-assisted work, and on any existing user-controlled commercial assets that can be documented. If no route survives, report that evidence plainly and choose the best available executable path without claiming it can achieve the target.
+
+
+---
+
+## 15. HIGH-VALUE SMART-CONTRACT AUDIT COMPETITIONS — OUT-OF-THE-BOX REVIEW
+
+This route deserves separate treatment because historical competition prize pools can be materially larger than ordinary gig tasks, and the user has previously worked on a Polygon smart-contract/flash-loan software project. That prior project history is not proof of professional audit qualification or an accepted vulnerability finding.
+
+### Code4rena (competitive smart-contract audits)
+- Anyone can register as a Warden and join public competitions. Submission windows typically last 1–3 weeks, followed by judging and a 48-hour QA period.
+- Historical/public audit listings include prize pools from tens of thousands to hundreds of thousands of USDC; one listed historical Monad audit shows $500,000. This is a contest pool, not the amount any individual is expected to receive.
+- Awards are divided based on valid, unique findings, severity, duplicates and rank. A single valid report may receive only a fraction of the pool; unsatisfactory submissions receive no award.
+- Payout schedule: participants who have completed payout requirements by award announcement are paid within one week of announcement. The second batch is sent after the 30-day tax-info submission window, within a further week. Thus, a participant who has not completed tax requirements before the announcement may miss the 30-day bank-settlement deadline.
+- AI policy is strict: automated tools may be used as a first pass, but ChatGPT/LLM-generated reports are strongly discouraged; the warden must verify validity and clarity. High/Medium Solidity/EVM reports generally require a runnable coded PoC. LLM-generated nonsense/low-effort reports can be treated as spam and lead to suspension.
+- Awards are distributed in USDC, not directly as Indian bank credit. A compliant conversion and bank settlement path must be verified separately.
+- Decision: **high-upside research candidate, not a primary ₹10 crore plan**. It is worth monitoring only if a suitable live audit is open, the user can complete required identity/tax/wallet setup before judging, and every finding can be independently reproduced and validated. Do not submit AI guesses or automated scanner output.
+
+Official sources:
+- https://docs.code4rena.com/competitions
+- https://docs.code4rena.com/competitions/submission-guidelines
+- https://docs.code4rena.com/awarding/awarding-process
+- https://code4rena.com/audits
+
+### Immunefi (Web3 bug bounty)
+- A reviewed program page lists a maximum smart-contract critical reward of USD $50,000 and requires a Proof of Concept for all smart-contract reports; reward is paid in USDC after validity/KYC conditions.
+- The reviewed program's displayed reward tiers and program statistics are specific to that program and must not be generalized to every Immunefi bounty.
+- Immunefi rules explicitly prohibit automated scanner reports lacking required impact information, spam/low-quality submissions, unauthorized testing on mainnet/public testnet, and reports that are not substantially the researcher's own.
+- Decision: **possible side route only**, with authorized local-fork testing and a reproducible PoC. The cap on the reviewed program is far below ₹10 crore; the bounty is uncertain; USDC is not bank-settled INR until lawfully converted and credited.
+- Official sources:
+  - https://immunefi.com/bug-bounty/immunefi/information/
+  - https://immunefi.com/rules/
+
+### Strategic assessment
+
+Smart-contract competitions/bounties are more interesting than generic microtasks because prize pools can be large and the user has prior exposure to smart-contract engineering. But the payment mechanics, individual award dilution, competition schedule, human responsibility for validation, and USDC-to-bank conversion all prevent treating the advertised prize pool as predictable cash.
+
+This route may be tested in parallel only as a bounded, authorized research experiment. It must not distract from identifying a higher-probability transaction mechanism. No exploit against live systems, unauthorized probing, automated traffic, or unverified submissions are permitted.
