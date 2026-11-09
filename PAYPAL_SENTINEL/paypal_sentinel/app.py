@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import os
-from decimal import Decimal
 from pathlib import Path
+
+from dotenv import load_dotenv
+load_dotenv()
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -38,17 +40,12 @@ class PlanResponse(BaseModel):
 
 
 class ApprovalRequest(BaseModel):
-    plan_id: str
+    plan_id: str = Field(min_length=8, max_length=100)
 
 
 class OrderRequest(BaseModel):
-    plan_id: str
-    approval_token: str | None = None
-
-
-def daily_reserved() -> Decimal:
-    # The persistent reservation store is authoritative at checkout.
-    return Decimal("0")
+    plan_id: str = Field(min_length=8, max_length=100)
+    approval_token: str | None = Field(default=None, max_length=200)
 
 
 @app.get("/api/health")
@@ -65,7 +62,7 @@ async def config():
 async def create_plan(request: PlanRequest):
     try:
         ai_result = await parse_purchase_request(request.prompt)
-        plan = build_plan(ai_result, request.prompt, daily_reserved())
+        plan = build_plan(ai_result, request.prompt, store.daily_reserved())
         payload = {
             "sku": plan.sku,
             "quantity": plan.quantity,
@@ -80,11 +77,15 @@ async def create_plan(request: PlanRequest):
             "intent_hash": plan.intent_hash,
         }
         plan_id = store.save_plan(payload)
-        return PlanResponse(plan_id=plan_id, **{k: v for k, v in payload.items() if k != "intent_hash"}, expires_in_seconds=600)
+        return PlanResponse(
+            plan_id=plan_id,
+            **{key: value for key, value in payload.items() if key != "intent_hash"},
+            expires_in_seconds=600,
+        )
     except AIPlannerError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-    except ValueError as exc:
-        raise HTTPException(status_code=500, detail="Policy configuration error") from exc
+    except (ValueError, RuntimeError) as exc:
+        raise HTTPException(status_code=500, detail="Policy or ledger validation failed safely") from exc
 
 
 @app.post("/api/agent/approve")
@@ -113,16 +114,16 @@ async def create_paypal_order(request: OrderRequest):
             request.plan_id, plan["amount"], plan["currency"],
             os.getenv("DAILY_LIMIT_USD", "100.00"),
         )
-    except ValueError as exc:
-        raise HTTPException(status_code=403, detail=str(exc)) from exc
+    except (ValueError, ArithmeticError) as exc:
+        raise HTTPException(status_code=403, detail="Daily spend reservation refused") from exc
     try:
         order = await paypal.create_order(
-            plan["amount"], plan["currency"], request.plan_id, plan["item_name"],
+            plan["amount"], plan["currency"], request.plan_id, plan["item_name"], payment_id,
         )
         order_id = order["id"]
         store.set_order(payment_id, order_id)
         return {"id": order_id, "status": order.get("status", "CREATED"), "decision": plan["decision"]}
-    except (PayPalError, KeyError, Exception) as exc:
+    except Exception as exc:
         store.fail_payment(payment_id)
         raise HTTPException(status_code=502, detail="PayPal sandbox order creation failed safely") from exc
 
@@ -134,8 +135,11 @@ async def capture_paypal_order(order_id: str):
         raise HTTPException(status_code=404, detail="Unknown PayPal order")
     if payment["state"] == "COMPLETED":
         return {"id": order_id, "status": "COMPLETED", "capture_id": payment["capture_id"]}
-    if payment["state"] != "CREATED":
-        raise HTTPException(status_code=409, detail="Order is not in a capturable state")
+    if not store.begin_capture(order_id):
+        raise HTTPException(
+            status_code=409,
+            detail="Order is not capturable or capture is already in progress; reconcile before retrying",
+        )
     try:
         result = await paypal.capture_order(order_id)
         if result.get("status") != "COMPLETED":
@@ -148,7 +152,11 @@ async def capture_paypal_order(order_id: str):
         store.complete_payment(order_id, capture["id"])
         return {"id": order_id, "status": "COMPLETED", "capture_id": capture["id"]}
     except Exception as exc:
-        raise HTTPException(status_code=502, detail="Capture verification failed; reconcile in PayPal sandbox") from exc
+        store.mark_capture_unknown(order_id)
+        raise HTTPException(
+            status_code=502,
+            detail="Capture outcome is uncertain. Reconcile this order in PayPal before any retry.",
+        ) from exc
 
 
 @app.get("/")
