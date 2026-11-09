@@ -27,7 +27,7 @@ from publisher import Publisher
 from telegram_bot import TelegramBot
 from database import Database
 from pipeline_safety import publishing_is_enabled
-from editorial_qa import topic_is_generation_eligible, editorial_package_approved
+from editorial_qa import topic_is_generation_eligible, editorial_package_approved, content_review_hash
 
 # Setup logging
 Path("logs").mkdir(exist_ok=True)
@@ -103,13 +103,28 @@ def run_daily_pipeline():
                     topic_data, "youtube_short"
                 )
                 
+                # Persist the full reviewable package and a stable fingerprint.
+                review_metadata = dict(content_package.get("metadata") or {})
+                review_metadata.update({
+                    "description": content_package.get("description", ""),
+                    "hashtags": content_package.get("hashtags", []),
+                    "thumbnail_prompt": content_package.get("thumbnail_prompt", ""),
+                    "editorial_status": "pending_review",
+                    "editorial_approved": False,
+                    "editorial_approval_required": True,
+                })
+                review_metadata["review_content_hash"] = content_review_hash(
+                    content_package.get("title"), content_package.get("script"), review_metadata
+                )
+                content_package["metadata"] = review_metadata
+
                 # Save to DB
                 content_id = db.save_content(
                     topic_id=topic_data.get("id", safe_name),
                     content_type="youtube_short",
                     title=content_package["title"],
                     script=content_package["script"],
-                    metadata=content_package.get("metadata", {})
+                    metadata=review_metadata
                 )
                 
                 logger.info("STEP 2b: Generating images...")

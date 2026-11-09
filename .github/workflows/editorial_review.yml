@@ -1,0 +1,53 @@
+name: Human Editorial Review
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Prepare a review package, or record a decision after review
+        required: true
+        type: choice
+        options:
+          - prepare
+          - approve
+          - reject
+      content_id:
+        description: UUID of the content_items row
+        required: true
+        type: string
+      expected_hash:
+        description: Required for approve/reject; copy the fingerprint from a prepare run
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  editorial-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepare or record decision
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          EDITORIAL_APPROVER_LOGINS: ${{ vars.EDITORIAL_APPROVER_LOGINS }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          REVIEW_ACTION: ${{ inputs.action }}
+          CONTENT_ID: ${{ inputs.content_id }}
+          EXPECTED_HASH: ${{ inputs.expected_hash }}
+        run: |
+          if [ "$REVIEW_ACTION" = "prepare" ]; then
+            python scripts/editorial_review.py prepare "$CONTENT_ID"
+          else
+            python scripts/editorial_review.py decide "$CONTENT_ID" "$REVIEW_ACTION" "$GITHUB_ACTOR" "$EXPECTED_HASH"
+          fi

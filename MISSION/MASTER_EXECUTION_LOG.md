@@ -5,10 +5,12 @@ Autonomous Internet Revenue Engine. Stretch target: ₹10 crore in actual settle
 
 ## Current checkpoint
 - Date: 2026-11-09
-- Active branch: revenue-engine/phase-1-safety-fixes
+- Active branch: revenue-engine/phase-3-editorial-review
+- Phase 3 branch is based on the unmerged Phase 1/2 PR head; PR #1 remains open and unmerged.
 - Repository: https://github.com/manish91082-coder/ai-content-system
 - Default branch: master
-- Draft PR #1: https://github.com/manish91082-coder/ai-content-system/pull/1
+- Draft PR #1 (Phase 1/2): https://github.com/manish91082-coder/ai-content-system/pull/1
+- Draft PR #2 (Phase 3, stacked on Phase 1 branch): https://github.com/manish91082-coder/ai-content-system/pull/2
 - PR is unmerged. No production deployment and no live publishing have occurred.
 
 ## Phase 0 — repository audit
@@ -46,12 +48,19 @@ Detailed documents:
 - MISSION/REPOSITORY_AUDIT_2026-11-09.md
 
 ## Automated verification
-GitHub Actions CI run #24 passed:
+GitHub Actions CI run #29 passed on the Phase 3 branch:
+https://github.com/manish91082-coder/ai-content-system/actions/runs/42652645914
+
+- Dependencies installed; Python compilation passed for src, tests and scripts.
+- 30 regression tests passed, including Supabase REST JSONB persistence, review fingerprint integrity, service-key rejection and static SQL security checks.
+- Provider metadata check completed in degraded state: Groq authenticated/model listed; Gemini still returns 401. No inference prompt was sent.
+
+Earlier Phase 1/2 verification (run #24) passed:
 https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 
 - Dependencies installed.
 - Python source and tests compiled.
-- 21 regression tests passed.
+- 21 regression tests passed in run #24.
 - Provider metadata check completed in degraded state.
 - Groq credential authenticated and openai/gpt-oss-120b model listed.
 - Gemini credential failed with HTTP 401 UNAUTHENTICATED / ACCESS_TOKEN_TYPE_UNSUPPORTED. Google reports the configured API key is invalid or unsupported. The secret value was not exposed.
@@ -67,8 +76,8 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 ## Remaining blockers
 1. Account owner must replace the invalid GEMINI_API_KEY secret if Gemini is to be used. Do not paste secrets into chat.
 2. Confirm Groq account billing tier and available free quota before controlled inference.
-3. Add source authority scoring, article retrieval and cross-source corroboration; implement a secure manual editorial approval UI/database workflow.
-4. Redesign Supabase RLS before production data use.
+3. Add source authority scoring, article retrieval and cross-source corroboration; complete the private asset review/fulfilment workflow.
+4. Apply and verify the Phase 3 review SQL and redesign legacy Supabase RLS before production data use.
 5. Build product catalogue, checkout, order lifecycle, automated fulfilment, refund handling, affiliate attribution and settlement reconciliation.
 6. Validate one narrow customer offer with a real paid pilot.
 
@@ -77,3 +86,27 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 - Generated content, views, clicks, leads, unpaid invoices, pending orders and wallet balances are not revenue.
 - No fake orders, fake testimonials, spam distribution or policy bypass.
 - ₹10 crore remains a stretch target, not a promise.
+
+
+## Phase 3 — secure human editorial review (implementation branch)
+- Added a deterministic SHA-256 review fingerprint over title, script, description, hashtags, thumbnail prompt and source references.
+- The content generator pipeline now persists the complete review package and fingerprint in JSONB metadata.
+- Fixed Supabase REST persistence for content rows and status/file-path updates; JSONB values are now sent as JSON objects rather than pre-serialized JSON strings.
+- Added a GitHub Actions workflow with a two-step review process: prepare a full review summary, then approve/reject using the exact fingerprint.
+- Decisions are accepted only from authenticated GitHub actors included in the `EDITORIAL_APPROVER_LOGINS` repository variable.
+- Added a restricted Supabase RPC that locks the row, requires service_role, verifies pending status and the fingerprint, updates status and appends an audit event transactionally.
+- Added an append-only audit table with RLS enabled, restricted grants and an immutability trigger.
+- Added setup/runbook documentation. No Supabase schema has been deployed; no secrets or content approvals were performed.
+- Approval status is intentionally distinct from publish-ready status. Durable private asset storage, a later-run publish queue and revocation/release controls remain unimplemented.
+- Legacy broad RLS policies remain a release blocker and are not silently treated as repaired.
+
+
+## Phase 4 — customer delivery and settlement architecture
+- Added `MISSION/PHASE_4_CUSTOMER_DELIVERY_ARCHITECTURE.md`.
+- Defined provider-neutral product/order/payment/fulfilment/refund/settlement boundaries and explicit state machines.
+- Defined signed webhook intake, raw-body verification, event-level deduplication, idempotent fulfilment and server-side payment verification.
+- Defined private digital delivery, customer-data minimisation and explicit release controls.
+- Separated gross captured payments, provider balance, expected settlement, bank-credit confirmation and net settled revenue.
+- Current provider candidates: Razorpay first for India direct checkout after merchant approval; Cashfree alternate; Gumroad optional digital-product fallback. None is activated or conclusively selected.
+- Current public provider references checked: Razorpay standard public pricing states 2% transaction fee and no setup/AMC; Cashfree standard settlement guide describes T+2 subject to account/bank/risk conditions; Gumroad lists India INR bank payout, $100 standard minimum and a 7-day holding period for weekly/monthly/quarterly payouts.
+- No payment provider account was accessed, no KYC was performed, no checkout was created, and no live payment occurred.

@@ -6,12 +6,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
 
 from pipeline_safety import publishing_is_enabled
 from telegram_bot import TelegramBot
 from publisher import Publisher
 from content_generator import ContentGenerator
-from editorial_qa import topic_is_generation_eligible, build_editorial_context, build_source_metadata, editorial_package_approved
+from editorial_qa import topic_is_generation_eligible, build_editorial_context, build_source_metadata, editorial_package_approved, content_review_hash
+from database import Database
+import editorial_review
 
 
 class PublishingSafetyTests(unittest.TestCase):
@@ -145,6 +148,102 @@ class EditorialEvidenceTests(unittest.TestCase):
             result = publisher.publish_all(package, {}, {})
         self.assertFalse(result["editorial_approval"]["success"])
         self.assertEqual(result["editorial_approval"]["status"], "pending_review")
+
+
+class EditorialReviewSqlSecurityTests(unittest.TestCase):
+    def test_review_rpc_is_restricted_and_transactional(self):
+        sql = (ROOT / "config" / "editorial_review_schema.sql").read_text(encoding="utf-8")
+        self.assertIn("SECURITY INVOKER", sql)
+        self.assertIn("FOR UPDATE", sql)
+        self.assertIn("service_role", sql)
+        self.assertIn("ENABLE ROW LEVEL SECURITY", sql)
+        self.assertIn("REVOKE ALL ON FUNCTION", sql)
+        self.assertIn("GRANT EXECUTE ON FUNCTION", sql)
+        self.assertIn("BEFORE UPDATE OR DELETE", sql)
+        self.assertNotIn("SECURITY DEFINER", sql)
+
+
+class EditorialReviewCliSecurityTests(unittest.TestCase):
+    def test_review_cli_requires_server_side_service_key(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "SUPABASE_SERVICE_KEY"):
+                editorial_review._config()
+
+    def test_review_cli_rejects_publishable_key(self):
+        with patch.dict(os.environ, {
+            "SUPABASE_URL": "https://example.supabase.co",
+            "SUPABASE_SERVICE_KEY": "sb_publishable_test"
+        }, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "server-side service key"):
+                editorial_review._config()
+
+
+class SupabaseRestPersistenceTests(unittest.TestCase):
+    def setUp(self):
+        self.db = object.__new__(Database)
+        self.db.client = None
+        self.db.use_rest = True
+        self.db._mock_data = {"topics": [], "content": [], "posts": []}
+
+    def test_save_content_uses_json_objects_and_rest_api(self):
+        row_id = "00000000-0000-0000-0000-000000000001"
+        with patch("database._rest_request", return_value=[{"id": row_id}]) as request:
+            result = self.db.save_content(
+                "topic-1", "youtube_short", "Title", "Script",
+                {"description": "Full description", "hashtags": ["#AI"]}
+            )
+        self.assertEqual(result, row_id)
+        payload = request.call_args.args[2]
+        self.assertIsInstance(payload["metadata"], dict)
+        self.assertEqual(payload["metadata"]["description"], "Full description")
+
+    def test_update_content_status_supports_rest_patch_and_json_paths(self):
+        with patch("database._rest_request", return_value=[]) as request:
+            self.db.update_content_status(
+                "content-1", "pending_editorial_review", {"videos": {"short": "/tmp/a.mp4"}}
+            )
+        self.assertEqual(request.call_args.args[0], "PATCH")
+        payload = request.call_args.args[2]
+        self.assertIsInstance(payload["file_paths"], dict)
+        self.assertEqual(payload["status"], "pending_editorial_review")
+
+    def test_pending_content_reads_through_rest_api(self):
+        rows = [{"id": "content-1", "status": "ready_to_publish"}]
+        with patch("database._rest_request", return_value=rows) as request:
+            self.assertEqual(self.db.get_pending_content(), rows)
+        self.assertEqual(request.call_args.args[0], "GET")
+
+
+class EditorialFingerprintTests(unittest.TestCase):
+    def test_review_hash_is_stable_for_same_package(self):
+        metadata = {
+            "description": "Description",
+            "hashtags": ["#AI"],
+            "thumbnail_prompt": "A thumbnail",
+            "sources": [{"url": "https://example.org/source"}],
+            "evidence_status": "source_excerpt_supplied_not_independently_verified",
+        }
+        first = content_review_hash("Title", "Script", metadata)
+        second = content_review_hash("Title", "Script", metadata)
+        self.assertEqual(first, second)
+        self.assertEqual(len(first), 64)
+
+    def test_review_hash_changes_when_reviewed_content_changes(self):
+        metadata = {"description": "Original description", "hashtags": ["#AI"]}
+        original = content_review_hash("Title", "Script", metadata)
+        changed = content_review_hash(
+            "Title", "Script", {**metadata, "description": "Changed description"}
+        )
+        self.assertNotEqual(original, changed)
+
+    def test_review_hash_changes_when_source_reference_changes(self):
+        first = content_review_hash("Title", "Script", {
+            "sources": [{"url": "https://example.org/a"}]
+        })
+        second = content_review_hash("Title", "Script", {
+            "sources": [{"url": "https://example.org/b"}]
+        })
+        self.assertNotEqual(first, second)
 
 
 class TelegramReportTests(unittest.TestCase):
