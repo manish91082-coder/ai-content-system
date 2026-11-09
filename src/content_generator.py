@@ -93,6 +93,19 @@ class ContentGenerator:
             message = message.replace(secret, "[REDACTED]")
         return message[:500]
 
+    @staticmethod
+    def _is_permanent_provider_error(error: Exception) -> bool:
+        """Disable a provider for this process after auth or model-not-found errors."""
+        status = getattr(error, "status_code", None) or getattr(error, "code", None)
+        if status in (401, 403, 404):
+            return True
+        message = str(error).lower()
+        return status == 400 and (
+            "model not found" in message
+            or "unsupported model" in message
+            or "model does not exist" in message
+        )
+
     def _call_gemini(self, prompt: str) -> str:
         """Call Gemini using the maintained Google GenAI SDK."""
         response = self.gemini_client.models.generate_content(
@@ -128,6 +141,9 @@ class ContentGenerator:
             except Exception as e:
                 summary = self._redact_error(e, GEMINI_API_KEY)
                 errors.append(f"Gemini {type(e).__name__}: {summary}")
+                if self._is_permanent_provider_error(e):
+                    self.gemini_client = None
+                    logger.warning("Gemini disabled for the remainder of this run after a permanent authentication/model error.")
                 logger.warning(f"Gemini failed ({type(e).__name__}): {summary}. Trying Groq fallback.")
 
         if self.groq_client:
@@ -139,6 +155,9 @@ class ContentGenerator:
             except Exception as e:
                 summary = self._redact_error(e, GROQ_API_KEY)
                 errors.append(f"Groq {type(e).__name__}: {summary}")
+                if self._is_permanent_provider_error(e):
+                    self.groq_client = None
+                    logger.error("Groq disabled for the remainder of this run after a permanent authentication/model error.")
                 logger.error(f"Groq failed ({type(e).__name__}): {summary}")
 
         if not errors:
