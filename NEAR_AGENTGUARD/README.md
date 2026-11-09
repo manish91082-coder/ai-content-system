@@ -63,3 +63,9 @@ The AgentGuard implementation in this directory is newly authored for the NEAR H
 
 ## Security note
 This is a prototype, not an audited wallet, custody service, smart contract or financial product. Do not connect a production wallet. Review all code and testnet integration before any real transaction.
+
+
+## NEAR integration safety decision
+The official NEAR Intents Agent API documentation describes the Agent API as an **experimental, mainnet-only beta** and warns that assets may be lost. Its quickstart uses real funds (approximately 10 USDC) and there is no testnet version. This prototype therefore does not connect to that beta or request real funds. A later integration must first be reviewed against the current API docs and require explicit owner approval; no partner API key or grant token may be placed in a browser or model prompt.
+
+For the hackathon proof, prefer a NEAR testnet contract plus a narrowly scoped FunctionCall access key, subject to contract implementation and testnet validation. Such a key cannot make native transfers or replace account keys; the contract must itself enforce the spending policy and control any test funds. This is a design target, not yet implemented or deployed.
