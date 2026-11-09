@@ -80,6 +80,8 @@ def evaluate(
 
     if not isinstance(intent.agent_id, str) or not intent.agent_id.strip():
         return block("missing_agent_id")
+    if intent.asset != "NEAR":
+        return block("unsupported_asset")
     if not isinstance(intent.recipient, str) or not intent.recipient.strip():
         return block("missing_recipient")
     if not isinstance(intent.amount, Decimal) or not intent.amount.is_finite():
