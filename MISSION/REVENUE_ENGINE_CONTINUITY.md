@@ -388,3 +388,71 @@ The user has clarified the timing policy:
 - Do not count a payment as guaranteed merely because someone says it will arrive. Record contractual payment date, approval/vesting conditions, refund/chargeback/appeal risks, escrow terms and counterparty/platform reliability.
 - The outer 90-day window is a contingency for settlement timing, not permission to accept low-quality, low-probability or unrelated work. The target remains ₹10 crore; do not lower the amount or drift into routine gig work.
 - When ranking opportunities, consider both expected earned value by Day 30 and probability-weighted settlement by Day 90. High-value opportunities with a credible, documented 35–90 day release can remain eligible even if they miss Day 30 cash receipt.
+
+
+## 16. VERIFIED FOLLOW-UP — LIVE AGENT / PRIZE ROUTES (2026-11-09)
+
+### NEAR Hackathon — official page rechecked
+- Official page: https://nearhackathon.com/ (search result snapshot 2026-11-09).
+- Tracks explicitly include **AI Security & Defense** (spending limits, policy engines, sandboxed wallets, reputation/scam detection) and **Agent Economy** (agents earn, spend, negotiate, hire agents and pay for APIs/compute/data). Real-World Money is also a listed track.
+- Solo entry is allowed; one person may submit up to two independent projects, with cross-reference in each README. No wallet connection is required at submission; the NEAR account address is supplied for prize payment.
+- Submission requires working prototype, public repository, public X demo post tagged @NEARProtocol and #NEARHackathon, and submission form by **14 Nov 2026 23:59 UTC**. Results announced by **18 Nov 2026 23:59 UTC**.
+- Site says Claude Code and Codex perform initial run/README screening, then human judges decide. Prior judging dimensions include implementation, design, impact, originality and sustainability.
+- Official page surfaced the above requirements but its accessible search snapshot did not expose a complete official prize table. A secondary event information page lists $250,000 pool, $55,000 grand prize, and per-track $10,000/$3,000/$2,000 awards, paid in NEAR. Treat those figures as provisional until cross-checked against official downloadable HACKATHON.md / submission form.
+- Primary decision: **advance NEAR Agent Economy + AI Security as the strongest near-term candidate**, but only after checking HACKATHON.md and eligibility/terms. No submission has been created or made.
+
+Official source: https://nearhackathon.com/
+Secondary prize/timeline reference: https://www.loops.house/near-hackathon
+
+### BasedAgents — payment mechanism verified; economic supply not verified
+- Official agent docs: https://basedagents.ai/docs/agents
+- Official task marketplace: https://basedagents.ai/tasks
+- Official API documentation / open-task endpoint described by docs: GET https://api.basedagents.ai/v1/tasks?status=open
+- Flow: register Ed25519 agent identity; set user-controlled USDC payout wallet on Base; browse open tasks; claim; deliver signed receipt; buyer accepts or seven-day no-review timer accepts; escrowed USDC is released. Agent must independently perform and evidence the task. Registration private key is stored locally; do not paste it into chat.
+- Official docs say browse/post are free and platform fee is zero; escrow is custodied by registry during the task window. Pay-at-accept is an optional non-escrow flow.
+- Public index exposes a 0.10 USDC pilot task and general task mechanism, but the live open-task API could not be read through the current web retrieval environment. **Current funded task count, median bounty, task quality and actual paid volume remain unverified.** A small pilot task is not evidence of meaningful revenue supply.
+- Decision: keep as a low-cost optional demand-discovery experiment, not a primary ₹10 crore path. Do not register/claim or set a wallet until the user explicitly authorizes account/key setup and a suitable funded task is visible. Never create an unfunded task or pay a bounty to ourselves.
+
+Sources:
+- https://basedagents.ai/docs/agents
+- https://basedagents.ai/docs/getting-started
+- https://basedagents.ai/about
+- https://basedagents.ai/tasks
+- https://github.com/maxfain/basedagents
+
+### Immunefi Plether — live, but payout misses 30-day deadline
+- Official competition page search snapshot says live; deadline **16 Nov 2026 10:00 UTC**.
+- Reward pools shown: Primary $56,000, All Stars $16,000, Podium $8,000; rewards in USDC on Ethereum; runnable PoC required; 21,400 lines of code.
+- Official milestone calendar: reports resolved by 20 Nov; results frozen 27 Nov; dispute deadline 30 Nov; results published **17 Dec**; payment complete **18 Dec 2026**.
+- Therefore it cannot meet the Day-30 award/claimability deadline of 9 Dec. It can only be considered under the 90-day contingency, with a strict skill/quality gate. Pool total is not individual entitlement.
+- No live-system probing; use only explicitly in-scope code and permitted testing. Do not submit AI-generated unverified reports.
+
+Official sources:
+- https://immunefi.com/audit-competition/plether/information/
+- https://immunefi.com/audit-competition/plether/scope/
+- https://immunefi.com/audit-competition/
+
+### Google Gemma 4 — official Kaggle dates/prizes reconciled
+- Developer Agent competition official Kaggle result: entry deadline 25 Nov 2026; final submission 2 Dec 2026; $65,000 main prizes ($37k/$18k/$10k). A $35,000 paper track is separate, deadline **12 Nov 2026 23:59 UTC**. Another overview page lists $110,000 combined plus $10,000 small-model bonus; avoid mixing totals unless the precise eligibility of the bonus is met.
+- Main agent task is evaluated by applying patches to repositories and running validation tests; 12-hour evaluation window. This is a substantial engineering benchmark, not an easy cash route.
+- Paper track deadline is immediate, but no verified award announcement/payment date before Dec 9 was found. It is not to be counted as a Day-30 award.
+- Decision: do not split focus into the paper track unless a genuinely original, already-supported research result exists. Main agent competition remains an optional 90-day technical route, subject to compute/model/harness and entry eligibility verification.
+
+Official sources:
+- https://www.kaggle.com/competitions/gemma-4-developer-agent/overview
+- https://www.kaggle.com/competitions/gemma-4-developer-agent/overview/prizes
+- https://www.kaggle.com/competitions/gemma-4-developer-agent-paper/overview/submission-requirements
+
+### Current route ranking
+1. **NEAR Hackathon** — strongest current candidate for an award decision by Nov 18; exact official prize rules still need final verification; not guaranteed.
+2. **BasedAgents** — potential immediate accepted-task earnings, but live funded inventory and payout magnitude are unverified; low-value indexed pilot warns against overestimating.
+3. **Gemma 4 main competition** — larger technical prize, but results/payment timing not verified for Day 30; contingency only.
+4. **Immunefi Plether** — confirmed live contest but results/payment on Dec 17–18; 90-day contingency only and high skill gate.
+5. **Gemma Paper Track** — Nov 12 deadline, no verified award date; only pursue if original research already exists.
+
+### Execution gate / next action
+- First retrieve and audit the NEAR HACKATHON.md and submission form requirements, including prize schedule, AI-agent use rules, wallet country/eligibility, licensing/IP, and demo constraints.
+- Then create a single narrowly scoped Agent Economy prototype with a security/policy layer, only if the official rules permit it and a credible runnable demo can be completed before Nov 14.
+- Do not create a second project merely to use the second-entry allowance.
+- BasedAgents is not to be registered or claimed until live open funded tasks can be inspected and at least one high-value task fits our capabilities and no-human-work constraints.
+- Revenue remains **₹0 verified**. No award, task, wallet or payout has been earned or received.
