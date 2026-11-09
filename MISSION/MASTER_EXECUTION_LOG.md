@@ -46,12 +46,12 @@ Detailed documents:
 - MISSION/REPOSITORY_AUDIT_2026-11-09.md
 
 ## Automated verification
-GitHub Actions CI run #18 passed:
-https://github.com/manish91082-coder/ai-content-system/actions/runs/42650422406
+GitHub Actions CI run #24 passed:
+https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 
 - Dependencies installed.
 - Python source and tests compiled.
-- 19 regression tests passed.
+- 21 regression tests passed.
 - Provider metadata check completed in degraded state.
 - Groq credential authenticated and openai/gpt-oss-120b model listed.
 - Gemini credential failed with HTTP 401 UNAUTHENTICATED / ACCESS_TOKEN_TYPE_UNSUPPORTED. Google reports the configured API key is invalid or unsupported. The secret value was not exposed.
@@ -67,7 +67,7 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650422406
 ## Remaining blockers
 1. Account owner must replace the invalid GEMINI_API_KEY secret if Gemini is to be used. Do not paste secrets into chat.
 2. Confirm Groq account billing tier and available free quota before controlled inference.
-3. Add source authority scoring, article retrieval, cross-source corroboration and a human editorial approval queue.
+3. Add source authority scoring, article retrieval and cross-source corroboration; implement a secure manual editorial approval UI/database workflow.
 4. Redesign Supabase RLS before production data use.
 5. Build product catalogue, checkout, order lifecycle, automated fulfilment, refund handling, affiliate attribution and settlement reconciliation.
 6. Validate one narrow customer offer with a real paid pilot.
