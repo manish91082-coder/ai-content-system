@@ -15,6 +15,7 @@ from pathlib import Path
 from loguru import logger
 from tenacity import retry, stop_after_attempt, wait_exponential
 from database import Database
+from publish_guard import publishing_allowed
 
 # Platform credentials from environment
 YT_CLIENT_ID = os.environ.get("YOUTUBE_CLIENT_ID")
@@ -274,7 +275,19 @@ class Publisher:
     # ─────────────────────────────────────────
     def publish_all(self, content_package: dict, video_paths: dict,
                     image_paths: dict) -> dict:
-        """Publish content to all platforms"""
+        """Publish content only when both authorization gates permit it."""
+        if not publishing_allowed(
+            os.environ.get("TEST_MODE", ""),
+            os.environ.get("PUBLISH_ENABLED", "")
+        ):
+            logger.warning("Publisher blocked by fail-closed authorization guard.")
+            return {
+                "publishing": {
+                    "success": False,
+                    "error": "Publishing blocked: TEST_MODE must be off and PUBLISH_ENABLED must be true."
+                }
+            }
+
         results = {}
         title = content_package["title"]
         description = content_package["description"]
