@@ -46,3 +46,11 @@ def test_capture_state_is_single_transition(tmp_path):
     payment = store.get_payment("ORDER-123")
     assert payment["state"] == "COMPLETED"
     assert payment["capture_id"] == "CAPTURE-123"
+
+
+
+def test_purchase_plan_cannot_create_multiple_orders(tmp_path):
+    store = Store(str(tmp_path / "state.sqlite3"))
+    store.reserve_payment("one-plan", "12.00", "USD", "100.00")
+    with pytest.raises(ValueError, match="already been used"):
+        store.reserve_payment("one-plan", "12.00", "USD", "100.00")
