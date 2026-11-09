@@ -318,3 +318,20 @@ Do not build/list anything yet. Continue route discovery and verify whether any 
 ### Current decision state
 
 No primary route selected. The next pass must compare platform-native buyer/reward markets where a new India-based participant can receive money for a verified outcome or self-serve transaction, with zero inventory/upfront working capital, no calls/manual sales, and bank settlement before 2026-12-09. No product, marketplace, storefront, API or broker platform is to be built until a route passes all hard gates.
+
+
+### Fourth-pass task / prize market findings — 2026-11-09
+
+- Outlier's India listing describes paid human expert evaluation (one current English-writing opportunity advertises average USD $7.50/hour); it is freelance human labour, not autonomous AI revenue.
+- Clickworker has weekly bill runs but requires accepted task work, payable minimum and tax/payment setup; non-EU direct bank transfer can take 5–7 business days after the bill run.
+- UserTesting pays 14 days after a human-completed test; some work is live conversation.
+- Topcoder examples pay per accepted human test case; a community article describes cash-out 15 days after challenge closure but is not a current India bank-payout guarantee.
+- Kaggle prize rules may allow up to 30 days after final eligibility confirmation; prize itself is uncertain and competition work is not an autonomous revenue mechanism.
+- These task/prize routes are excluded from the primary plan because they monetize human participant labour or uncertain contest performance, conflict with no routine user work, and cannot scale to ₹10 crore within 30 days.
+- Expanded sources and exclusion rationale are recorded in MISSION/REVENUE_OPPORTUNITY_AUDIT_2026-11-09.md.
+
+### Updated strategy state
+
+The search has tested asset sales (Acquire/Flippa), software/API marketplaces (AWS/RapidAPI), security bounties (HackerOne/Bugcrowd/Intigriti), paid tasks/prizes (Outlier/Clickworker/UserTesting/Topcoder/Kaggle), creator/affiliate payout rails, and commission models against RBI PA and CBIC GST constraints.
+
+No route yet passes all gates. Continue only with AI-permitted platform-native rewards/transactions or documented user-controlled commercial assets. Do not disguise human gig work as automation, do not use the user's labour as a hidden input, and do not build a product to compensate for missing distribution.
