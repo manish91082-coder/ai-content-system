@@ -39,7 +39,9 @@ class PayPalSandbox:
         self._token_expiry = time.time() + int(data.get("expires_in", 300))
         return self._token
 
-    async def create_order(self, amount: str, currency: str, plan_id: str, description: str) -> dict:
+    async def create_order(
+        self, amount: str, currency: str, plan_id: str, description: str, request_id: str
+    ) -> dict:
         token = await self.access_token()
         body = {
             "intent": "CAPTURE",
@@ -49,18 +51,16 @@ class PayPalSandbox:
                 "description": description[:120],
                 "amount": {"currency_code": currency, "value": amount},
             }],
-            "payment_source": {"paypal": {"experience_context": {
-                "shipping_preference": "NO_SHIPPING",
-                "user_action": "PAY_NOW",
-                "return_url": "http://localhost:8000/?payment=success",
-                "cancel_url": "http://localhost:8000/?payment=cancel",
-            }}},
         }
         async with httpx.AsyncClient(timeout=20.0) as client:
             response = await client.post(
                 self.BASE_URL + "/v2/checkout/orders",
                 json=body,
-                headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"},
+                headers={
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json",
+                    "PayPal-Request-Id": request_id,
+                },
             )
             response.raise_for_status()
             return response.json()
@@ -71,7 +71,11 @@ class PayPalSandbox:
             response = await client.post(
                 self.BASE_URL + "/v2/checkout/orders/" + order_id + "/capture",
                 json={},
-                headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"},
+                headers={
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json",
+                    "PayPal-Request-Id": order_id + "-capture",
+                },
             )
             response.raise_for_status()
             return response.json()
