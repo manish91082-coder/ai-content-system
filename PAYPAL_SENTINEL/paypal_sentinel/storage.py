@@ -144,10 +144,12 @@ class Store:
 
     def set_order(self, payment_id: str, order_id: str) -> None:
         with self.lock:
-            self.conn.execute(
+            cursor = self.conn.execute(
                 "UPDATE payments SET order_id=?, state='CREATED' WHERE payment_id=? AND state='CREATING'",
                 (order_id, payment_id),
             )
+            if cursor.rowcount != 1:
+                raise RuntimeError("payment reservation state transition failed")
 
     def fail_payment(self, payment_id: str) -> None:
         with self.lock:
@@ -191,7 +193,9 @@ class Store:
 
     def complete_payment(self, order_id: str, capture_id: str) -> None:
         with self.lock:
-            self.conn.execute(
+            cursor = self.conn.execute(
                 "UPDATE payments SET state='COMPLETED', capture_id=? WHERE order_id=? AND state='CAPTURING'",
                 (capture_id, order_id),
             )
+            if cursor.rowcount != 1:
+                raise RuntimeError("payment completion state transition failed")
