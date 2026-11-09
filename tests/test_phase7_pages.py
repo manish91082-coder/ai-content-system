@@ -30,7 +30,7 @@ class Phase7Tests(unittest.TestCase):
         self.assertIn('href="demo.html"', content)
         self.assertIn('href="admission-desk-lite.html"', content)
         self.assertIn("validated नहीं", content.lower())
-        self.assertIn("No checkout", content)
+        self.assertIn("checkout या payment collection सक्रिय नहीं", content.lower())
 
     def test_demo_has_fictional_data_and_interactive_controls(self):
         content = DEMO.read_text(encoding="utf-8")
