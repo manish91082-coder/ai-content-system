@@ -85,5 +85,5 @@ def test_receipt_hash_chain_detects_tampering():
         assert log.verify() is True
         row = json.loads(path.read_text())
         row["event"]["recipient"] = "attacker.near"
-        path.write_text(json.dumps(row) + "\\n")
+        path.write_text(json.dumps(row) + "\n")
         assert log.verify() is False
