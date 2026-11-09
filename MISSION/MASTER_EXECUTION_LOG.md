@@ -25,7 +25,9 @@ Autonomous Internet Revenue Engine. Target: ₹10 crore actual settled revenue w
 - [x] Added a second gate inside `Publisher.publish_all` (defense in depth).
 - [x] Scheduled workflow executions force TEST_MODE=true.
 - [x] Added compile and unittest steps before the daily pipeline.
-- [x] Added ten regression tests.
+- [x] Added thirteen regression tests.
+- [x] Updated Groq SDK to 1.7.0 to resolve HTTPX 0.28 proxy-client incompatibility.
+- [x] Added provider metadata-only credential/model checks and provider circuit breaker.
 - [x] Migrated Gemini to maintained Google GenAI SDK and current free-tier model.
 - [x] Replaced obsolete Groq model with current free-plan model.
 - [x] Added official provider research and data-use constraints.
@@ -42,8 +44,10 @@ Autonomous Internet Revenue Engine. Target: ₹10 crore actual settled revenue w
 - Telegram newline correction: c5bbc26ddad9307a1bdba0c72934a565c3ce9869
 
 ## Verification truth
-- GitHub Actions CI run #3 succeeded: all dependencies installed, compileall passed, all 10 tests passed.
-- CI run #1 and #2 correctly exposed dependency conflicts; both were fixed before run #3.
+- GitHub Actions CI run #10 succeeded: all dependencies installed, compileall passed, all 13 tests passed, and metadata-only provider check completed.
+- CI runs #1 and #2 exposed dependency conflicts; both were fixed before run #3.
+- CI runs #5–#9 exposed provider integration issues and were used to fix Groq SDK compatibility, default model handling, and provider circuit-breaker behavior.
+- Provider check confirmed Groq key authentication and `openai/gpt-oss-120b` model availability. Gemini secret is present but invalid: Google returned HTTP 401 `UNAUTHENTICATED` / `ACCESS_TOKEN_TYPE_UNSUPPORTED` for the Gemini Developer API. No secret value was read.
 - No production publish action was attempted.
 - Actual settled revenue remains ₹0 until bank/payment settlement evidence is supplied.
 
@@ -55,7 +59,7 @@ Autonomous Internet Revenue Engine. Target: ₹10 crore actual settled revenue w
 - No product/checkout/order/fulfilment/refund/settlement system.
 
 ## Next actions
-1. Diagnose Gemini authentication by validating the key privately; never expose it.
-2. Execute one controlled Groq inference test and confirm the active free-tier quota.
+1. Replace the invalid `GEMINI_API_KEY` GitHub Actions secret with a valid Google AI Studio Gemini Developer API key (not an OAuth access token); never paste it into chat or source code.
+2. Once the account's free-tier/billing status is confirmed, run a controlled Groq inference test using the authenticated `openai/gpt-oss-120b` model.
 3. Add source provenance and editorial QA.
 4. Evaluate market opportunities and select a first revenue offer based on verifiable demand and India payout feasibility.
