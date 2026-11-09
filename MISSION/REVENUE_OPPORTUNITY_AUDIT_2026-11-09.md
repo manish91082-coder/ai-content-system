@@ -423,3 +423,64 @@ AWS Marketplace is conditional on an India legal seller with GSTIN/e-invoicing a
 **Strategic implication:** the next research pass must focus on platforms where (a) the platform already has active buyers, (b) a new eligible participant can receive payment for a verified outcome or self-serve transaction, (c) no inventory or upfront working capital is required, (d) no calls/manual sales are needed, and (e) first payout can clear to an Indian bank within the deadline. This includes legitimate outcome-based reward markets, verified digital asset marketplaces, platform-native task/reward markets, and existing demand channels that accept new providers.
 
 Do not build a marketplace, product, storefront, or API before one of these channels passes all hard gates. The mission's route selection remains open pending that final demand-and-settlement comparison.
+
+
+---
+
+## 13. PLATFORM-NATIVE TASK / PRIZE MARKET AUDIT
+
+This pass tested whether paid tasks or competitive prize platforms could bypass customer acquisition and provide a quick payout. The decisive distinction is whether the AI can lawfully perform the work autonomously, or whether the platform is paying a human contributor for their own labour.
+
+### Outlier AI
+- A current India-targeted opportunity page describes identity and skill verification, flexible freelance contribution, and an India English-writing expert rate averaging USD $7.50/hour for that specific listed opportunity.
+- The service is human expert feedback and evaluation, not an autonomous software agent revenue channel. The opportunity's listed location and terms vary by project.
+- Decision: reject as a primary route. It requires the user to perform paid human work, and even full-time hours cannot approach ₹10 crore in 30 days.
+
+Official listing: https://app.outlier.ai/opportunities/4472140005?location=India
+
+### Clickworker
+- Official help says weekly bill runs, subject to payable minimum, tax details and correct payment setup. For non-EU direct bank transfers, arrival may take 5–7 business days after bill run; some work is credited only after client acceptance.
+- It is paid task labour, with limited task values and account/project availability; not autonomous income and not remotely capable of the target scale.
+- Decision: exclude as primary route and do not use the user as a human task worker.
+- Official sources:
+  - https://support-workplace.clickworker.com/support/solutions/articles/80000672346
+  - https://support-workplace.clickworker.com/support/solutions/articles/80000969080
+
+### UserTesting
+- Official help says test payments are processed via PayPal 14 days after completion. Some formats involve live conversations, and the user must personally participate in tests.
+- Decision: exclude; human participation and low per-test ceiling conflict with no routine user labour and the ₹10 crore objective.
+- Official source: https://support.usertesting.com/hc/en-us/articles/4405125498003-Where-s-my-payment
+
+### Topcoder
+- Public challenge examples show individual accepted test-case prizes (e.g. $20–$150 per test case), paid only after review/acceptance. A Topcoder community article describes cash-out availability 15 days after challenge closure, but it is an older community article, not a current India-specific bank-payout guarantee.
+- Decision: at best a human skill-challenge route with low/uncertain ceiling; exclude as a primary route.
+- Sources:
+  - https://www.topcoder.com/challenges/e1dc1120-b76b-4a3b-b0a4-eac949c09fd2
+  - https://www.topcoder.com/blog/google-interviews-topcoder-10-burning-questions/
+
+### Kaggle competitions
+- Competition rules can require final eligibility verification and allow up to 30 days after confirmation for prize delivery. A public forum response mentions 6 weeks or more, but is anecdotal and old.
+- Decision: prizes are uncertain, work is human/competition-dependent, and settlement may consume the remaining deadline. Not a primary route.
+- Sources:
+  - https://www.kaggle.com/c/testtesttest/rules
+  - https://www.kaggle.com/general/17952
+
+### Finding
+
+Paid task platforms and prize competitions can provide buyer/reward discovery, but they generally monetize the human participant's time or uncertain competitive performance. They are not autonomous AI revenue engines and their economic ceiling is far below the mission target. They are excluded from primary execution.
+
+## 14. CURRENT STRATEGIC CONCLUSION
+
+The route search has now tested:
+- High-ticket asset/business sales (Acquire, Flippa).
+- Software/API marketplaces (AWS Marketplace India, RapidAPI).
+- Security reward markets (HackerOne, Bugcrowd, Intigriti).
+- Paid task and prize markets (Outlier, Clickworker, UserTesting, Topcoder, Kaggle).
+- Affiliate/creator storefront and standard marketplace payout rails.
+- Commission/brokerage models against RBI PA and CBIC GST constraints.
+
+No route yet passes all hard gates simultaneously. The gap is not a lack of ideas; it is the absence of verified, immediate buyer/reward demand at a scale large enough to reach ₹10 crore, while also allowing zero-capital, no-human-sales, AI-operated fulfilment and bank settlement within 30 days.
+
+**Decision:** continue only with routes where AI can do the core value-producing work under the platform's rules and where the platform already exposes genuine buyers/reward issuers. Do not disguise human gig work as automation. Do not use the user's time as a hidden input. Do not start a product build to compensate for missing distribution.
+
+The next and final discovery pass should focus on legitimate platform-native reward/competition programs that explicitly permit AI-assisted work, and on any existing user-controlled commercial assets that can be documented. If no route survives, report that evidence plainly and choose the best available executable path without claiming it can achieve the target.
