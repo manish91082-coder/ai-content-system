@@ -23,6 +23,31 @@ class ReceiptLog:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
+    def verify(self) -> bool:
+        if not self.path.exists():
+            return True
+        previous_hash = "0" * 64
+        expected_sequence = 1
+        for line in self.path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            body = {
+                "sequence": row["sequence"],
+                "timestamp": row["timestamp"],
+                "event": row["event"],
+                "previous_hash": row["previous_hash"],
+            }
+            canonical = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            digest = hashlib.sha256(canonical.encode()).hexdigest()
+            if row["sequence"] != expected_sequence or row["previous_hash"] != previous_hash:
+                return False
+            if row["receipt_hash"] != digest:
+                return False
+            previous_hash = digest
+            expected_sequence += 1
+        return True
+
     def append(self, event: dict) -> Receipt:
         previous_hash = "0" * 64
         sequence = 1
