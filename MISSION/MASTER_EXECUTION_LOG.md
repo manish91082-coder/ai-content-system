@@ -25,7 +25,7 @@ Autonomous Internet Revenue Engine. Target: ₹10 crore actual settled revenue w
 - [x] Added a second gate inside `Publisher.publish_all` (defense in depth).
 - [x] Scheduled workflow executions force TEST_MODE=true.
 - [x] Added compile and unittest steps before the daily pipeline.
-- [x] Added nine regression tests.
+- [x] Added ten regression tests.
 - [x] Migrated Gemini to maintained Google GenAI SDK and current free-tier model.
 - [x] Replaced obsolete Groq model with current free-plan model.
 - [x] Added official provider research and data-use constraints.
@@ -42,9 +42,8 @@ Autonomous Internet Revenue Engine. Target: ₹10 crore actual settled revenue w
 - Telegram newline correction: c5bbc26ddad9307a1bdba0c72934a565c3ce9869
 
 ## Verification truth
-- Eight equivalent gate/report sanity checks passed in local analysis.
-- Full checked-out repository compile/test execution has not been completed; container could not resolve github.com for clone.
-- GitHub Actions test workflow has not yet been triggered.
+- GitHub Actions CI run #3 succeeded: all dependencies installed, compileall passed, all 10 tests passed.
+- CI run #1 and #2 correctly exposed dependency conflicts; both were fixed before run #3.
 - No production publish action was attempted.
 - Actual settled revenue remains ₹0 until bank/payment settlement evidence is supplied.
 
@@ -56,7 +55,7 @@ Autonomous Internet Revenue Engine. Target: ₹10 crore actual settled revenue w
 - No product/checkout/order/fulfilment/refund/settlement system.
 
 ## Next actions
-1. Run regression tests on the branch through GitHub Actions and inspect results.
-2. Verify the Gemini key privately and execute one controlled inference test; never expose the key.
-3. Execute a controlled Groq inference test and confirm the active free-tier quota.
+1. Diagnose Gemini authentication by validating the key privately; never expose it.
+2. Execute one controlled Groq inference test and confirm the active free-tier quota.
+3. Add source provenance and editorial QA.
 4. Evaluate market opportunities and select a first revenue offer based on verifiable demand and India payout feasibility.
