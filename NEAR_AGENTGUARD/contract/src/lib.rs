@@ -184,8 +184,8 @@ mod tests {
     #[test]
     #[should_panic(expected = "owner only")]
     fn non_owner_cannot_register_agent() {
-        context(account("attacker.testnet"), 1);
         let mut contract = setup();
+        context(account("attacker.testnet"), 1);
         contract.register_agent(account("attacker.testnet"));
     }
 
