@@ -99,3 +99,14 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 - Added setup/runbook documentation. No Supabase schema has been deployed; no secrets or content approvals were performed.
 - Approval status is intentionally distinct from publish-ready status. Durable private asset storage, a later-run publish queue and revocation/release controls remain unimplemented.
 - Legacy broad RLS policies remain a release blocker and are not silently treated as repaired.
+
+
+## Phase 4 — customer delivery and settlement architecture
+- Added `MISSION/PHASE_4_CUSTOMER_DELIVERY_ARCHITECTURE.md`.
+- Defined provider-neutral product/order/payment/fulfilment/refund/settlement boundaries and explicit state machines.
+- Defined signed webhook intake, raw-body verification, event-level deduplication, idempotent fulfilment and server-side payment verification.
+- Defined private digital delivery, customer-data minimisation and explicit release controls.
+- Separated gross captured payments, provider balance, expected settlement, bank-credit confirmation and net settled revenue.
+- Current provider candidates: Razorpay first for India direct checkout after merchant approval; Cashfree alternate; Gumroad optional digital-product fallback. None is activated or conclusively selected.
+- Current public provider references checked: Razorpay standard public pricing states 2% transaction fee and no setup/AMC; Cashfree standard settlement guide describes T+2 subject to account/bank/risk conditions; Gumroad lists India INR bank payout, $100 standard minimum and a 7-day holding period for weekly/monthly/quarterly payouts.
+- No payment provider account was accessed, no KYC was performed, no checkout was created, and no live payment occurred.
