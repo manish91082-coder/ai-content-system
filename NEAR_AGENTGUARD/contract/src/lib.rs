@@ -26,7 +26,10 @@ impl AgentGuard {
     pub fn new(owner: AccountId, max_single: U128, daily_limit: U128) -> Self {
         assert!(!env::state_exists(), "already initialized");
         assert!(max_single.0 > 0, "max_single must be positive");
-        assert!(daily_limit.0 >= max_single.0, "daily_limit must cover max_single");
+        assert!(
+            daily_limit.0 >= max_single.0,
+            "daily_limit must cover max_single"
+        );
         Self {
             owner,
             agents: UnorderedSet::new(b"a"),
@@ -83,12 +86,19 @@ impl AgentGuard {
     /// Recipient and limits are enforced on-chain, independently of any LLM.
     #[payable]
     pub fn pay(&mut self, recipient: AccountId, amount: U128, memo: String) -> Promise {
-        assert_eq!(env::attached_deposit(), NearToken::from_yoctonear(0), "no attached deposit accepted");
+        assert_eq!(
+            env::attached_deposit(),
+            NearToken::from_yoctonear(0),
+            "no attached deposit accepted"
+        );
         assert!(!self.frozen, "payments frozen");
         let agent = env::predecessor_account_id();
         assert!(self.agents.contains(&agent), "agent not registered");
         assert!(!self.blocked.contains(&recipient), "recipient blocked");
-        assert!(self.recipients.contains(&recipient), "recipient not allowlisted");
+        assert!(
+            self.recipients.contains(&recipient),
+            "recipient not allowlisted"
+        );
         assert!(amount.0 > 0, "amount must be positive");
         assert!(amount.0 <= self.max_single, "single payment limit exceeded");
 
@@ -97,18 +107,24 @@ impl AgentGuard {
             self.spend_day = today;
             self.spent_today = 0;
         }
-        let new_spend = self.spent_today.checked_add(amount.0).expect("spend overflow");
+        let new_spend = self
+            .spent_today
+            .checked_add(amount.0)
+            .expect("spend overflow");
         assert!(new_spend <= self.daily_limit, "daily spend limit exceeded");
 
         self.spent_today = new_spend;
-        env::log_str(&serde_json::json!({
-            "event": "AgentGuardPaymentAuthorized",
-            "agent": agent,
-            "recipient": recipient,
-            "amount_yocto": amount.0.to_string(),
-            "day": today,
-            "memo": memo,
-        }).to_string());
+        env::log_str(
+            &serde_json::json!({
+                "event": "AgentGuardPaymentAuthorized",
+                "agent": agent,
+                "recipient": recipient,
+                "amount_yocto": amount.0.to_string(),
+                "day": today,
+                "memo": memo,
+            })
+            .to_string(),
+        );
         Promise::new(recipient).transfer(NearToken::from_yoctonear(amount.0))
     }
 
@@ -164,11 +180,7 @@ mod tests {
 
     fn setup() -> AgentGuard {
         context(account("owner.testnet"), 1);
-        let mut contract = AgentGuard::new(
-            account("owner.testnet"),
-            U128(10),
-            U128(20),
-        );
+        let mut contract = AgentGuard::new(account("owner.testnet"), U128(10), U128(20));
         contract.register_agent(account("worker.testnet"));
         contract.allow_recipient(account("vendor.testnet"));
         contract
