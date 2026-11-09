@@ -14,6 +14,16 @@ CREATE TABLE IF NOT EXISTS public.editorial_review_events (
 CREATE INDEX IF NOT EXISTS idx_editorial_review_events_content
     ON public.editorial_review_events(content_id, reviewed_at DESC);
 
+-- The earlier pipeline serialized JSONB metadata as a JSON string. Normalize
+-- valid object-shaped legacy values so the review RPC can inspect their keys.
+UPDATE public.content_items
+SET metadata = ((metadata #>> '{}')::jsonb)
+WHERE jsonb_typeof(metadata) = 'string'
+  AND (metadata #>> '{}') ~ '^\\s*\\{';
+
+GRANT USAGE ON SCHEMA public TO service_role;
+GRANT SELECT, INSERT, UPDATE ON TABLE public.content_items TO service_role;
+
 ALTER TABLE public.editorial_review_events ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.editorial_review_events FROM PUBLIC, anon, authenticated;
 GRANT SELECT, INSERT ON TABLE public.editorial_review_events TO service_role;
