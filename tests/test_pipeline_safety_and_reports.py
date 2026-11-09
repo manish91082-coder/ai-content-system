@@ -150,6 +150,19 @@ class EditorialEvidenceTests(unittest.TestCase):
         self.assertEqual(result["editorial_approval"]["status"], "pending_review")
 
 
+class EditorialReviewSqlSecurityTests(unittest.TestCase):
+    def test_review_rpc_is_restricted_and_transactional(self):
+        sql = (ROOT / "config" / "editorial_review_schema.sql").read_text(encoding="utf-8")
+        self.assertIn("SECURITY INVOKER", sql)
+        self.assertIn("FOR UPDATE", sql)
+        self.assertIn("service_role", sql)
+        self.assertIn("ENABLE ROW LEVEL SECURITY", sql)
+        self.assertIn("REVOKE ALL ON FUNCTION", sql)
+        self.assertIn("GRANT EXECUTE ON FUNCTION", sql)
+        self.assertIn("BEFORE UPDATE OR DELETE", sql)
+        self.assertNotIn("SECURITY DEFINER", sql)
+
+
 class EditorialReviewCliSecurityTests(unittest.TestCase):
     def test_review_cli_requires_server_side_service_key(self):
         with patch.dict(os.environ, {}, clear=True):
