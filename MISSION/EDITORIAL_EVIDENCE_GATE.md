@@ -21,7 +21,7 @@ Prevent the automated pipeline from treating a headline or trend signal as suffi
 - The orchestrator saves assets with database status pending_editorial_review.
 - Publisher.publish_all independently requires editorial_approved=true, a non-empty approved_by identity, and a non-empty approved_at timestamp, in addition to the publishing safety gate.
 - A generated model response cannot self-approve. No automatic approval is granted.
-- The manual approval interface and secure approval mutation workflow are not yet implemented. Until that workflow exists, all generated assets remain pending review and publishing stays blocked even if the environment publishing flags are accidentally enabled.
+- A secure GitHub Actions review workflow and restricted Supabase decision RPC are implemented on the Phase 3 branch. They are not operational until the owner applies the SQL schema and configures the required repository secrets/approver allowlist. Until then, generated assets remain pending review and publishing stays blocked.
 
 ## Important distinction
 This is a **provenance and eligibility gate**, not a full independent fact-checking system:
@@ -50,3 +50,14 @@ Six tests cover:
 
 ## Release gate
 Do not enable live publishing solely because these tests pass. The system still needs manual editorial approval, a valid Gemini key if Gemini is to be used, controlled inference verification, and a confirmed commercial workflow.
+
+
+## Phase 3 review integrity controls
+- The review package now stores description, hashtags and thumbnail prompt alongside title/script and source metadata.
+- SHA-256 fingerprint binds the exact reviewed text and source references; edits invalidate the supplied fingerprint.
+- The GitHub workflow displays a review package first. A separate approve/reject dispatch records a decision, so a reviewer can inspect before deciding.
+- The workflow validates the authenticated GitHub actor against a repository variable; reviewer identity is not accepted as a free-form input.
+- A Supabase RPC performs a row lock, status/hash checks, status update and audit insert in one transaction.
+- Audit events are append-only through a database trigger. The function is SECURITY INVOKER and execution is granted only to service_role.
+- The workflow records editorial approval only. It does not publish and does not switch on the publishing gate.
+- Review remains not production-operational until the SQL is applied and repository settings are configured by the owner.
