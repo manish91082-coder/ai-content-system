@@ -594,3 +594,48 @@ Important official docs finding: NEAR Agent API is experimental and mainnet-only
 Official docs: https://docs.agentsonintents.com/integration/agent-api/overview ; https://docs.agentsonintents.com/integration/agent-api/quickstart/introduction ; https://docs.near.org/protocol/accounts-contracts/access-keys
 
 No award/task/revenue has been earned. ₹0 verified.
+
+
+## OPPORTUNITY AUDIT ADDENDUM — 2026-11-10
+
+### PayPal AI Hackathon — verified official rules
+Official rules: https://paypalaihackathon.devpost.com/rules
+- Submission deadline: 12 Nov 2026, 12:00 PM Pacific Standard Time = 13 Nov 2026, 01:30 IST.
+- Winners announced on or around 21 Dec 2026.
+- Eligible entrant categories include adult individuals, teams and existing organizations. India is not among the expressly listed excluded countries in the rules reviewed; local law and payout compliance still apply.
+- Project must integrate PayPal Developer Platform sandbox plus an AI model/tool. Functional demo required; static mockup is insufficient.
+- Public code repository and open-source license required. Rules specify the license should be detectable and visible in the repository About section.
+- Public YouTube demo video must be under 3 minutes and show the working project.
+- Prize table includes Grand Prize $12,000 / $8,000 / $5,000; Honorable Mentions of $5,000 each in listed categories; and separate sponsor awards. A project can win up to one Grand Prize and one Sponsor Prize, or one Honorable Mention and one Sponsor Prize.
+- Monetary prizes are delivered within 60 days after completed winner forms are received. Non-US winners may need W-8BEN and are responsible for applicable local reporting/tax/FX compliance.
+- Therefore this is not a Day-30 payout route; because results are expected 21 Dec and payment may take another 60 days after forms, it also cannot be relied on to meet the 90-day outer settlement target. Treat as long-horizon optional upside, not verified revenue.
+- PayPal API official docs: OAuth 2.0 client credentials, sandbox base URL https://api-m.sandbox.paypal.com, Orders v2 create and capture. Server-side order creation is required; test sandbox before live. PayPal docs say a PayPal Business account is needed for live integration and testing integrations outside the US.
+- Project branch paypal-hackathon/paypal-sentinel-v1, directory PAYPAL_SENTINEL. CI passed 9 tests and Python compileall. No PayPal sandbox credentials or real transaction are verified. Project folder has MIT license, but repository root/About license metadata is not yet compliant/verified.
+- Required entrant steps: create PayPal Developer sandbox REST app, configure client ID/secret locally (never paste into chat or commit), create Gemini API key, run sandbox checkout, record public YouTube demo under 3 minutes, complete Devpost registration/submission.
+
+### AgentGuard latest verification
+- Branch near-hackathon/agentguard-v0, project NEAR_AGENTGUARD.
+- Python CI at commit e394ac7444f270233b31e649333309ae3d197e0d: 14 tests passed; benign demo ALLOW; prompt-injection attempt BLOCK before simulated signer.
+- Rust CI at the same commit: 10 contract unit tests passed.
+- Rust workflow has been expanded to add wasm32-unknown-unknown and build release WASM. Latest run after adding WASM build and memo-length guard is pending as of this addendum.
+- Contract remains undeployed. No wallet, funds, testnet transaction or submission used.
+- NEAR Hackathon primary track: AI Security & Defense only. No Agent Economy claim until a real agent-to-agent service/payment workflow exists.
+
+### Bug bounty portfolio review
+These are maximum program caps, not expected earnings. A bounty exists only after a valid, in-scope, reproducible vulnerability is accepted and rewarded.
+
+1. Instadapp / Fluid — up to $500,000; critical minimum $25,000, high cap $100,000; no KYC listed; PoC required for all severities. Scope is restricted to listed assets; prior audits and deployed-code requirement apply. High complexity and low base probability. Official: https://immunefi.com/bug-bounty/instadapp/information/
+2. GMTrade — up to $100,000; critical $25,000–$100,000; high $10,000–$20,000; no KYC listed; runnable PoC required. Rust/Solana codebase has multiple prior audits and previous bounty reports, so known-issue deduplication is mandatory. Official: https://immunefi.com/bug-bounty/gmtrade/information/ and https://github.com/gmsol-labs/gmx-solana
+3. Threshold Network — up to $150,000; critical minimum $10,000; no KYC listed; runnable PoC required; many prior audits and known-issue repositories. Official: https://immunefi.com/bug-bounty/thresholdnetwork/information/
+4. Wormhole — up to $1,000,000, critical minimum $100,000, but KYC is required and the codebase/security model is exceptionally complex. This is not a quick or likely payout route. Official: https://immunefi.com/bug-bounty/wormhole/information/
+5. GMX — up to $5,000,000 but highly competitive, multiple chains and prior audits, and KYC/eligibility conditions must be checked before any work. Official: https://immunefi.com/bug-bounty/gmx/information/
+
+No target has been tested against deployed systems. Only local source review and forked/local PoCs are permitted. Never test mainnet/public testnet assets, third-party services, or generate high-volume traffic where program rules prohibit it. No bounty report will be submitted unless a deterministic in-scope impact is independently reproduced and checked against known issues/audits.
+
+### Current ranking for the ₹10 crore mission
+- NEAR Hackathon: near-term award decision (18 Nov) and plausible 90-day settlement window, but highly competitive and no guarantee.
+- High-value security bounty: potentially the largest direct award route but extremely low and unknown probability; prioritize one tractable, recent, in-scope codebase rather than spreading shallow scans.
+- PayPal AI Hackathon: good product/competition upside, but result/payment timing falls outside the current 30/90-day clocks.
+- Product storefronts and low-value microtask platforms remain secondary; no speculative sales forecast is counted.
+
+Verified revenue remains ₹0. No submission, accepted bounty, award, claimable balance or settled payout has been earned.
