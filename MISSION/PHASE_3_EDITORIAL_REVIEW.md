@@ -12,12 +12,12 @@
 
 ## Required one-time owner setup
 1. Review `config/editorial_review_schema.sql` and apply it manually in the intended Supabase project's SQL Editor. This branch does not execute DDL against the live database.
-2. Confirm the existing `content_items` table has UUID `id`, JSONB `metadata`, `status`, and `updated_at` columns. The supplied schema has these columns, but the live project must be checked before applying.
+2. Confirm the existing `content_items` table has UUID `id`, JSONB `metadata`, `status`, and `updated_at` columns. The SQL also normalizes valid legacy JSONB string values into objects and grants the service_role the minimum table access needed by this workflow.
 3. In GitHub repository Settings → Secrets and variables → Actions:
    - Secret `SUPABASE_URL`
    - Secret `SUPABASE_SERVICE_KEY` (server-side service-role key only; never paste it into chat or commit it)
    - Variable `EDITORIAL_APPROVER_LOGINS` (comma-separated exact GitHub login allowlist; start with the repository owner only)
-4. Ensure the Supabase Data API exposes the `public` schema and the `editorial_review_decide` function is reachable through RPC. Supabase changed new-table Data API exposure defaults on 2026-10-30; do not assume a newly created table is automatically exposed. The review table itself is not queried from the client; the function is the only decision endpoint.
+4. Ensure the Supabase Data API exposes the `public` schema and the `editorial_review_decide` function is reachable through RPC. Supabase changed default grants for new public tables/functions in late October 2026; do not assume default access exists. This SQL explicitly grants the function and audit-table access to service_role only. The review table itself is not queried from the client.
 5. After schema and secrets are configured, run the workflow with action `prepare`, inspect the complete summary, then run `approve` or `reject` with the exact content ID and fingerprint.
 6. Keep `PUBLISH_ENABLED` unset/false and scheduled runs in test mode. An approval is not authorization to publish.
 
@@ -37,3 +37,9 @@ Run:
 python -m compileall -q src tests scripts
 python -m unittest discover -s tests -v
 ```
+
+
+## CI evidence
+- GitHub Actions run #29: https://github.com/manish91082-coder/ai-content-system/actions/runs/42652645914
+- 30 tests passed; compile step covered `src`, `tests`, and `scripts`.
+- Provider check remains degraded because Gemini key authentication fails; Groq metadata authentication/model listing succeeds.
