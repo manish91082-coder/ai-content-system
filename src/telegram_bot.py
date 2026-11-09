@@ -56,7 +56,7 @@ class TelegramBot:
         """Format both legacy flat and current topic -> platform -> result reports."""
         lines = []
         if not isinstance(publish_results, dict):
-            return "  No publishing result data available.\\n"
+            return "  No publishing result data available.\n"
 
         for topic, platform_results in publish_results.items():
             topic_label = escape(str(topic)[:60])
@@ -80,7 +80,7 @@ class TelegramBot:
                 else:
                     lines.append(f"  ⏸ {topic_label} | {platform_label}: {escape(str(result)[:180])}")
 
-        return "\\n".join(lines) if lines else "  No publishing attempts recorded.\\n"
+        return "\n".join(lines) if lines else "  No publishing attempts recorded.\n"
 
     def send_daily_report(self, research_topics: list,
                            publish_results: dict,
@@ -96,7 +96,7 @@ class TelegramBot:
             else:
                 label = str(item)
             topic_lines.append(f"  {i + 1}. {escape(str(label)[:160])}")
-        topics_text = "\\n".join(topic_lines) or "  No topics researched."
+        topics_text = "\n".join(topic_lines) or "  No topics researched."
 
         platforms_text = self._format_publish_results(publish_results)
         message = f"""🤖 <b>AI Content System — Daily Report</b>
