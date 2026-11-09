@@ -5,7 +5,8 @@ Autonomous Internet Revenue Engine. Stretch target: ₹10 crore in actual settle
 
 ## Current checkpoint
 - Date: 2026-11-09
-- Active branch: revenue-engine/phase-1-safety-fixes
+- Active branch: revenue-engine/phase-3-editorial-review
+- Phase 3 branch is based on the unmerged Phase 1/2 PR head; PR #1 remains open and unmerged.
 - Repository: https://github.com/manish91082-coder/ai-content-system
 - Default branch: master
 - Draft PR #1: https://github.com/manish91082-coder/ai-content-system/pull/1
@@ -67,7 +68,7 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 ## Remaining blockers
 1. Account owner must replace the invalid GEMINI_API_KEY secret if Gemini is to be used. Do not paste secrets into chat.
 2. Confirm Groq account billing tier and available free quota before controlled inference.
-3. Add source authority scoring, article retrieval and cross-source corroboration; implement a secure manual editorial approval UI/database workflow.
+3. Add source authority scoring, article retrieval and cross-source corroboration; complete the private asset review/fulfilment workflow.
 4. Redesign Supabase RLS before production data use.
 5. Build product catalogue, checkout, order lifecycle, automated fulfilment, refund handling, affiliate attribution and settlement reconciliation.
 6. Validate one narrow customer offer with a real paid pilot.
@@ -77,3 +78,16 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 - Generated content, views, clicks, leads, unpaid invoices, pending orders and wallet balances are not revenue.
 - No fake orders, fake testimonials, spam distribution or policy bypass.
 - ₹10 crore remains a stretch target, not a promise.
+
+
+## Phase 3 — secure human editorial review (implementation branch)
+- Added a deterministic SHA-256 review fingerprint over title, script, description, hashtags, thumbnail prompt and source references.
+- The content generator pipeline now persists the complete review package and fingerprint in JSONB metadata.
+- Fixed Supabase REST persistence for content rows and status/file-path updates; JSONB values are now sent as JSON objects rather than pre-serialized JSON strings.
+- Added a GitHub Actions workflow with a two-step review process: prepare a full review summary, then approve/reject using the exact fingerprint.
+- Decisions are accepted only from authenticated GitHub actors included in the `EDITORIAL_APPROVER_LOGINS` repository variable.
+- Added a restricted Supabase RPC that locks the row, requires service_role, verifies pending status and the fingerprint, updates status and appends an audit event transactionally.
+- Added an append-only audit table with RLS enabled, restricted grants and an immutability trigger.
+- Added setup/runbook documentation. No Supabase schema has been deployed; no secrets or content approvals were performed.
+- Approval status is intentionally distinct from publish-ready status. Durable private asset storage, a later-run publish queue and revocation/release controls remain unimplemented.
+- Legacy broad RLS policies remain a release blocker and are not silently treated as repaired.
