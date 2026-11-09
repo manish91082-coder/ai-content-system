@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
-from typing import Iterable
 
 
 class Decision(str, Enum):
@@ -44,6 +43,21 @@ class Policy:
     min_account_age_days: int = 0
     warn_on_first_interaction: bool = True
 
+    def __post_init__(self) -> None:
+        limits = (self.max_single_payment, self.max_daily_spend, self.human_approval_above)
+        if any(not isinstance(value, Decimal) or not value.is_finite() for value in limits):
+            raise ValueError("policy limits must be finite Decimal values")
+        if self.max_single_payment <= 0 or self.max_daily_spend <= 0:
+            raise ValueError("payment limits must be positive")
+        if self.max_daily_spend < self.max_single_payment:
+            raise ValueError("daily limit must be at least the single-payment limit")
+        if self.human_approval_above < 0 or self.min_account_age_days < 0:
+            raise ValueError("approval threshold and minimum account age cannot be negative")
+        for values in (self.allowed_recipients, self.blocked_recipients,
+                       self.allowed_contracts, self.allowed_methods):
+            if any(not value or not value.strip() for value in values):
+                raise ValueError("policy allow/block lists cannot contain blank values")
+
 
 @dataclass(frozen=True)
 class Evaluation:
@@ -60,25 +74,48 @@ def evaluate(
 ) -> Evaluation:
     """Fail-closed deterministic policy. The model cannot override this result."""
     signals = signals or RiskSignals()
-    reasons: list[str] = []
 
-    if not intent.recipient.strip():
-        return Evaluation(Decision.BLOCK, ("missing_recipient",), intent.amount)
+    def block(reason: str) -> Evaluation:
+        return Evaluation(Decision.BLOCK, (reason,), intent.amount)
+
+    if not isinstance(intent.agent_id, str) or not intent.agent_id.strip():
+        return block("missing_agent_id")
+    if not isinstance(intent.recipient, str) or not intent.recipient.strip():
+        return block("missing_recipient")
+    if not isinstance(intent.amount, Decimal) or not intent.amount.is_finite():
+        return block("amount_must_be_finite_decimal")
     if intent.amount <= 0:
-        return Evaluation(Decision.BLOCK, ("amount_must_be_positive",), intent.amount)
+        return block("amount_must_be_positive")
+    if not isinstance(spent_today, Decimal) or not spent_today.is_finite() or spent_today < 0:
+        return block("invalid_spend_counter")
+    if signals.account_age_days is not None and signals.account_age_days < 0:
+        return block("invalid_counterparty_age")
+    if signals.evidence_count < 0:
+        return block("invalid_evidence_count")
     if signals.known_malicious or intent.recipient in policy.blocked_recipients:
-        return Evaluation(Decision.BLOCK, ("recipient_blocklisted",), intent.amount)
+        return block("recipient_blocklisted")
     if intent.amount > policy.max_single_payment:
-        return Evaluation(Decision.BLOCK, ("single_payment_limit_exceeded",), intent.amount)
+        return block("single_payment_limit_exceeded")
     if spent_today + intent.amount > policy.max_daily_spend:
-        return Evaluation(Decision.BLOCK, ("daily_spend_limit_exceeded",), intent.amount)
+        return block("daily_spend_limit_exceeded")
 
-    if policy.allowed_recipients and intent.recipient not in policy.allowed_recipients:
+    if not policy.allowed_recipients:
+        return block("recipient_allowlist_not_configured")
+
+    reasons: list[str] = []
+    if intent.recipient not in policy.allowed_recipients:
         reasons.append("recipient_not_allowlisted")
-    if intent.contract_id is not None and intent.contract_id not in policy.allowed_contracts:
-        return Evaluation(Decision.BLOCK, ("contract_not_allowlisted",), intent.amount)
-    if intent.method_name is not None and intent.method_name not in policy.allowed_methods:
-        return Evaluation(Decision.BLOCK, ("method_not_allowlisted",), intent.amount)
+
+    if policy.allowed_contracts:
+        if not intent.contract_id:
+            return block("contract_id_required")
+        if intent.contract_id not in policy.allowed_contracts:
+            return block("contract_not_allowlisted")
+    if policy.allowed_methods:
+        if not intent.method_name:
+            return block("method_name_required")
+        if intent.method_name not in policy.allowed_methods:
+            return block("method_not_allowlisted")
 
     if signals.account_age_days is None:
         reasons.append("counterparty_age_unknown")
