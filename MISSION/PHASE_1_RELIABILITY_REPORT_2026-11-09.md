@@ -29,7 +29,7 @@ Evidence: https://github.com/manish91082-coder/ai-content-system/actions/runs/42
 - Added automated tests and an isolated test-only workflow.
 - Migrated default Gemini model identifier to `gemini-3.8-flash`.
 - Migrated default Groq model identifier to `openai/gpt-oss-120b`.
-- Made model identifiers configurable through `GEMINI_MODEL` and `GROQ_MODEL`.
+- Made model identifiers configurable through `GEMINI_MODEL` and `GROQ_MODEL`. The Groq model is an active-ID migration candidate, not a verified zero-cost entitlement.
 - Replaced anti-detection editorial wording with reader-value, factuality, and no-fabricated-experience requirements.
 - Improved provider error logging to preserve useful exception details without logging secret values.
 
@@ -46,7 +46,7 @@ Validation workflow: https://github.com/manish91082-coder/ai-content-system/acti
 ## 4. Current provider evidence and constraints
 
 - Groq official deprecation history confirms `llama-3.1-70b-versatile` was shut down on 2025-01-24. The current official model catalogue and free-tier rate-limit documentation must be checked before each production model selection.
-- Groq current free-tier options include `openai/gpt-oss-120b`; per-model limits apply and may change.
+- `openai/gpt-oss-120b` is an active Groq model identifier. Groq's model page displays per-token pricing, while free-plan rate limits are a separate entitlement. Therefore, do not assume this model is zero-cost for this account until the Groq console confirms free-plan access and remaining quota. Per-model limits can change.
 - Google's Gemini Developer API currently lists `gemini-3.8-flash` with a free tier. Google states free-tier content may be used to improve products. Do not send confidential customer information through that tier.
 - OpenRouter's free model access is rate-limited (50 requests/day on Free, with 20 requests/minute on free variants). It is a possible backup, not an unlimited production dependency.
 - Free tiers are best-effort and not production SLAs. The pipeline must gracefully stop when limits are reached.
