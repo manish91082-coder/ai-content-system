@@ -1,74 +1,84 @@
-# Phase 1 — Reliability and Publishing Safety Remediation
+# Phase 1 and Phase 2 Engineering Checkpoint
 
 **Date:** 2026-11-09  
-**Branch:** `revenue-engine/phase-1-safety-fixes`  
-**Scope:** isolated code changes only. No production/default-branch deployment and no live publishing.
+**Branch:** revenue-engine/phase-1-safety-fixes  
+**Scope:** isolated reliability, publishing safety, provider diagnostics, and editorial evidence improvements. No production deployment and no live publishing.
 
-## 1. Confirmed defect and remediation
+## 1. Pipeline reliability and publishing safety
 
-The 2026-11-08 Daily Pipeline run #17 failed after topic generation attempts because the report formatter treated nested per-topic publishing dictionaries as strings and sliced them with `[:50]`. The resulting exception was `slice(None, 50, None)`.
+- Telegram report formatting now handles nested topic/platform/result structures, malformed payloads, and HTML escaping.
+- Startup/report wording no longer equates content generation with publishing.
+- Publishing requires both PUBLISH_ENABLED=true and TEST_MODE=false.
+- The publisher has its own fail-closed guard.
+- Scheduled daily runs force TEST_MODE=true.
+- Regression tests cover the safety gate and report formatting.
 
-Changes made:
-- `src/telegram_bot.py`: report formatting now understands topic → platform → result nesting, handles legacy flat results and malformed values, escapes dynamic HTML content, and does not claim that generated assets were published.
-- `src/main.py`: records publishing as blocked when the safety gate is closed; does not call `publisher.publish_all` in that state; only records actual publisher result dictionaries.
-- `src/pipeline_safety.py`: publishing requires both `PUBLISH_ENABLED=true` and `TEST_MODE=false`. Missing or malformed values block publishing.
-- `.github/workflows/daily_content.yml`: scheduled executions force test mode; live publishing additionally requires the repository variable `PUBLISH_ENABLED` to be explicitly set to true.
-- `tests/test_pipeline_safety_and_reports.py`: ten regression tests cover default-deny behavior, explicit gate conditions, nested/legacy reporting, malformed payloads, and HTML escaping.
-- Workflow now runs Python compile checks, unit tests, and metadata-only provider credential/model checks before the content pipeline.
-- `groq` SDK upgraded to 1.7.0 after CI exposed `Client.__init__() got an unexpected keyword argument 'proxies'` in 0.11.0 with HTTPX 0.28.1.
-- Provider circuit breaker disables a provider for the remainder of a run after permanent 401/403/404 or model-not-found failures, avoiding repeated failed calls.
+## 2. Provider integration and diagnostics
 
-## 2. Safety semantics
+- Migrated from the deprecated Google generativeai SDK to the maintained google-genai SDK.
+- Updated Gemini and Groq model defaults based on the model catalogue reviewed for this branch.
+- Reconciled dependency conflicts by upgrading Supabase, HTTPX, and Groq SDK versions.
+- Added a metadata-only provider check. It lists models/authenticates credentials without sending an inference prompt.
+- Added a provider circuit breaker for permanent authentication/model errors.
 
-Publishing is allowed only when both conditions are true:
-- Repository variable `PUBLISH_ENABLED` is explicitly `true`.
-- Runtime environment `TEST_MODE` is explicitly false.
+### Observed provider state
+- Groq: key authentication succeeded and openai/gpt-oss-120b was listed.
+- Gemini: configured secret failed with HTTP 401 UNAUTHENTICATED / ACCESS_TOKEN_TYPE_UNSUPPORTED. Google response says the API key is invalid or unsupported. Replace the GitHub Actions GEMINI_API_KEY secret with a valid Google AI Studio Gemini Developer API key. Do not paste secrets into chat or source code.
+- No provider inference request was made by the metadata-only check. Billing tier and remaining quota were not established.
 
-Scheduled runs force `TEST_MODE=true`. The repository variable has not been enabled by this work. No live social publishing was attempted.
+## 3. Source provenance and editorial evidence gate
 
-## 3. Verification status
+- RSS research records retain original article URL, title, feed URL, available excerpt and publication/update timestamp.
+- YouTube trend records retain the feed-provided URL/title/summary/date.
+- Google Trends is labelled as a discovery signal without source evidence.
+- Topic selection preserves source metadata.
+- News/current/trending topics are rejected unless a valid HTTP(S) source URL and a source excerpt of at least 120 characters are supplied.
+- Evergreen/general educational content may proceed without a source excerpt, but generation instructions prohibit unsupported current events, statistics, prices, legal/tax/medical/financial recommendations, named-person claims and other time-sensitive assertions.
+- Generated scripts and descriptions receive source-constrained instructions.
+- Content metadata records source URL/title/date and an honest evidence status.
+- Description prompts prohibit invented links, timestamps and social handles.
 
-- GitHub Actions CI run #10 succeeded: full dependencies installed, compile checks passed, all 13 tests passed, and provider catalogue check completed. Run: https://github.com/manish91082-coder/ai-content-system/actions/runs/42649140264
-- Groq credential authentication and `openai/gpt-oss-120b` model listing were confirmed using metadata-only API calls.
-- Gemini secret exists but is invalid for the Gemini Developer API: HTTP 401 `UNAUTHENTICATED`, reason `ACCESS_TOKEN_TYPE_UNSUPPORTED`. No key value was exposed. This appears to be an OAuth token or otherwise unsupported/invalid key type; replace with a valid Google AI Studio API key.
+This is a provenance and eligibility gate, not independent fact-checking. A URL or RSS excerpt does not establish source authority or truth. Human editorial review remains mandatory before public release.
 
-- Dedicated GitHub Actions CI run #3 succeeded: dependency installation, Python source/test compilation, and all 10 regression tests passed. Run: https://github.com/manish91082-coder/ai-content-system/actions/runs/42648302328
-- The first two CI attempts exposed real dependency conflicts: Google GenAI required HTTPX >=0.28.1 while Supabase 2.9.1 required HTTPX <0.28. The dependency set was reconciled by moving to Supabase 2.34.1 and HTTPX 0.28.1. The successful third run installed the full requirements set cleanly.
+Detailed design: MISSION/EDITORIAL_EVIDENCE_GATE.md
 
-## 4. Verification status
+## 4. Automated verification
 
-- Source changes committed to the isolated branch.
-- GitHub Actions CI run #3 passed all 10 regression tests and Python compile checks.
-- Full automated CI test suite has now run successfully on the isolated branch. No live provider inference or social publishing has been run.
-- No PR merged; no changes deployed to `master`.
-- No production API secret values were inspected or changed. Secret names were present; only provider API responses were observed.
+GitHub Actions CI run #18:
+https://github.com/manish91082-coder/ai-content-system/actions/runs/42650422406
 
-## 5. Known remaining blockers
+- Dependency installation: passed.
+- Python compile checks: passed.
+- Regression suite: 19 tests passed.
+- Metadata-only provider check: completed in degraded state.
+- Groq authentication/model listing: passed.
+- Gemini authentication: failed due to invalid/unsupported configured key.
 
-- Gemini authentication remains unresolved and requires the account owner to replace the invalid `GEMINI_API_KEY` secret. Groq key and target model are verified at catalogue/authentication level; no inference request was made.
-- Telegram credentials were absent in the observed run; reporting is now safer but delivery remains unconfigured.
-- Research source verification, fact-checking and provenance need implementation.
-- Supabase schema's broad RLS policies need security redesign before production use.
-- No checkout, product catalogue, order/fulfilment, affiliate attribution, refunds, or settlement ledger exists yet.
+Earlier CI runs exposed and helped resolve dependency conflicts. The current run verifies the source-provenance gate and all 19 tests on the branch code as of commit 0d14f6ec877083507252929121f27d60c6f749c8.
 
-## 6. Provider migration findings
-
-- Gemini's previous model ID `gemini-2.0-flash-exp` is no longer a suitable default; Google's current catalogue recommends newer model IDs. The legacy `google-generativeai` Python SDK is deprecated/not actively maintained.
-- Gemini SDK migrated to `google-genai==2.33.0`; default model is `gemini-3.5-flash-lite`, which Google's current pricing page lists as free on the Free Tier.
-- Groq's previous hard-coded model ID `llama-3.1-70b-versatile` was replaced with `openai/gpt-oss-120b`, which is in the current model catalogue and free-plan rate-limit table.
-- Gemini's previous `Unauthenticated` response remains a credential issue until a valid API key is confirmed. No secret value was inspected. If authentication still fails, the owner must verify/replace the GitHub secret privately.
-- Google unpaid-tier content may be used to improve Google products and reviewed by human reviewers. Do not submit confidential or personal data.
-- Full details and official source links: `MISSION/AI_PROVIDER_RESEARCH_2026-11-09.md`.
-
-## 7. Pull request status
+## 5. PR and deployment status
 
 - Draft PR #1: https://github.com/manish91082-coder/ai-content-system/pull/1
-- Base: `master`; head: `revenue-engine/phase-1-safety-fixes`.
-- GitHub reports the draft PR as clean/mergeable. It remains unmerged and no production deployment has occurred.
+- Base: master
+- Head: revenue-engine/phase-1-safety-fixes
+- PR remains draft and unmerged.
+- No production deployment or live social publishing occurred.
+- Scheduled publishing remains disabled by TEST_MODE=true.
+- Actual settled revenue remains ₹0 until settlement evidence exists.
 
-## 8. Next gate
+## 6. Remaining release blockers
 
-1. Run the regression workflow on this branch and inspect exact test results.
-2. Diagnose the provider failures with current official provider documentation and non-secret configuration checks.
-3. Add source provenance and editorial QA.
-4. Only then evaluate a first revenue offer and payment/delivery workflow.
+1. Account owner must replace the invalid Gemini secret, if Gemini is to remain enabled.
+2. Confirm provider billing tier/free quota and run a controlled inference test only after confirming no unexpected charge.
+3. Add stronger source retrieval, source authority assessment, cross-source corroboration, and human editorial approval.
+4. Redesign Supabase row-level security before production data use.
+5. Build product catalogue, checkout, order state machine, delivery, refunds, attribution, and settlement reconciliation.
+6. Validate one narrow customer offer with a real paid pilot before broad automation.
+
+## 7. Next execution order
+
+1. Wait for a valid Gemini secret or continue with Groq only after its account quota and billing status are confirmed.
+2. Build a source authority and cross-check layer beyond RSS excerpt provenance.
+3. Build an editorial review/approval queue; never auto-publish unreviewed content.
+4. Select one narrow business segment using primary customer evidence.
+5. Implement checkout and automated fulfilment only after a paid pilot validates demand.
