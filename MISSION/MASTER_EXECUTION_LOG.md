@@ -57,9 +57,19 @@ The target is a stretch objective, not a guarantee. Count only cleared, reconcil
 6. No offer/checkout/fulfilment/partner attribution/refund/settlement ledger exists.
 7. No verified sales or settled revenue. Current verified revenue: ₹0.
 
+## Phase 2 — Market and offer validation
+
+- [x] Reviewed current 2026 demand signals for AI integration, automation and AI-enabled workflow reliability.
+- [x] Compared India-based published workflow prices and Upwork project price bands.
+- [x] Audited Fiverr, Upwork and Gumroad acquisition/payout constraints against the zero-capital requirement.
+- [x] Selected one narrow first-offer hypothesis: AI Pipeline Reliability Repair Sprint.
+- [x] Recorded buyer triggers, bounded scope, pilot price hypothesis, acquisition channels, and validation gates in `MISSION/PHASE_2_MARKET_AND_OFFER_HYPOTHESIS_2026-11-09.md`.
+
+**Decision status:** market evidence supports testing the category, but no buyer interview, paid order, or customer conversion has yet been verified. The proposed ₹9,900 pilot is a test price, not validated willingness-to-pay.
+
 ## Next execution phase
 
-Phase 2 — Market and offer validation. Research narrow, high-value, zero-capital offers with short time-to-payment, India-compatible payout routes, lawful acquisition, and automatable fulfilment. Select only after comparing evidence and practical execution cost.
+Phase 3 — Create the buyer-facing proof asset and service listing package. Build a sanitized case study from the Phase 1 reliability work, a fixed-scope offer brief, acceptance checklist, and a no-secrets intake template. Keep the production branch unchanged.
 
 ## Operating rule
 
