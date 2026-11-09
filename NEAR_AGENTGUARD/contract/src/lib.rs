@@ -268,6 +268,18 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected = "memo too long")]
+    fn oversized_memo_is_rejected() {
+        let mut contract = setup();
+        context(account("worker.testnet"), 1);
+        let _ = contract.pay(
+            account("vendor.testnet"),
+            U128(1),
+            "x".repeat(257),
+        );
+    }
+
+    #[test]
     fn daily_limit_resets_on_next_utc_day() {
         let mut contract = setup();
         context(account("worker.testnet"), 1);
