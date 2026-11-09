@@ -5,6 +5,7 @@ on:
     branches:
       - revenue-engine/phase-1-safety-fixes
       - revenue-engine/phase-3-editorial-review
+      - revenue-engine/phase-5-order-core
     paths:
       - "src/**"
       - "tests/**"

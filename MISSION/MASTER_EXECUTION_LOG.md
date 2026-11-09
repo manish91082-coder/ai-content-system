@@ -110,3 +110,14 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 - Current provider candidates: Razorpay first for India direct checkout after merchant approval; Cashfree alternate; Gumroad optional digital-product fallback. None is activated or conclusively selected.
 - Current public provider references checked: Razorpay standard public pricing states 2% transaction fee and no setup/AMC; Cashfree standard settlement guide describes T+2 subject to account/bank/risk conditions; Gumroad lists India INR bank payout, $100 standard minimum and a 7-day holding period for weekly/monthly/quarterly payouts.
 - No payment provider account was accessed, no KYC was performed, no checkout was created, and no live payment occurred.
+
+## Phase 5 — Executable Order Core (9 Nov 2026)
+
+- Branch: `revenue-engine/phase-5-order-core`; draft PR #3: https://github.com/manish91082-coder/ai-content-system/pull/3
+- Implemented `src/order_core.py`: SQLite order ledger, normalized payment event inbox, provider/environment/event deduplication, amount/currency/order checks, forward-only payment transitions, entitlement revocation on refund/dispute, unique fulfilment job and idempotent completion.
+- Added generic raw-body HMAC-SHA256 signature verification helper. Provider-specific signature adapters and endpoint integration are not yet implemented.
+- Added `tests/test_order_core.py` and `MISSION/PHASE_5_ORDER_CORE.md`.
+- GitHub Actions run #31 passed: compile, 43 unit tests, provider metadata check job. Run: https://github.com/manish91082-coder/ai-content-system/actions/runs/42658044134
+- Provider status from that run: Groq authenticated and model listed (`openai/gpt-oss-120b`); Gemini key still returns 401 UNAUTHENTICATED. No inference prompt sent by provider metadata check.
+- No checkout, live gateway, webhook endpoint, customer delivery, bank reconciliation, Supabase deployment, publishing, PR merge or revenue collection activated.
+- Next implementation gate: provider sandbox adapter only after owner merchant-account/KYC and webhook contract are available; then private asset delivery and settlement reconciliation. Live payments require explicit owner authorization.
