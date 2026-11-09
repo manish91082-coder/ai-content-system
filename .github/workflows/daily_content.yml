@@ -83,7 +83,8 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           
           # Mode
-          TEST_MODE: ${{ inputs.test_mode }}
+          TEST_MODE: ${{ github.event_name != 'workflow_dispatch' || inputs.test_mode }}
+          PUBLISH_ENABLED: ${{ vars.PUBLISH_ENABLED }}
         run: |
           cd src
           python main.py
