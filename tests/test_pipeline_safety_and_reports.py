@@ -1,6 +1,7 @@
 import sys
 import os
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -138,7 +139,7 @@ class EditorialEvidenceTests(unittest.TestCase):
                 "editorial_approved": False
             }
         }
-        with unittest.mock.patch.dict(os.environ, {
+        with patch.dict(os.environ, {
             "PUBLISH_ENABLED": "true", "TEST_MODE": "false"
         }, clear=False):
             result = publisher.publish_all(package, {}, {})
