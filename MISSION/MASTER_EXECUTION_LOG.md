@@ -76,9 +76,18 @@ The target is a stretch objective, not a guarantee. Count only cleared, reconcil
 - [ ] Publish a marketplace listing: pending seller account identity/payout onboarding and operator approval.
 - [ ] Validate the offer with a paid pilot: not yet done.
 
+## Phase 4 — Proof asset
+
+- [x] Created a sanitized case study: `PORTFOLIO/CASE_STUDY_AI_PIPELINE_RELIABILITY.md`.
+- [x] Created a public portfolio index: `PORTFOLIO/README.md`.
+- [x] Explicitly documented what has not been tested or deployed; no customer or revenue claim is made.
+- [ ] Marketplace account onboarding and payout verification: operator action required.
+- [ ] Listing publication and first paid pilot: pending.
+- [ ] Full authenticated AI-provider smoke test and end-to-end pipeline validation: pending.
+
 ## Next execution phase
 
-Phase 4 — Build a sanitized technical case study and a compact portfolio page/file. Then prepare the marketplace listing in the user's chosen account after identity and payout setup. Keep all secrets out of chat and repository; keep `master` unchanged until full pipeline integration is verified.
+Phase 5 — Prepare channel-specific listing metadata and buyer-intake automation, then wait for the required seller-account/KYC/payout action. Do not enable social publishing or merge to `master` until full integration tests pass.
 
 ## Operating rule
 
