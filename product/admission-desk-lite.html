@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Offline Hindi-first coaching admission enquiry tracker. Data stays in this browser.">
+<title>Admission Desk Lite | Coaching Enquiry Tracker</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;color:#172033;background:#f4f6fa}
+*{box-sizing:border-box}body{margin:0}header{background:#172b4d;color:#fff;padding:22px max(18px,calc((100vw - 1120px)/2))}
+header h1{margin:0 0 6px;font-size:clamp(22px,4vw,32px)}header p{margin:0;color:#dbe6f5}
+main{max-width:1120px;margin:22px auto;padding:0 16px 40px}.notice{background:#fff8df;border:1px solid #ead48a;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:14px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.metric,.panel{background:#fff;border:1px solid #e3e8f0;border-radius:14px;padding:15px;box-shadow:0 2px 8px #172b4d0a}
+.metric strong{display:block;font-size:26px}.metric span{color:#596579;font-size:13px}
+.layout{display:grid;grid-template-columns: minmax(280px, .85fr) minmax(0,1.5fr);gap:16px}.panel h2{margin:0 0 14px;font-size:18px}
+label{display:block;font-size:13px;font-weight:650;margin:10px 0 5px}input,select,textarea{width:100%;border:1px solid #cbd3df;border-radius:8px;padding:10px;font:inherit;background:#fff;color:#172033}
+textarea{min-height:70px;resize:vertical}.hint{font-size:12px;color:#687589;margin-top:4px}
+button,.button{border:0;border-radius:8px;padding:10px 13px;background:#2057a5;color:white;font:inherit;font-weight:650;cursor:pointer;text-decoration:none;display:inline-block}
+button.secondary,.button.secondary{background:#e9eef6;color:#1e3557}button.danger{background:#a52b36}button:focus,input:focus,select:focus,textarea:focus{outline:3px solid #83b7ff;outline-offset:1px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input{flex:1;min-width:160px}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px;min-width:690px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #e8edf3;vertical-align:top}th{color:#536177;font-size:12px;background:#f8fafd;position:sticky;top:0}
+.pill{display:inline-block;padding:3px 8px;border-radius:20px;background:#edf2fa;font-size:11px;white-space:nowrap}.empty{padding:28px;text-align:center;color:#687589}
+.row-actions{display:flex;gap:6px;flex-wrap:wrap}.row-actions button{padding:6px 8px;font-size:12px}.foot{margin-top:16px;color:#667287;font-size:12px;line-height:1.6}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:380px){.metrics{grid-template-columns:1fr 1fr}.metric strong{font-size:21px}}
+</style>
+</head>
+<body>
+<header><h1>Admission Desk Lite</h1><p>Coaching & Tuition Enquiry Tracker · हिंदी + English · Offline-first</p></header>
+<main>
+<div class="notice"><strong>Privacy first:</strong> यह tool कोई server या external service इस्तेमाल नहीं करता। Data इसी browser के local storage में रहता है। केवल अभिभावक/संपर्क व्यक्ति की न्यूनतम जानकारी रखें। Student के marks, health या अन्य संवेदनशील विवरण न डालें। Browser data मिटने पर रिकॉर्ड भी मिट सकते हैं। नियमित CSV backup रखें।</div>
+<section class="metrics" aria-label="Summary">
+<div class="metric"><strong id="m-total">0</strong><span>Total enquiries</span></div>
+<div class="metric"><strong id="m-new">0</strong><span>New / Follow-up</span></div>
+<div class="metric"><strong id="m-demo">0</strong><span>Demo scheduled</span></div>
+<div class="metric"><strong id="m-due">0</strong><span>Follow-ups due</span></div>
+</section>
+<div class="layout">
+<section class="panel">
+<h2 id="form-title">नई Enquiry जोड़ें</h2>
+<form id="lead-form">
+<input type="hidden" id="lead-id">
+<label for="guardian">Parent / Contact name *</label><input id="guardian" maxlength="80" required autocomplete="name" placeholder="अभिभावक का नाम">
+<label for="phone">Contact number *</label><input id="phone" inputmode="tel" maxlength="18" required placeholder="10 digit mobile number">
+<div class="hint">सिर्फ उस व्यक्ति का नंबर दर्ज करें जिसने संपर्क की अनुमति दी है।</div>
+<label for="course">Course / Class *</label><input id="course" maxlength="100" required placeholder="जैसे Class 10 Maths">
+<label for="source">Enquiry source</label><select id="source"><option>Walk-in</option><option>Phone</option><option>WhatsApp</option><option>Referral</option><option>Social media</option><option>Other</option></select>
+<label for="stage">Current stage</label><select id="stage"><option value="New">New / नई</option><option value="Contacted">Contacted / संपर्क हुआ</option><option value="Demo Scheduled">Demo Scheduled / Demo तय</option><option value="Demo Attended">Demo Attended / Demo हुआ</option><option value="Considering">Considering / विचाराधीन</option><option value="Enrolled">Enrolled / Admission</option><option value="Not Interested">Not Interested / रुचि नहीं</option></select>
+<label for="next-date">Next follow-up date</label><input id="next-date" type="date">
+<label for="notes">Short note (optional)</label><textarea id="notes" maxlength="500" placeholder="केवल जरूरी, गैर-संवेदनशील जानकारी"></textarea>
+<label><input id="consent" type="checkbox" style="width:auto;margin-right:7px"> Contact person has agreed to receive follow-up messages/calls</label>
+<div class="actions"><button type="submit" id="save-btn">Save enquiry</button><button type="button" class="secondary" id="reset-btn">Clear</button></div>
+</form>
+</section>
+<section class="panel">
+<h2>Enquiry Pipeline</h2>
+<div class="toolbar">
+<input id="search" placeholder="Search name, phone, course…" aria-label="Search enquiries">
+<select id="filter-stage" aria-label="Filter by stage"><option value="">All stages</option><option>New</option><option>Contacted</option><option>Demo Scheduled</option><option>Demo Attended</option><option>Considering</option><option>Enrolled</option><option>Not Interested</option></select>
+<button class="secondary" id="export-btn" type="button">Export CSV</button>
+<button class="secondary" id="import-btn" type="button">Import CSV</button>
+<input id="import-file" type="file" accept=".csv,text/csv" hidden>
+</div>
+<div class="table-wrap"><table><thead><tr><th>Contact</th><th>Course</th><th>Stage</th><th>Next follow-up</th><th>Actions</th></tr></thead><tbody id="lead-rows"></tbody></table><div class="empty" id="empty-state">अभी कोई enquiry नहीं है। बाईं ओर पहली enquiry जोड़ें।</div></div>
+<p class="foot">WhatsApp action केवल आपके लिए message draft खोलता है। Message अपने-आप send नहीं होता। भेजने से पहले recipient, consent और content जाँचें। यह tool CRM, cloud backup या multi-user system नहीं है।</p>
+</section>
+</div>
+<p class="foot">Admission Desk Lite · Version 1.0 · No analytics · No external scripts · No automatic messaging · All records remain on this device/browser.</p>
+</main>
+<script>
+(function(){
+"use strict";
+const KEY="admission_desk_lite_v1";
+const $=id=>document.getElementById(id);
+let leads=load();
+function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||"[]");return Array.isArray(v)?v:[]}catch(e){return []}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(leads));render()}
+function escCsv(v){let s=String(v??"");if(/^[=+@\\-\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
+function dateToday(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
+function safePhone(p){return String(p).replace(/[^0-9]/g,"")}
+function reset(){ $("lead-form").reset();$("lead-id").value="";$("form-title").textContent="नई Enquiry जोड़ें";$("save-btn").textContent="Save enquiry"}
+function render(){
+ const q=$("search").value.trim().toLowerCase(), stage=$("filter-stage").value;
+ const filtered=leads.filter(x=>(!stage||x.stage===stage)&&[x.guardian,x.phone,x.course].join(" ").toLowerCase().includes(q));
+ $("m-total").textContent=leads.length;
+ $("m-new").textContent=leads.filter(x=>["New","Contacted","Considering"].includes(x.stage)).length;
+ $("m-demo").textContent=leads.filter(x=>x.stage==="Demo Scheduled").length;
+ $("m-due").textContent=leads.filter(x=>x.nextDate&&x.nextDate<=dateToday()&&!["Enrolled","Not Interested"].includes(x.stage)).length;
+ const tbody=$("lead-rows");tbody.replaceChildren();
+ $("empty-state").hidden=filtered.length>0;
+ filtered.sort((a,b)=>(a.nextDate||"9999").localeCompare(b.nextDate||"9999")).forEach(x=>{
+  const tr=document.createElement("tr");
+  const contact=document.createElement("td");const strong=document.createElement("strong");strong.textContent=x.guardian;contact.append(strong,document.createElement("br"));const ph=document.createElement("span");ph.textContent=x.phone;contact.append(ph);
+  const course=document.createElement("td");course.textContent=x.course;
+  const st=document.createElement("td");const pill=document.createElement("span");pill.className="pill";pill.textContent=x.stage;st.append(pill);
+  const nd=document.createElement("td");nd.textContent=x.nextDate||"Not set";
+  const act=document.createElement("td");const group=document.createElement("div");group.className="row-actions";
+  const edit=button("Edit","secondary",()=>editLead(x.id));const wa=button("WhatsApp","",()=>openWhatsApp(x));const del=button("Delete","danger",()=>deleteLead(x.id));group.append(edit,wa,del);act.append(group);
+  tr.append(contact,course,st,nd,act);tbody.append(tr);
+ });
+}
+function button(label,cls,fn){const b=document.createElement("button");b.type="button";b.textContent=label;if(cls)b.className=cls;b.addEventListener("click",fn);return b}
+$("lead-form").addEventListener("submit",e=>{
+ e.preventDefault();
+ const id=$("lead-id").value, guardian=$("guardian").value.trim(), phone=$("phone").value.trim(), course=$("course").value.trim();
+ if(!guardian||!phone||!course){alert("Name, contact number and course are required.");return}
+ if(safePhone(phone).length<10||safePhone(phone).length>15){alert("कृपया सही contact number दर्ज करें।");return}
+ const old=leads.find(x=>x.id===id);
+ const item={id:id||crypto.randomUUID(),guardian,phone,course,source:$("source").value,stage:$("stage").value,nextDate:$("next-date").value,notes:$("notes").value.trim(),consent:$("consent").checked,createdAt:old?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
+ if(old)leads=leads.map(x=>x.id===id?item:x);else leads.push(item);
+ persist();reset();
+});
+function editLead(id){const x=leads.find(v=>v.id===id);if(!x)return;
+ $("lead-id").value=x.id;$("guardian").value=x.guardian;$("phone").value=x.phone;$("course").value=x.course;$("source").value=x.source;$("stage").value=x.stage;$("next-date").value=x.nextDate;$("notes").value=x.notes;$("consent").checked=!!x.consent;$("form-title").textContent="Enquiry edit करें";$("save-btn").textContent="Update enquiry";window.scrollTo({top:0,behavior:"smooth"});
+}
+function deleteLead(id){if(!confirm("इस enquiry को delete करना है?"))return;leads=leads.filter(x=>x.id!==id);persist()}
+function openWhatsApp(x){if(!x.consent){alert("पहले contact consent की पुष्टि करें।");return}
+ const msg="नमस्ते "+x.guardian+" जी, आपने "+x.course+" के बारे में enquiry की थी। क्या हम course details या demo class के लिए आपकी सहायता कर सकते हैं? यदि आप आगे संदेश नहीं चाहते, कृपया बता दें।";
+ const number=safePhone(x.phone);window.open("https://wa.me/"+number+"?text="+encodeURIComponent(msg),"_blank","noopener,noreferrer");
+}
+$("reset-btn").addEventListener("click",reset);$("search").addEventListener("input",render);$("filter-stage").addEventListener("change",render);
+$("export-btn").addEventListener("click",()=>{
+ const cols=["guardian","phone","course","source","stage","nextDate","notes","consent","createdAt","updatedAt"];
+ const rows=[cols.join(","),...leads.map(x=>cols.map(k=>escCsv(x[k])).join(","))];
+ const blob=new Blob(["\uFEFF"+rows.join("\r\n")],{type:"text/csv;charset=utf-8"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="admission-enquiries-backup.csv";a.click();URL.revokeObjectURL(a.href);
+});
+$("import-btn").addEventListener("click",()=>$("import-file").click());
+$("import-file").addEventListener("change",async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{
+  const text=await file.text();const lines=text.replace(/^\uFEFF/,"").split(/\r?\n/).filter(Boolean);
+  const parse=line=>{const out=[];let cur="",quoted=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'&&line[i+1]==='"'&&quoted){cur+='"';i++}else if(c==='"')quoted=!quoted;else if(c===","&&!quoted){out.push(cur);cur=""}else cur+=c}out.push(cur);return out};
+  const headers=parse(lines.shift()).map(x=>x.trim());const needed=["guardian","phone","course","source","stage","nextDate","notes","consent"];
+  if(!needed.every(x=>headers.includes(x)))throw Error("CSV headers do not match this app export.");
+  const imported=lines.map(line=>{const vals=parse(line),o={};headers.forEach((h,i)=>o[h]=vals[i]??"");return {id:crypto.randomUUID(),guardian:o.guardian,phone:o.phone,course:o.course,source:o.source,stage:o.stage,nextDate:o.nextDate,notes:o.notes,consent:o.consent==="true",createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}}).filter(x=>x.guardian&&x.phone&&x.course);
+  if(!confirm(imported.length+" records import करें? Existing records सुरक्षित रहेंगे."))return;
+  leads=leads.concat(imported);persist();alert("Import complete: "+imported.length+" records.");
+ }catch(err){alert("Import failed: "+err.message)}finally{e.target.value=""}
+});
+render();
+})();
+</script>
+</body>
+</html>
