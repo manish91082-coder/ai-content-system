@@ -9,7 +9,7 @@ Autonomous Internet Revenue Engine. Target: ₹10 crore actual settled revenue w
 - Repository: https://github.com/manish91082-coder/ai-content-system
 - Default branch: `master`
 - Active working branch: `revenue-engine/phase-1-safety-fixes`
-- Deployment status: not deployed; no PR merged; master unchanged by Phase 1 code work.
+- Deployment status: draft PR #1 opened against `master`; not merged; no production deployment. PR: https://github.com/manish91082-coder/ai-content-system/pull/1
 
 ## Completed in Phase 0
 - Exact repository and connected GitHub permissions verified.
@@ -45,6 +45,8 @@ Autonomous Internet Revenue Engine. Target: ₹10 crore actual settled revenue w
 
 ## Verification truth
 - GitHub Actions CI run #10 succeeded: all dependencies installed, compileall passed, all 13 tests passed, and metadata-only provider check completed.
+- Draft PR #1 is open and currently mergeable/clean; 16 files changed. No merge performed.
+- Groq key authenticated and `openai/gpt-oss-120b` is listed. Gemini key is present but invalid/unsupported by Gemini Developer API; operator action required.
 - CI runs #1 and #2 exposed dependency conflicts; both were fixed before run #3.
 - CI runs #5–#9 exposed provider integration issues and were used to fix Groq SDK compatibility, default model handling, and provider circuit-breaker behavior.
 - Provider check confirmed Groq key authentication and `openai/gpt-oss-120b` model availability. Gemini secret is present but invalid: Google returned HTTP 401 `UNAUTHENTICATED` / `ACCESS_TOKEN_TYPE_UNSUPPORTED` for the Gemini Developer API. No secret value was read.
