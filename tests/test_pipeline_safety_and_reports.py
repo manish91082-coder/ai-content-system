@@ -6,6 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
 
 from pipeline_safety import publishing_is_enabled
 from telegram_bot import TelegramBot
@@ -13,6 +14,7 @@ from publisher import Publisher
 from content_generator import ContentGenerator
 from editorial_qa import topic_is_generation_eligible, build_editorial_context, build_source_metadata, editorial_package_approved, content_review_hash
 from database import Database
+import editorial_review
 
 
 class PublishingSafetyTests(unittest.TestCase):
@@ -146,6 +148,21 @@ class EditorialEvidenceTests(unittest.TestCase):
             result = publisher.publish_all(package, {}, {})
         self.assertFalse(result["editorial_approval"]["success"])
         self.assertEqual(result["editorial_approval"]["status"], "pending_review")
+
+
+class EditorialReviewCliSecurityTests(unittest.TestCase):
+    def test_review_cli_requires_server_side_service_key(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "SUPABASE_SERVICE_KEY"):
+                editorial_review._config()
+
+    def test_review_cli_rejects_publishable_key(self):
+        with patch.dict(os.environ, {
+            "SUPABASE_URL": "https://example.supabase.co",
+            "SUPABASE_SERVICE_KEY": "sb_publishable_test"
+        }, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "server-side service key"):
+                editorial_review._config()
 
 
 class SupabaseRestPersistenceTests(unittest.TestCase):
