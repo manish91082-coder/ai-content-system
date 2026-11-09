@@ -73,12 +73,16 @@ def evaluate(
     if spent_today + intent.amount > policy.max_daily_spend:
         return Evaluation(Decision.BLOCK, ("daily_spend_limit_exceeded",), intent.amount)
 
+    if policy.allowed_recipients and intent.recipient not in policy.allowed_recipients:
+        reasons.append("recipient_not_allowlisted")
     if intent.contract_id is not None and intent.contract_id not in policy.allowed_contracts:
         return Evaluation(Decision.BLOCK, ("contract_not_allowlisted",), intent.amount)
     if intent.method_name is not None and intent.method_name not in policy.allowed_methods:
         return Evaluation(Decision.BLOCK, ("method_not_allowlisted",), intent.amount)
 
-    if signals.account_age_days is not None and signals.account_age_days < policy.min_account_age_days:
+    if signals.account_age_days is None:
+        reasons.append("counterparty_age_unknown")
+    elif signals.account_age_days < policy.min_account_age_days:
         reasons.append("counterparty_account_too_new")
     if signals.recent_code_change:
         reasons.append("counterparty_recent_code_change")
