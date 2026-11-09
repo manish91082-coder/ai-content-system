@@ -25,7 +25,8 @@ Latest observed Daily AI Content Pipeline run #17 failed on 2026-11-08. Its logs
 3. `src/publisher.py`: duplicates the gate inside `publish_all` to prevent bypass through a direct publisher call.
 4. `src/main.py`: does not call publisher while gate is closed; reports blocked publishing distinctly.
 5. `.github/workflows/daily_content.yml`: scheduled runs force test mode; explicit repository variable gates live publishing; compile and unit tests run before pipeline.
-7. `tests/test_pipeline_safety_and_reports.py`: nine regression tests.
+6. `tests/test_pipeline_safety_and_reports.py`: nine regression tests.
+7. `src/content_generator.py` and `requirements.txt`: migrated from the deprecated Gemini SDK and retired model IDs to current free-tier model identifiers.
 
 ## Provider research
 - Gemini: maintained `google-genai` SDK and `gemini-3.5-flash-lite` selected from current official model/pricing docs.
@@ -42,7 +43,7 @@ Latest observed Daily AI Content Pipeline run #17 failed on 2026-11-08. Its logs
 - No changes from this branch have been merged into `master`.
 
 ## Remaining risks / blockers
-- Gemini auth and Groq bad request require provider/model and secret-presence diagnosis. Secret values must never be printed.
+- Gemini authentication still requires a valid account key; the Groq model ID was updated but live API inference remains unverified. Secret values must never be printed.
 - Telegram delivery remains unavailable until configured by the account owner.
 - RSS headlines need source provenance and fact-checking before content generation.
 - Supabase schema contains broad RLS policies and must be redesigned before production use.
