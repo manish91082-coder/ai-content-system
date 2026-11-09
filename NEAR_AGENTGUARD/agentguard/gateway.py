@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 from typing import Protocol
@@ -33,6 +34,7 @@ class PaymentGateway:
         self.signer = signer
         self.receipts = ReceiptLog(receipt_path)
         self.spent_today = Decimal("0")
+        self._spend_day = datetime.now(timezone.utc).date()
 
     def authorize(
         self,
@@ -40,6 +42,10 @@ class PaymentGateway:
         signals: RiskSignals | None = None,
         human_approval_token: str | None = None,
     ) -> GatewayResult:
+        today = datetime.now(timezone.utc).date()
+        if today != self._spend_day:
+            self.spent_today = Decimal("0")
+            self._spend_day = today
         result = evaluate(intent, self.policy, self.spent_today, signals)
         signer_called = False
         tx_ref = None
