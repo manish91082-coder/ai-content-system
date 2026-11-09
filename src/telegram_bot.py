@@ -7,6 +7,7 @@ import os
 import json
 import requests
 from datetime import date, datetime
+from html import escape
 from loguru import logger
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
@@ -50,47 +51,70 @@ class TelegramBot:
             logger.error(f"Telegram send failed: {e}")
             return False
 
-    def send_daily_report(self, research_topics: list, 
+    @staticmethod
+    def _format_publish_results(publish_results: dict) -> str:
+        """Format both legacy flat and current topic -> platform -> result reports."""
+        lines = []
+        if not isinstance(publish_results, dict):
+            return "  No publishing result data available.\n"
+
+        for topic, platform_results in publish_results.items():
+            topic_label = escape(str(topic)[:60])
+            if not isinstance(platform_results, dict):
+                lines.append(f"  • {topic_label}: invalid result format")
+                continue
+
+            # Support a flat result as well as the nested topic/platform structure.
+            if "success" in platform_results or "error" in platform_results:
+                platform_results = {"status": platform_results}
+
+            for platform, result in platform_results.items():
+                platform_label = escape(str(platform).upper()[:30])
+                if isinstance(result, dict):
+                    if result.get("success") is True:
+                        destination = result.get("url") or result.get("post_id") or "Published (no URL returned)"
+                        lines.append(f"  ✅ {topic_label} | {platform_label}: {escape(str(destination)[:180])}")
+                    else:
+                        error = result.get("error") or result.get("message") or "Not published / status unavailable"
+                        lines.append(f"  ⏸ {topic_label} | {platform_label}: {escape(str(error)[:180])}")
+                else:
+                    lines.append(f"  ⏸ {topic_label} | {platform_label}: {escape(str(result)[:180])}")
+
+        return "\n".join(lines) if lines else "  No publishing attempts recorded.\n"
+
+    def send_daily_report(self, research_topics: list,
                            publish_results: dict,
                            stats: dict = None) -> bool:
-        """Send formatted daily report"""
+        """Send formatted daily report without assuming nested values are strings."""
         today = date.today().strftime("%d %B %Y")
-        now = datetime.now().strftime("%I:%M %p IST")
-        
-        # Topics summary
-        topics_text = "\n".join([
-            f"  {i+1}. {t.get('topic', 'N/A')[:50]}"
-            for i, t in enumerate(research_topics[:5])
-        ])
-        
-        # Platform results
-        platforms_text = ""
-        for platform, result in publish_results.items():
-            if result.get("success"):
-                url = result.get("url", result.get("post_id", "Posted"))
-                platforms_text += f"  ✅ {platform.upper()}: {url}\n"
+        now = datetime.now().strftime("%I:%M %p")
+
+        topic_lines = []
+        for i, item in enumerate((research_topics or [])[:5]):
+            if isinstance(item, dict):
+                label = item.get("topic", "N/A")
             else:
-                error = result.get("error", "Unknown error")[:50]
-                platforms_text += f"  ❌ {platform.upper()}: {error}\n"
-        
-        # Build message
+                label = str(item)
+            topic_lines.append(f"  {i + 1}. {escape(str(label)[:160])}")
+        topics_text = "\n".join(topic_lines) or "  No topics researched."
+
+        platforms_text = self._format_publish_results(publish_results)
         message = f"""🤖 <b>AI Content System — Daily Report</b>
 📅 {today} | ⏰ {now}
 
 ━━━━━━━━━━━━━━━━━━━━
-📊 <b>TODAY'S TOPICS RESEARCHED:</b>
+📊 <b>TOPICS RESEARCHED:</b>
 {topics_text}
 
 ━━━━━━━━━━━━━━━━━━━━
-📤 <b>PUBLISHED TO:</b>
+📤 <b>PUBLISHING RESULTS:</b>
 {platforms_text}
 ━━━━━━━━━━━━━━━━━━━━
 
-✅ System running automatically!
-🔄 Next run: Tomorrow 9:00 AM IST
+ℹ️ Report reflects recorded pipeline results. A generated asset is not counted as a published post.
 
-<i>— Your AI Content System</i>"""
-        
+<i>— AI Content System</i>"""
+
         return self.send_message(message)
 
     def send_error_alert(self, error_module: str, error_message: str) -> bool:
@@ -108,14 +132,14 @@ Check GitHub Actions logs for details.
 
     def send_startup_message(self) -> bool:
         """Send startup notification"""
-        message = """🚀 <b>AI Content System Started!</b>
+        message = """🚀 <b>AI Content System Started</b>
 
 ⚡ GitHub Actions workflow triggered
-🔍 Starting research...
-📝 Will generate content...
-📤 Will auto-publish...
+🔍 Research stage starting
+📝 Content generation will be attempted
+🛡️ Publishing is controlled by the explicit safety gate
 
-You'll receive the results soon!"""
+A generated asset is not a published post. The daily report will show the recorded result."""
         
         return self.send_message(message)
 

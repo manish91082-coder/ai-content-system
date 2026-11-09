@@ -1,6 +1,6 @@
 """
 Content Generator — Module 3a
-Uses Gemini 2.0 Flash (primary) + Groq Llama 3.1 (backup)
+Uses Gemini 3.5 Flash-Lite (primary) + Groq GPT-OSS 120B (backup)
 Generates Hindi content: titles, scripts, descriptions, hashtags
 """
 
@@ -9,15 +9,17 @@ import json
 import time
 import random
 from loguru import logger
-from tenacity import retry, stop_after_attempt, wait_exponential
-import google.generativeai as genai
+from google import genai
 from groq import Groq
+from editorial_qa import build_editorial_context, build_source_metadata
 
 # ─────────────────────────────────────────
 #  CONFIG
 # ─────────────────────────────────────────
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+GEMINI_MODEL_ID = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
+GROQ_MODEL_ID = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 
 CONTENT_TYPES = {
     "youtube_short": {
@@ -46,75 +48,122 @@ CONTENT_TYPES = {
     }
 }
 
-# Anti-AI-detection: randomize writing style
+# Writing styles vary presentation; never attempt to evade platform detection.
 WRITING_STYLES = [
     "conversational_storytelling",
     "practical_tips_list",
     "question_and_answer",
-    "personal_experience",
+    "first_person_explainer",
     "news_style"
 ]
 
 class ContentGenerator:
     def __init__(self):
+        self.gemini_client = None
+        self.groq_client = None
+        self._last_provider = None
         self._setup_gemini()
         self._setup_groq()
 
     def _setup_gemini(self):
-        """Initialize Gemini client"""
-        if GEMINI_API_KEY:
-            genai.configure(api_key=GEMINI_API_KEY)
-            self.gemini_model = genai.GenerativeModel('gemini-2.0-flash-exp')
-            logger.success("Gemini initialized")
-        else:
-            self.gemini_model = None
+        """Initialize the maintained Google GenAI SDK client."""
+        if not GEMINI_API_KEY:
             logger.warning("Gemini API key not found")
+            return
+        try:
+            self.gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+            logger.success(f"Gemini client initialized (model={GEMINI_MODEL_ID})")
+        except Exception as e:
+            logger.error(f"Gemini client initialization failed ({type(e).__name__}): {self._redact_error(e, GEMINI_API_KEY)}")
 
     def _setup_groq(self):
-        """Initialize Groq client"""
-        if GROQ_API_KEY:
-            self.groq_client = Groq(api_key=GROQ_API_KEY)
-            logger.success("Groq initialized")
-        else:
-            self.groq_client = None
+        """Initialize Groq client."""
+        if not GROQ_API_KEY:
             logger.warning("Groq API key not found")
+            return
+        try:
+            self.groq_client = Groq(api_key=GROQ_API_KEY)
+            logger.success(f"Groq client initialized (model={GROQ_MODEL_ID})")
+        except Exception as e:
+            logger.error(f"Groq client initialization failed ({type(e).__name__}): {self._redact_error(e, GROQ_API_KEY)}")
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+    @staticmethod
+    def _redact_error(error: Exception, secret: str = None) -> str:
+        message = str(error)
+        if secret:
+            message = message.replace(secret, "[REDACTED]")
+        return message[:500]
+
+    @staticmethod
+    def _is_permanent_provider_error(error: Exception) -> bool:
+        """Disable a provider for this process after auth or model-not-found errors."""
+        status = getattr(error, "status_code", None) or getattr(error, "code", None)
+        if status in (401, 403, 404):
+            return True
+        message = str(error).lower()
+        return status == 400 and (
+            "model not found" in message
+            or "unsupported model" in message
+            or "model does not exist" in message
+        )
+
     def _call_gemini(self, prompt: str) -> str:
-        """Call Gemini API"""
-        response = self.gemini_model.generate_content(prompt)
+        """Call Gemini using the maintained Google GenAI SDK."""
+        response = self.gemini_client.models.generate_content(
+            model=GEMINI_MODEL_ID,
+            contents=prompt
+        )
+        if not response.text:
+            raise RuntimeError("Gemini returned an empty text response")
         return response.text.strip()
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
     def _call_groq(self, prompt: str) -> str:
-        """Call Groq API (backup)"""
+        """Call a currently listed Groq free-plan model as backup."""
         completion = self.groq_client.chat.completions.create(
-            model="llama-3.1-70b-versatile",
+            model=GROQ_MODEL_ID,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.8,
             max_tokens=2000
         )
-        return completion.choices[0].message.content.strip()
+        content = completion.choices[0].message.content
+        if not content:
+            raise RuntimeError("Groq returned an empty text response")
+        return content.strip()
 
     def _call_ai(self, prompt: str) -> str:
-        """Call AI with Gemini first, Groq as fallback"""
-        if self.gemini_model:
+        """Call Gemini first, then Groq; preserve actionable error classes."""
+        errors = []
+        if self.gemini_client:
             try:
                 result = self._call_gemini(prompt)
-                logger.debug("Used: Gemini")
+                self._last_provider = f"Gemini:{GEMINI_MODEL_ID}"
+                logger.debug(f"Used {self._last_provider}")
                 return result
             except Exception as e:
-                logger.warning(f"Gemini failed: {e}. Trying Groq...")
-        
+                summary = self._redact_error(e, GEMINI_API_KEY)
+                errors.append(f"Gemini {type(e).__name__}: {summary}")
+                if self._is_permanent_provider_error(e):
+                    self.gemini_client = None
+                    logger.warning("Gemini disabled for the remainder of this run after a permanent authentication/model error.")
+                logger.warning(f"Gemini failed ({type(e).__name__}): {summary}. Trying Groq fallback.")
+
         if self.groq_client:
             try:
                 result = self._call_groq(prompt)
-                logger.debug("Used: Groq (backup)")
+                self._last_provider = f"Groq:{GROQ_MODEL_ID}"
+                logger.debug(f"Used {self._last_provider}")
                 return result
             except Exception as e:
-                logger.error(f"Both AI APIs failed: {e}")
-        
-        raise Exception("All AI APIs failed")
+                summary = self._redact_error(e, GROQ_API_KEY)
+                errors.append(f"Groq {type(e).__name__}: {summary}")
+                if self._is_permanent_provider_error(e):
+                    self.groq_client = None
+                    logger.error("Groq disabled for the remainder of this run after a permanent authentication/model error.")
+                logger.error(f"Groq failed ({type(e).__name__}): {summary}")
+
+        if not errors:
+            raise RuntimeError("No AI provider configured. Add valid provider keys as GitHub Actions secrets.")
+        raise RuntimeError("All configured AI providers failed. " + " | ".join(errors))
 
     def generate_title(self, topic: str, content_type: str) -> str:
         """Generate catchy Hindi title"""
@@ -138,7 +187,7 @@ Return ONLY the title, nothing else.
         logger.info(f"Generated title: {title}")
         return title
 
-    def generate_script(self, topic: str, title: str, content_type: str) -> str:
+    def generate_script(self, topic: str, title: str, content_type: str, topic_data: dict = None) -> str:
         """Generate full Hindi script"""
         config = CONTENT_TYPES.get(content_type, CONTENT_TYPES["youtube_short"])
         style = random.choice(WRITING_STYLES)
@@ -152,6 +201,9 @@ Duration: {config['duration']}
 Word count: {config['script_length']}
 Format: {config['format']}
 Writing style: {style}
+
+Editorial evidence instructions:
+{build_editorial_context(topic_data or {"topic": topic, "category": "general"})}
 
 Requirements:
 - Pure Hindi with Devanagari script (English technical words allowed)
@@ -169,23 +221,24 @@ Script:
         logger.success(f"Script generated: {len(script)} chars")
         return script
 
-    def generate_description(self, topic: str, title: str, 
-                              content_type: str) -> str:
+    def generate_description(self, topic: str, title: str,
+                              content_type: str, topic_data: dict = None) -> str:
         """Generate YouTube/platform description"""
         prompt = f"""
 Write an SEO-optimized Hindi description for a {content_type} about "{topic}".
 Title: {title}
 
-Include:
-- First 2 lines: most important keywords (shown in search)
-- Main description in Hindi (200-300 words)
-- Chapters/timestamps if long video
-- 3-5 relevant links (describe as [LINK: description])
-- Social media handles: @AIContentHindi
-- Call to action: Like + Subscribe करें
-- 5-10 Hindi hashtags at the end
+Editorial evidence instructions:
+{build_editorial_context(topic_data or {"topic": topic, "category": "general"})}
 
-Return formatted description ready to paste in YouTube.
+Include:
+- A concise, accurate Hindi description
+- Chapters/timestamps only when actual timestamps are supplied
+- Cite only source URLs supplied in the evidence context; never invent links or social handles
+- Call to action only as a neutral invitation, without invented account names
+- 3-5 relevant hashtags only if genuinely relevant
+
+Do not add factual claims that are not supported by the supplied source excerpts. Return formatted description ready to paste in YouTube.
 """
         return self._call_ai(prompt)
 
@@ -241,10 +294,10 @@ Example format: "A professional Indian person looking amazed at a glowing smartp
         title = self.generate_title(topic, content_type)
         time.sleep(1)  # Rate limiting
         
-        script = self.generate_script(topic, title, content_type)
+        script = self.generate_script(topic, title, content_type, topic_data=topic_data)
         time.sleep(1)
         
-        description = self.generate_description(topic, title, content_type)
+        description = self.generate_description(topic, title, content_type, topic_data=topic_data)
         time.sleep(1)
         
         hashtags = self.generate_hashtags(topic, "youtube")
@@ -264,7 +317,11 @@ Example format: "A professional Indian person looking amazed at a glowing smartp
             "metadata": {
                 "word_count": len(script.split()),
                 "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "ai_model": "gemini-2.0-flash or groq-llama-3.1"
+                "ai_model": self._last_provider or "provider_not_recorded",
+                "editorial_status": "pending_review",
+                "editorial_approved": False,
+                "editorial_approval_required": True,
+                **build_source_metadata(topic_data)
             }
         }
         

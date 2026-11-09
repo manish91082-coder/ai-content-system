@@ -15,6 +15,8 @@ from pathlib import Path
 from loguru import logger
 from tenacity import retry, stop_after_attempt, wait_exponential
 from database import Database
+from pipeline_safety import publishing_is_enabled
+from editorial_qa import editorial_package_approved
 
 # Platform credentials from environment
 YT_CLIENT_ID = os.environ.get("YOUTUBE_CLIENT_ID")
@@ -274,7 +276,26 @@ class Publisher:
     # ─────────────────────────────────────────
     def publish_all(self, content_package: dict, video_paths: dict,
                     image_paths: dict) -> dict:
-        """Publish content to all platforms"""
+        """Publish content to all platforms only when the explicit safety gate is open."""
+        if not publishing_is_enabled():
+            logger.warning("Publishing blocked by fail-closed safety gate.")
+            return {
+                "publishing": {
+                    "success": False,
+                    "error": "Publishing disabled: PUBLISH_ENABLED must be true and TEST_MODE must be false."
+                }
+            }
+
+        if not editorial_package_approved(content_package):
+            logger.warning("Publishing blocked: explicit human editorial approval is missing.")
+            return {
+                "editorial_approval": {
+                    "success": False,
+                    "status": "pending_review",
+                    "error": "Require editorial_approved=true, approved_by, and approved_at."
+                }
+            }
+
         results = {}
         title = content_package["title"]
         description = content_package["description"]

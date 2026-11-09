@@ -1,20 +1,31 @@
 # 🤖 AI Content Creation & Posting System
 
-> **Fully Automated** • **Hindi First** • **Zero Cost** • **No Manual Work**
+> **Automation Prototype** • **Hindi First** • **Free-Tier-First** • **Publishing Disabled by Default**
 
 [![GitHub Actions](https://img.shields.io/badge/Automation-GitHub%20Actions-blue)](https://github.com/manish91082-coder/ai-content-system/actions)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-## 🎯 What This Does
+## ⚠️ Verified Status — 2026-11-09
 
-This system runs **completely automatically** to:
+This repository is an automation prototype, not a verified revenue-generating production system.
+
+- Research workflow has completed successfully in an observed GitHub Actions run.
+- Daily content pipeline run #17 failed: Gemini authentication, Groq model/request, and daily-report defects were recorded.
+- Reliability and publishing-safety fixes are on the isolated branch `revenue-engine/phase-1-safety-fixes`; CI run #10 passed all 13 tests and dependency/compile checks. Changes are not merged into `master`.
+- Groq credentials authenticate and the selected model is listed. The configured Gemini secret currently fails API authentication and must be replaced with a valid Google AI Studio API key.
+- No checkout, customer order/fulfilment, affiliate attribution, or bank-settlement ledger is implemented.
+- Verified settled revenue: **₹0** as of this audit. Views, generated assets, or pending payouts are not revenue.
+
+## 🎯 What This Prototype Is Intended to Do
+
+The codebase is intended to automate parts of the content workflow to:
 1. 🔍 **Research** — Finds trending Hindi topics daily
 2. ✍️ **Create** — Generates text, images, voice, video content
 3. 📤 **Post** — Uploads to YouTube, Instagram, Facebook automatically
-4. 💰 **Monetize** — Tracks income from all platforms
+4. 📈 **Measure** — Store post outcomes and basic analytics where configured
 5. 📊 **Report** — Sends daily Telegram summary
 
-**User's daily work = 5 minutes (check morning report)**
+External account setup, API credentials, OAuth, publishing permissions, editorial review, and monetization setup still require human action.
 
 ## 🏗️ Architecture
 
@@ -57,25 +68,27 @@ ai-content-system/
 └── README.md                   ← This file
 ```
 
-## ⚡ Tech Stack (100% Free, No Downloads)
+## ⚡ Components (free tiers and external-service limits apply)
 
 | Component | Tool | Cost |
 |-----------|------|------|
 | Automation | GitHub Actions | FREE |
-| Text AI | Gemini 2.0 Flash | FREE 1500/day |
-| Text Backup | Groq Llama 3.1 | FREE 14400/day |
-| Images | Pollinations.ai | FREE, no key |
-| Voice | Azure Speech | FREE 500K/month |
+| Text AI | Gemini 3.5 Flash-Lite | Free tier, account quota applies |
+| Text Backup | Groq GPT-OSS 120B | Free plan, model-specific quota applies |
+| Images | Pollinations.ai | External service; availability/terms may change |
+| Voice | gTTS (online) + pyttsx3 fallback | No paid API configured |
 | Video | FFmpeg (in Actions) | FREE |
-| Database | Supabase | FREE 500MB |
+| Database | Supabase | Free tier subject to current project limits |
 | Notifications | Telegram Bot | FREE |
-| Storage | Google Drive API | FREE 15GB |
+| Storage | Google Drive API | Uses the connected Google account's quota |
 
 ## 🔐 Required Secrets (Add in GitHub → Settings → Secrets)
 
 ```
 GEMINI_API_KEY          → Google AI Studio
 GROQ_API_KEY            → console.groq.com
+GEMINI_MODEL            → optional; defaults to gemini-3.5-flash-lite
+GROQ_MODEL              → optional; defaults to openai/gpt-oss-120b
 AZURE_SPEECH_KEY        → Azure Portal
 AZURE_SPEECH_REGION     → e.g. centralindia
 SUPABASE_URL            → Your Supabase project
@@ -88,10 +101,21 @@ YOUTUBE_REFRESH_TOKEN   → OAuth flow
 GDRIVE_CREDENTIALS      → Google Drive API JSON
 ```
 
-## 🚀 Status
+## 🔐 Publishing safety gate
 
-- [x] Phase 1: Research & Documentation ✅
-- [x] Phase 2: Code Architecture ✅
-- [ ] Phase 3: API Keys Setup (needs user action)
-- [ ] Phase 4: First automated post
-- [ ] Phase 5: Full monetization active
+Live publishing is blocked unless both conditions are true:
+- The repository variable `PUBLISH_ENABLED` is explicitly set to `true`.
+- The run is not in test mode (`TEST_MODE=false`).
+
+Scheduled runs force test mode. Keep `PUBLISH_ENABLED` unset unless the account owner has explicitly approved live publishing and all content/platform checks have passed. API keys belong only in GitHub Actions Secrets, never in source code or issues.
+
+## 🚀 Delivery status
+
+- [x] Baseline repository audit
+- [x] Isolated reliability and publishing-safety remediation branch created
+- [x] Regression tests authored
+- [x] Full regression workflow execution and review (13 tests passed; provider status degraded because Gemini key is invalid)
+- [ ] Provider credentials and live free-tier inference verified
+- [ ] Source provenance and editorial quality gate implemented
+- [ ] Product offer, checkout, fulfilment, refund, and settlement ledger built
+- [ ] First customer payment and settlement independently verified

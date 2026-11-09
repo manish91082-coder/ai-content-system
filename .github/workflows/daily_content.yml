@@ -51,6 +51,11 @@ jobs:
           pip install -r requirements.txt
           echo "✅ Python packages installed"
 
+      - name: 🧪 Run Safety and Regression Tests
+        run: |
+          python -m compileall -q src tests
+          python -m unittest discover -s tests -v
+
       - name: 📁 Create Output Directories
         run: |
           mkdir -p output/images output/audio output/videos temp logs
@@ -83,7 +88,8 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           
           # Mode
-          TEST_MODE: ${{ inputs.test_mode }}
+          TEST_MODE: ${{ github.event_name != 'workflow_dispatch' || inputs.test_mode }}
+          PUBLISH_ENABLED: ${{ vars.PUBLISH_ENABLED }}
         run: |
           cd src
           python main.py

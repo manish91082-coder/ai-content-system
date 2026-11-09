@@ -26,6 +26,8 @@ from video_creator import VideoCreator
 from publisher import Publisher
 from telegram_bot import TelegramBot
 from database import Database
+from pipeline_safety import publishing_is_enabled
+from editorial_qa import topic_is_generation_eligible, editorial_package_approved
 
 # Setup logging
 Path("logs").mkdir(exist_ok=True)
@@ -48,6 +50,8 @@ def run_daily_pipeline():
     
     all_publish_results = {}
     all_topics = []
+    publish_enabled = publishing_is_enabled()
+    logger.warning(f"LIVE PUBLISHING GATE ENABLED: {publish_enabled}")
     
     try:
         # ─────────────────────────────────────────
@@ -76,7 +80,20 @@ def run_daily_pipeline():
             safe_name = f"content_{datetime.now().strftime('%Y%m%d')}_{i+1:02d}"
             
             logger.info(f"\n📍 Processing topic {i+1}/3: {topic_name}")
-            
+
+            if not topic_is_generation_eligible(topic_data):
+                logger.warning(
+                    f"Editorial gate rejected current/news topic without adequate source evidence: {topic_name}"
+                )
+                all_publish_results[topic_name[:30]] = {
+                    "editorial_qa": {
+                        "success": False,
+                        "status": "blocked",
+                        "error": "Insufficient source evidence: no valid source URL with a useful excerpt."
+                    }
+                }
+                continue
+
             try:
                 # ─────────────────────────────────────────
                 # STEP 2: GENERATE CONTENT
@@ -119,38 +136,56 @@ def run_daily_pipeline():
                     logger.warning("Voice generation failed, skipping video")
                     video_paths = {}
                 
-                # Update DB status
+                # Generated assets must enter the human review queue, never auto-approve.
                 db.update_content_status(
-                    content_id, "ready_to_publish",
+                    content_id, "pending_editorial_review",
                     {"images": image_paths, "videos": video_paths}
                 )
-                
+
                 # ─────────────────────────────────────────
                 # STEP 3: PUBLISH
                 # ─────────────────────────────────────────
                 logger.info("STEP 3: Publishing to all platforms...")
-                
-                if video_paths:
+
+                if video_paths and publish_enabled and editorial_package_approved(content_package):
                     publish_results = publisher.publish_all(
                         content_package=content_package,
                         video_paths=video_paths,
                         image_paths=image_paths
                     )
                     all_publish_results[topic_name[:30]] = publish_results
-                    
-                    # Log published posts to DB
+
+                    # Log only actual publisher responses; never infer a successful post.
                     for platform, result in publish_results.items():
-                        db.save_post(
-                            content_id=content_id,
-                            platform=platform,
-                            post_url=result.get("url", ""),
-                            post_id=result.get("post_id", ""),
-                            status="success" if result.get("success") else "failed"
-                        )
+                        if isinstance(result, dict):
+                            db.save_post(
+                                content_id=content_id,
+                                platform=platform,
+                                post_url=result.get("url", ""),
+                                post_id=result.get("post_id", ""),
+                                status="success" if result.get("success") is True else "failed"
+                            )
+                elif video_paths and publish_enabled:
+                    logger.warning("Publishing blocked: human editorial approval is missing.")
+                    all_publish_results[topic_name[:30]] = {
+                        "editorial_approval": {
+                            "success": False,
+                            "status": "pending_review",
+                            "error": "Human editorial approval metadata is required before publishing."
+                        }
+                    }
+                elif video_paths:
+                    logger.warning("Publishing blocked by safety gate; generated assets retained.")
+                    all_publish_results[topic_name[:30]] = {
+                        "publishing": {
+                            "success": False,
+                            "error": "Publishing disabled: set PUBLISH_ENABLED=true and TEST_MODE=false after explicit authorization."
+                        }
+                    }
                 else:
                     logger.warning(f"No video created for: {topic_name}")
                     all_publish_results[topic_name[:30]] = {
-                        "skipped": {"success": False, "error": "No video created"}
+                        "pipeline": {"success": False, "error": "No video created"}
                     }
                 
                 # Rate limiting between topics
