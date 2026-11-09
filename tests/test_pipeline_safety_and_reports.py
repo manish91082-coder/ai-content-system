@@ -11,7 +11,7 @@ from pipeline_safety import publishing_is_enabled
 from telegram_bot import TelegramBot
 from publisher import Publisher
 from content_generator import ContentGenerator
-from editorial_qa import topic_is_generation_eligible, build_editorial_context, build_source_metadata, editorial_package_approved
+from editorial_qa import topic_is_generation_eligible, build_editorial_context, build_source_metadata, editorial_package_approved, content_review_hash
 
 
 class PublishingSafetyTests(unittest.TestCase):
@@ -145,6 +145,38 @@ class EditorialEvidenceTests(unittest.TestCase):
             result = publisher.publish_all(package, {}, {})
         self.assertFalse(result["editorial_approval"]["success"])
         self.assertEqual(result["editorial_approval"]["status"], "pending_review")
+
+
+class EditorialFingerprintTests(unittest.TestCase):
+    def test_review_hash_is_stable_for_same_package(self):
+        metadata = {
+            "description": "Description",
+            "hashtags": ["#AI"],
+            "thumbnail_prompt": "A thumbnail",
+            "sources": [{"url": "https://example.org/source"}],
+            "evidence_status": "source_excerpt_supplied_not_independently_verified",
+        }
+        first = content_review_hash("Title", "Script", metadata)
+        second = content_review_hash("Title", "Script", metadata)
+        self.assertEqual(first, second)
+        self.assertEqual(len(first), 64)
+
+    def test_review_hash_changes_when_reviewed_content_changes(self):
+        metadata = {"description": "Original description", "hashtags": ["#AI"]}
+        original = content_review_hash("Title", "Script", metadata)
+        changed = content_review_hash(
+            "Title", "Script", {**metadata, "description": "Changed description"}
+        )
+        self.assertNotEqual(original, changed)
+
+    def test_review_hash_changes_when_source_reference_changes(self):
+        first = content_review_hash("Title", "Script", {
+            "sources": [{"url": "https://example.org/a"}]
+        })
+        second = content_review_hash("Title", "Script", {
+            "sources": [{"url": "https://example.org/b"}]
+        })
+        self.assertNotEqual(first, second)
 
 
 class TelegramReportTests(unittest.TestCase):
