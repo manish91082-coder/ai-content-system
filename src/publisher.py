@@ -16,6 +16,7 @@ from loguru import logger
 from tenacity import retry, stop_after_attempt, wait_exponential
 from database import Database
 from pipeline_safety import publishing_is_enabled
+from editorial_qa import editorial_package_approved
 
 # Platform credentials from environment
 YT_CLIENT_ID = os.environ.get("YOUTUBE_CLIENT_ID")
@@ -282,6 +283,16 @@ class Publisher:
                 "publishing": {
                     "success": False,
                     "error": "Publishing disabled: PUBLISH_ENABLED must be true and TEST_MODE must be false."
+                }
+            }
+
+        if not editorial_package_approved(content_package):
+            logger.warning("Publishing blocked: explicit human editorial approval is missing.")
+            return {
+                "editorial_approval": {
+                    "success": False,
+                    "status": "pending_review",
+                    "error": "Require editorial_approved=true, approved_by, and approved_at."
                 }
             }
 
