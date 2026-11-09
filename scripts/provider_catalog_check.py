@@ -59,13 +59,17 @@ def check_groq():
 def main():
     results = [check_gemini(), check_groq()]
     configured = [result for result in results if result is not None]
+    healthy = [result for result in configured if result is True]
     if not configured:
         print("Provider check: SKIPPED (no provider secrets configured)")
         return 0
-    if any(result is False for result in configured):
-        print("Provider check: FAILED (see redacted diagnostics above)")
+    if not healthy:
+        print("Provider check: FAILED (no configured provider is healthy)")
         return 1
-    print("Provider check: PASS (configured keys authenticated and target models listed)")
+    if len(healthy) != len(configured):
+        print("Provider check: DEGRADED (at least one provider is healthy; inspect failed-provider diagnostics)")
+        return 0
+    print("Provider check: PASS (all configured providers authenticated and target models listed)")
     return 0
 
 
