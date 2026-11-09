@@ -132,14 +132,14 @@ Check GitHub Actions logs for details.
 
     def send_startup_message(self) -> bool:
         """Send startup notification"""
-        message = """🚀 <b>AI Content System Started!</b>
+        message = """🚀 <b>AI Content System Started</b>
 
 ⚡ GitHub Actions workflow triggered
-🔍 Starting research...
-📝 Will generate content...
-📤 Will auto-publish...
+🔍 Research stage starting
+📝 Content generation will be attempted
+🛡️ Publishing is controlled by the explicit safety gate
 
-You'll receive the results soon!"""
+A generated asset is not a published post. The daily report will show the recorded result."""
         
         return self.send_message(message)
 
