@@ -1,71 +1,70 @@
 # AgentGuard — Policy-Bound Agent Payments
 
-**NEAR HACKATHON 2026 | Tracks: Agent Economy + AI Security & Defense**
+**NEAR HACKATHON 2026 | Primary track: AI Security & Defense**
 
-AgentGuard is a safety gateway for autonomous agents that need to earn, spend, hire other agents and pay for APIs without receiving unrestricted control of a wallet.
+AgentGuard is a deterministic security gateway for autonomous agents that request payments. It places enforceable policy between an agent's proposal and a signer, reducing the risk of prompt injection, malicious counterparties and uncontrolled spending.
 
-## The problem
-An autonomous agent may be manipulated by prompt injection, deceptive task instructions or a malicious counterparty into making an irreversible payment. A normal LLM instruction such as "do not pay this address" is not an enforceable financial control.
+## Threat model
+An agent may receive adversarial task content that attempts to redirect funds, change a recipient, bypass limits or persuade the agent to ignore its instructions. LLM instructions alone are not a security boundary. AgentGuard applies deterministic checks outside the model.
 
-## What this prototype demonstrates
-1. An agent proposes a payment.
-2. A deterministic policy engine checks the recipient, method, contract, amount, rolling spend limit and risk signals.
+## Prototype behavior
+1. The agent proposes a payment intent.
+2. A deterministic policy engine checks agent identity, recipient, contract, method, amount, daily spend and risk signals.
 3. The gateway returns **ALLOW**, **WARN** or **BLOCK** with machine-readable reasons.
-4. The signing boundary is called only for ALLOW. WARN requires an explicit human approval token; BLOCK cannot be overridden by the agent.
-5. Every decision is written to a tamper-evident SHA-256 hash-chained receipt log.
-6. A prompt-injection attack demo tries to route a payment to a blocked recipient and is stopped before the signing boundary.
+4. ALLOW reaches the demo signer. WARN requires a cryptographically authenticated approval token bound to the exact intent, expiring within a short window and usable once. BLOCK cannot be overridden.
+5. Every decision is recorded in a SHA-256 hash-chained JSONL receipt log. The gateway refuses startup or append if the log is corrupt.
+6. A prompt-injection demonstration attempts to pay a blocked recipient and is stopped before the signer boundary.
 
-## Safety model
-- This prototype never stores a seed phrase or private key.
-- The demo signing adapter is intentionally a stub. It does not broadcast transactions or move funds.
-- A production NEAR integration must use a scoped FunctionCall access key or a policy-bound Agent API wallet, never a FullAccess key for the autonomous worker.
-- Contract allowlists, method allowlists, per-transaction caps, daily caps and human approval thresholds are enforced outside the LLM.
-- A FunctionCall key is not a general-purpose transfer key. NEAR access-key limitations and gas allowance failure modes must be understood before deployment.
+## Security controls in this prototype
+- No seed phrase or private key is stored.
+- The demo signer returns SIMULATED_ONLY; it never broadcasts or transfers funds.
+- Empty recipient allowlists fail closed.
+- Configured contract and method allowlists are mandatory for each payment intent.
+- Invalid/non-finite amounts, invalid spend counters and blocked recipients are rejected.
+- Human approval is HMAC-authenticated, intent-bound, expiring and single-use in the in-process demonstration.
+- Receipt integrity is checked before gateway startup and every append.
 
-## Run
-```bash
+## Run locally
+~~~bash
 python -m pip install -e ".[dev]"
 python demo/run_attack_demo.py
 pytest -q
-```
+~~~
 
-Expected demo: the benign payment is allowed in simulation; the prompt-injected payment to `bad.actor.near` is blocked; the signing adapter is not invoked for the blocked action.
+Expected behavior: the benign scoped payment is allowed in simulation; the prompt-injection attempt to bad.actor.near is blocked; the signer is not called for the blocked action.
 
 ## Architecture
-```text
-Task / Agent proposal
-        |
-        v
-Policy Gateway -----> Counterparty signals / blocklist
-        |                         |
-        v                         v
-ALLOW / WARN / BLOCK <--- Deterministic policy evaluation
-        |
-        +---- BLOCK: stop + receipt
-        |
-        +---- WARN: human approval token required
-        |
-        +---- ALLOW: scoped signer adapter (stub in this prototype)
+~~~text
+Agent proposal
+     |
+     v
+Deterministic policy engine <--- Counterparty evidence
+     |
+     +---- BLOCK ---> receipt; signer never called
+     |
+     +---- WARN ----> exact-intent human approval required
+     |                    |
+     |                    +--> no/invalid/replayed/expired token: stop
+     |                    +--> valid one-time token: demo signer
+     |
+     +---- ALLOW ---> demo signer
                           |
                           v
-                 Receipt + hash-chain audit
-```
+                   hash-chained receipt
+~~~
 
-## Scope and limitations
-The first milestone is an executable local policy and attack demonstration, not a claim of deployed NEAR mainnet functionality. NEAR testnet / Agent API integration is a subsequent adapter milestone after the exact API and key constraints are validated. No real funds are used.
+## NEAR integration status
+The Python signer is deliberately a stub. The Rust contract source is a separate testnet-oriented enforcement prototype. No NEAR deployment, wallet connection, real transaction or mainnet integration is claimed. A future testnet demonstration must use faucet funds only, a scoped FunctionCall access key, a verified contract build and reviewed deployment steps.
 
-## Fresh-work disclosure
-The AgentGuard implementation in this directory is newly authored for the NEAR HACKATHON build window. The parent repository contains unrelated pre-existing work; this directory is the isolated hackathon project. No pre-existing product or customer traction is claimed.
+The NEAR Intents Agent API is experimental and mainnet-only in the reviewed documentation. This project does not use that beta or request real funds.
 
 ## Track fit
-- **AI Security & Defense:** policy engine, sandboxed spending controls, counterparty risk and prompt-injection defence.
-- **Agent Economy:** safe agent-to-agent and agent-to-service payment authorisation.
+This implementation targets **AI Security & Defense**: deterministic spending controls, allowlisted recipients and methods, counterparty risk signals, ALLOW/WARN/BLOCK decisions, a signer boundary that refuses BLOCK, explicit human approval for WARN, and prompt-injection attack evidence.
 
-## Security note
-This is a prototype, not an audited wallet, custody service, smart contract or financial product. Do not connect a production wallet. Review all code and testnet integration before any real transaction.
+It does not currently claim a complete Agent Economy workflow. Agent-to-agent hiring, paid service discovery and settlement would require a separate working feature set.
 
+## Fresh-work disclosure
+The AgentGuard implementation in this directory is newly authored for the NEAR HACKATHON build window. The parent repository contains unrelated pre-existing work. No pre-existing product, users, customers or revenue are claimed.
 
-## NEAR integration safety decision
-The official NEAR Intents Agent API documentation describes the Agent API as an **experimental, mainnet-only beta** and warns that assets may be lost. Its quickstart uses real funds (approximately 10 USDC) and there is no testnet version. This prototype therefore does not connect to that beta or request real funds. A later integration must first be reviewed against the current API docs and require explicit owner approval; no partner API key or grant token may be placed in a browser or model prompt.
-
-For the hackathon proof, prefer a NEAR testnet contract plus a narrowly scoped FunctionCall access key, subject to contract implementation and testnet validation. Such a key cannot make native transfers or replace account keys; the contract must itself enforce the spending policy and control any test funds. This is a design target, not yet implemented or deployed.
+## Limitations
+This is a prototype, not an audited wallet, custody service, production signing system or financial product. The in-memory approval nonce store and process-local locks are suitable only for the local demonstration; production requires authenticated approval identity, durable atomic nonce storage, concurrency-safe spend accounting, external evidence provenance and independent security review. Do not connect a production wallet.
