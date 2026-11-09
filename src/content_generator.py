@@ -318,6 +318,9 @@ Example format: "A professional Indian person looking amazed at a glowing smartp
                 "word_count": len(script.split()),
                 "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
                 "ai_model": self._last_provider or "provider_not_recorded",
+                "editorial_status": "pending_review",
+                "editorial_approved": False,
+                "editorial_approval_required": True,
                 **build_source_metadata(topic_data)
             }
         }
