@@ -11,7 +11,7 @@
 **FREE: 1500 requests/day**
 
 1. Browser mein open karo: **https://aistudio.google.com**
-2. Google account se login karo (manish91082@gmail.com)
+2. Google account se login karo (your Google account)
 3. Left menu → "Get API Key"
 4. "Create API Key" button click karo
 5. Key copy karo (starts with "AIza...")
@@ -22,7 +22,7 @@
 **FREE: 14,400 requests/day**
 
 1. Open: **https://console.groq.com**
-2. "Sign in with Google" → manish91082@gmail.com
+2. "Sign in with Google" → your Google account
 3. Dashboard → "API Keys" → "Create API Key"
 4. Name: "ai-content-system"
 5. Key copy karo (starts with "gsk_...")
