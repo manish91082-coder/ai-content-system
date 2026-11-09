@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admission Desk Lite | Interview Scorecard</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;color:#17243a;background:#f4f7fb}
+*{box-sizing:border-box}body{margin:0}header{background:#172b4d;color:#fff;padding:22px max(16px,calc((100vw - 900px)/2))}
+main{max-width:900px;margin:22px auto;padding:0 14px 50px}.panel{background:#fff;border:1px solid #dfe6ef;border-radius:14px;padding:18px;margin:14px 0}
+h1{margin:0 0 8px;font-size:26px}.muted{color:#627087;font-size:13px}.warn{background:#fff5d9;border:1px solid #e7d48b;padding:12px;border-radius:10px}
+label{display:block;font-weight:600;margin:13px 0 6px}input,select,textarea{width:100%;padding:10px;border:1px solid #c7d1df;border-radius:8px;font:inherit;background:#fff}
+textarea{min-height:65px;resize:vertical}.q{padding:10px 0;border-bottom:1px solid #edf0f5}.q:last-child{border:0}
+button{padding:11px 15px;border:0;border-radius:8px;background:#2057a5;color:#fff;font:inherit;font-weight:650;cursor:pointer;margin:6px 6px 0 0}button.secondary{background:#e8eef7;color:#1c3559}button.danger{background:#8e2d36}
+.actions{display:flex;flex-wrap:wrap;gap:6px}.check{display:flex;align-items:flex-start;gap:9px;font-weight:400}.check input{width:auto;margin-top:5px}
+@media(max-width:600px){header{padding:18px 15px}.panel{padding:14px}}
+</style></head><body>
+<header><h1>Admission Desk Lite · Interview Scorecard</h1><div>Customer discovery · Hindi-first · Anonymous by design</div></header>
+<main>
+<div class="warn"><strong>Privacy rule:</strong> किसी owner, student या parent का नाम/फोन/email, student records या confidential figures न भरें। केवल anonymous centre code (जैसे UJ-01) रखें। यह worksheet इसी browser में localStorage पर रहती है। CSV export करके सुरक्षित रखें।</div>
+<section class="panel">
+<h2>Interview context</h2>
+<label for="code">Anonymous centre code</label><input id="code" placeholder="उदाहरण: UJ-01" maxlength="20">
+<label for="date">Interview date</label><input id="date" type="date">
+<label for="type">Institute type</label><select id="type"><option value="">Select</option><option>School tuition</option><option>Competitive exam coaching</option><option>Mixed courses</option><option>Other</option></select>
+<label for="role">Respondent role</label><select id="role"><option value="">Select</option><option>Owner</option><option>Centre manager</option><option>Enquiry desk staff</option><option>Other</option></select>
+<label class="check"><input id="permission" type="checkbox"> व्यक्ति ने research conversation के लिए स्पष्ट सहमति दी है।</label>
+</section>
+<section class="panel"><h2>पहले workflow समझें, product बाद में दिखाएँ</h2>
+<div class="q"><label for="q1">1. नई enquiry आने पर अभी सबसे पहले क्या करते हैं?</label><textarea id="q1"></textarea></div>
+<div class="q"><label for="q2">2. Enquiry कहाँ दर्ज होती है?</label><select id="q2"><option value="">Select</option><option>Paper register</option><option>Excel / Google Sheets</option><option>WhatsApp chats</option><option>CRM / software</option><option>Memory / informal</option><option>Other</option></select></div>
+<div class="q"><label for="q3">3. एक सामान्य सप्ताह में लगभग कितनी enquiries आती हैं?</label><select id="q3"><option value="">Select</option><option>0–10</option><option>11–25</option><option>26–50</option><option>51–100</option><option>100+</option><option>Not shared</option></select></div>
+<div class="q"><label for="q4">4. Follow-up की अगली तारीख कौन तय करता है और कहाँ दिखती है?</label><textarea id="q4"></textarea></div>
+<div class="q"><label for="q5">5. Follow-up छूटने या देर से होने की समस्या कितनी बार होती है?</label><select id="q5"><option value="">Select</option><option>Never / rarely</option><option>Monthly</option><option>Weekly</option><option>Several times a week</option><option>Unable to say</option></select></div>
+<div class="q"><label for="q6">6. एक enquiry को admission तक पहुँचाने में कौन-कौन से stages होते हैं?</label><textarea id="q6"></textarea></div>
+<div class="q"><label for="q7">7. एक से अधिक staff enquiry संभालते हैं?</label><select id="q7"><option value="">Select</option><option>No, one person</option><option>Yes, 2 people</option><option>Yes, 3–5 people</option><option>Yes, 5+</option></select></div>
+<div class="q"><label for="q8">8. मौजूदा process में सबसे ज्यादा समय/गलती कहाँ होती है?</label><textarea id="q8"></textarea></div>
+<div class="q"><label for="q9">9. इस समस्या का असर क्या पड़ता है? कोई वास्तविक उदाहरण, बिना personal data के।</label><textarea id="q9"></textarea></div>
+</section>
+<section class="panel"><h2>अब demo दिखाएँ और प्रतिक्रिया लें</h2>
+<div class="q"><label for="q10">10. Demo में कौन-सा हिस्सा आपके मौजूदा काम में उपयोगी लगा?</label><textarea id="q10"></textarea></div>
+<div class="q"><label for="q11">11. कौन-सी जरूरी सुविधा missing है या उपयोग में बाधा बनेगी?</label><textarea id="q11"></textarea></div>
+<div class="q"><label for="q12">12. क्या offline, single-browser tool आपके काम के लिए पर्याप्त है?</label><select id="q12"><option value="">Select</option><option>Yes</option><option>Maybe, with changes</option><option>No, cloud/multi-user required</option><option>Not sure</option></select></div>
+<label for="pain">Problem severity (respondent's view)</label><select id="pain"><option value="">Select</option><option>0 - No meaningful problem</option><option>1 - Minor inconvenience</option><option>2 - Noticeable recurring issue</option><option>3 - Significant operational problem</option><option>4 - Critical / costly problem</option></select>
+<label for="price">One-time pilot price reaction (after demo)</label><select id="price"><option value="">Select</option><option>₹299 seems acceptable</option><option>₹499 seems acceptable</option><option>Only free trial / free tool</option><option>Would pay, but different price</option><option>Not willing to pay</option><option>Did not ask</option></select>
+<label for="reason">Price response reason / conditions</label><textarea id="reason"></textarea>
+<label for="next">Next action (no promise assumed)</label><select id="next"><option value="">Select</option><option>No follow-up requested</option><option>Asked for revised demo</option><option>Requested written scope</option><option>Volunteered to test pilot</option><option>Declined</option></select>
+<label for="notes">Other notes (no personal or student data)</label><textarea id="notes"></textarea>
+</section>
+<section class="panel"><h2>Save this interview locally</h2><p class="muted">Save तभी करें जब consent checkbox tick हो। कोई data network पर नहीं भेजा जाता। Exported CSV को secure रखें।</p>
+<div class="actions"><button id="save">Save interview</button><button class="secondary" id="export">Export CSV</button><button class="secondary" id="clear">Clear this form</button><button class="danger" id="erase">Delete all local interviews</button></div>
+<p id="status" role="status" aria-live="polite" class="muted"></p><p id="count" class="muted"></p>
+</section>
+</main>
+<script>
+const ids=["code","date","type","role","permission","q1","q2","q3","q4","q5","q6","q7","q8","q9","q10","q11","q12","pain","price","reason","next","notes"];
+const key="admissionDeskInterviewV1";
+const el=id=>document.getElementById(id);
+const read=()=>Object.fromEntries(ids.map(id=>[id,el(id).type==="checkbox"?el(id).checked:el(id).value]));
+const records=()=>{try{return JSON.parse(localStorage.getItem(key)||"[]")}catch{return []}};
+const status=m=>el("status").textContent=m;
+el("date").value=new Date().toISOString().slice(0,10);
+function csv(rows){const cols=ids;const esc=v=>'"'+String(v??"").replace(/"/g,'""')+'"';return [cols.map(esc).join(","),...rows.map(r=>cols.map(c=>esc(r[c])).join(","))].join("\r\n");}
+el("save").addEventListener("click",()=>{
+ const r=read();
+ if(!r.permission){status("पहले स्पष्ट consent दर्ज करें।");return;}
+ if(!r.code.trim()||!r.date||!r.type||!r.role){status("Anonymous code, date, institute type और respondent role आवश्यक हैं।");return;}
+ const list=records();list.push({...r,saved_at:new Date().toISOString()});localStorage.setItem(key,JSON.stringify(list));
+ status("Interview local browser में save हुआ।");el("count").textContent="Saved records: "+list.length;
+});
+el("export").addEventListener("click",()=>{
+ const list=records();if(!list.length){status("Export करने के लिए कोई saved interview नहीं है।");return;}
+ const blob=new Blob(["\ufeff"+csv(list)],{type:"text/csv;charset=utf-8"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="admission-desk-anonymous-interviews.csv";a.click();URL.revokeObjectURL(url);status("CSV export तैयार।");
+});
+el("clear").addEventListener("click",()=>{ids.forEach(id=>{if(el(id).type==="checkbox")el(id).checked=false;else el(id).value="";});status("Form cleared. Saved records सुरक्षित हैं।");});
+el("erase").addEventListener("click",()=>{if(confirm("इस browser से सभी locally saved interview records delete करें?")){localStorage.removeItem(key);el("count").textContent="Saved records: 0";status("Local records deleted.");}});
+el("count").textContent="Saved records: "+records().length;
+</script></body></html>

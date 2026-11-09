@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Admission Desk Lite interactive demo using fictional coaching enquiries.">
+<title>Admission Desk Lite | Interactive Demo</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;color:#18243a;background:#f3f6fb}
+*{box-sizing:border-box}body{margin:0}header{background:#172b4d;color:white;padding:24px max(18px,calc((100vw - 1080px)/2))}
+header a{color:#dceaff}main{max-width:1080px;margin:24px auto;padding:0 16px 44px}
+.notice{background:#fff5d9;border:1px solid #e9d58c;padding:12px 14px;border-radius:12px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat,.panel{background:white;border:1px solid #e0e7f0;border-radius:14px;padding:15px}
+.stat b{display:block;font-size:26px}.stat span,.muted{font-size:13px;color:#617087}
+.panel{margin-top:16px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+input,select{padding:10px;border:1px solid #c8d2e0;border-radius:8px;font:inherit;background:white}
+input{flex:1;min-width:180px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{text-align:left;padding:11px;border-bottom:1px solid #e8edf4;font-size:14px}th{color:#59677d;background:#f8fafd}
+button,a.btn{border:0;border-radius:8px;background:#2057a5;color:white;padding:9px 12px;font:inherit;text-decoration:none;cursor:pointer}
+button.alt,a.alt{background:#e8eef7;color:#1d3558}.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#e9f1ff;font-size:12px}
+footer{margin-top:18px;color:#687589;font-size:13px}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}header{padding:20px}}
+</style></head>
+<body>
+<header><h1>Admission Desk Lite · Demo</h1><p>कोचिंग enquiries और follow-up का छोटा, साफ़ workflow</p><a href="landing.html">← Product overview</a></header>
+<main>
+<div class="notice"><strong>DEMO DATA ONLY:</strong> नीचे सभी नाम, नंबर और enquiry records काल्पनिक हैं। यह sandbox है। कोई data server पर नहीं भेजा जाता। Refresh करने पर demo फिर से reset हो जाएगा।</div>
+<section class="stats" aria-label="Demo metrics">
+<div class="stat"><b id="total">0</b><span>Total enquiries</span></div><div class="stat"><b id="active">0</b><span>Active follow-ups</span></div><div class="stat"><b id="demo">0</b><span>Demo scheduled</span></div><div class="stat"><b id="due">0</b><span>Follow-up due (demo)</span></div>
+</section>
+<section class="panel">
+<h2>Enquiry desk</h2><p class="muted">Search और stage filter बदलें। किसी row का stage बदलकर workflow देखें।</p>
+<div class="toolbar"><input id="search" placeholder="नाम या course खोजें…" aria-label="Search"><select id="filter" aria-label="Filter stage"><option value="">All stages</option><option>New</option><option>Contacted</option><option>Demo Scheduled</option><option>Joined</option><option>Not Interested</option></select></div>
+<div class="tablewrap"><table><thead><tr><th>Parent / Contact</th><th>Course</th><th>Stage</th><th>Next follow-up</th><th>Demo action</th></tr></thead><tbody id="rows"></tbody></table></div>
+</section>
+<section class="panel"><h2>इस demo से क्या verify करें?</h2><ul><li>Enquiry stage एक नज़र में दिखती है।</li><li>Search और filter से records जल्दी मिलते हैं।</li><li>Follow-up date अलग से track की जा सकती है।</li><li>यह demo जानबूझकर fictional है और किसी वास्तविक संस्थान का data नहीं रखता।</li></ul><a class="btn" href="admission-desk-lite.html">Open full offline app</a> <a class="btn alt" href="landing.html">Back to overview</a></section>
+<footer>यह simulated demo है, production CRM नहीं। Full app में data केवल उसी browser की local storage में रहता है। CSV backup आवश्यक है।</footer>
+</main>
+<script>
+const seed=[
+{id:1,name:"Aarav Sharma (fictional)",course:"Class 10 Maths",stage:"New",date:"2026-11-10"},
+{id:2,name:"Sana Khan (fictional)",course:"NEET Foundation",stage:"Contacted",date:"2026-11-11"},
+{id:3,name:"Rohan Verma (fictional)",course:"Class 12 Physics",stage:"Demo Scheduled",date:"2026-11-09"},
+{id:4,name:"Meera Joshi (fictional)",course:"JEE Foundation",stage:"Joined",date:"2026-11-14"},
+{id:5,name:"Kabir Patel (fictional)",course:"Class 9 Science",stage:"New",date:"2026-11-09"}
+];
+let data=seed.map(x=>({...x}));
+const stages=["New","Contacted","Demo Scheduled","Joined","Not Interested"];
+const $=id=>document.getElementById(id);
+function render(){
+$("total").textContent=data.length;
+$("active").textContent=data.filter(x=>!["Joined","Not Interested"].includes(x.stage)).length;
+$("demo").textContent=data.filter(x=>x.stage==="Demo Scheduled").length;
+$("due").textContent=data.filter(x=>x.date<="2026-11-09"&&!["Joined","Not Interested"].includes(x.stage)).length;
+const q=$("search").value.toLowerCase(), f=$("filter").value;
+const visible=data.filter(x=>(!f||x.stage===f)&&(!q||(x.name+" "+x.course).toLowerCase().includes(q)));
+$("rows").innerHTML=visible.map(x=>'<tr><td>'+x.name+'</td><td>'+x.course+'</td><td><span class="pill">'+x.stage+'</span></td><td>'+x.date+'</td><td><select aria-label="Change stage for '+x.name+'" data-id="'+x.id+'">'+stages.map(s=>'<option '+(s===x.stage?'selected':'')+'>'+s+'</option>').join("")+'</select></td></tr>').join("")||'<tr><td colspan="5">No matching demo records.</td></tr>';
+}
+$("search").addEventListener("input",render);$("filter").addEventListener("change",render);
+$("rows").addEventListener("change",e=>{if(e.target.matches("select[data-id]")){const row=data.find(x=>x.id===Number(e.target.dataset.id));if(row)row.stage=e.target.value;render();}});
+render();
+</script></body></html>

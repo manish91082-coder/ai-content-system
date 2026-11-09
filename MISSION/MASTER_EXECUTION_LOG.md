@@ -5,7 +5,7 @@ Autonomous Internet Revenue Engine. Stretch target: ₹10 crore in actual settle
 
 ## Current checkpoint
 - Date: 2026-11-09
-- Active branch: revenue-engine/phase-3-editorial-review
+- Active branch: revenue-engine/phase-7-self-serve-validation
 - Phase 3 branch is based on the unmerged Phase 1/2 PR head; PR #1 remains open and unmerged.
 - Repository: https://github.com/manish91082-coder/ai-content-system
 - Default branch: master
@@ -131,3 +131,33 @@ https://github.com/manish91082-coder/ai-content-system/actions/runs/42650983459
 - Added `tests/test_product_kit.py`; CI now watches Phase 6 branch, product and mission paths.
 - Product is an unvalidated pilot. No customer interview, paid order, public listing, checkout or distribution has been completed. Do not claim product-market fit or revenue.
 - Next: pass CI, then create a demo with fictional records and run a small, legitimate customer-validation experiment before selecting price or activating payment.
+
+
+## Phase 7 — Self-Serve Demo & Customer Validation (9 Nov 2026)
+
+- Branch: `revenue-engine/phase-7-self-serve-validation`, based on Phase 6 head `e1293278fedc96303a54780db56ef492325c76dc`.
+- Added `product/landing.html`: truthful static product overview, direct demo/app paths, explicit pilot limitations and no unsupported customer/result claims.
+- Added `product/demo.html`: interactive fictional enquiry dataset with search, stage filtering, stage changes and simulated dashboard metrics. Demo records are hard-coded fictional examples and reset on refresh.
+- Added `MISSION/PHASE_7_SELF_SERVE_VALIDATION.md`: narrow interview/usability protocol, ₹299/₹499 one-time price hypotheses (not validated prices), decision gates and privacy/safety limits.
+- Added `tests/test_phase7_pages.py`; extended existing CI workflow branch filter to include Phase 7.
+- No personal information is collected or transmitted by these pages. No telemetry, backend, payment checkout, contact form, live payment, public hosting, or automated fulfilment is configured.
+- This is a demo/validation asset release, not a completed customer-acquisition experiment. No owner interviews, qualified leads, orders, captured payments, bank settlements, or revenue are claimed.
+- Next evidence gate: run a small number of genuine coaching-centre owner interviews/usability sessions. A stated willingness to pay is not a sale; settled revenue requires bank reconciliation.
+
+
+### Phase 7 CI verification update
+- GitHub Actions run #39 passed on commit `a0b4b275843b9172d5a18c40bdc2e599c2cc36ff`: https://github.com/manish91082-coder/ai-content-system/actions/runs/42662677257
+- Python compilation passed and all 49 regression tests passed.
+- Provider metadata check remains degraded: Groq authenticated/model listed (`openai/gpt-oss-120b`); Gemini API key returns 401 invalid/unsupported. No inference prompt is implied by the metadata check.
+- Two earlier Phase 7 CI attempts failed only on test assertions that did not match the bilingual landing-page copy; assertions were corrected, then run #39 passed. No product runtime failure was reported by those tests.
+
+
+## Phase 7B — Ujjain Interview Readiness (9 Nov 2026)
+
+- Added `product/interview-scorecard.html`: mobile-friendly Hindi-first anonymous discovery worksheet; consent gate; local-browser-only storage; CSV export; no backend/network submission; no owner/student/parent personal data fields.
+- Added `MISSION/PHASE_7B_UJJAIN_PILOT_CANDIDATES.md`: five Ujjain coaching-centre candidates from public local business listings, addresses and listing links, with sampling logic and permission-first opening script. Candidate status only; no contact has been made, no endorsement or buying intent implied. Public listing ratings are not demand evidence.
+- Added `tests/test_phase7b_interview.py` covering controls, consent/privacy wording, no network submission, and shortlist stop rules.
+- CI run #44 passed: 52 tests, Python compilation. https://github.com/manish91082-coder/ai-content-system/actions/runs/42664239867
+- Provider check remains degraded: Groq authenticated/model listed; Gemini key invalid (401). No inference prompt sent by metadata check.
+- No interview, outreach, lead conversion, paid pilot, captured payment, bank settlement or revenue is claimed.
+- Next evidence action: user/authorized operator must voluntarily approach up to three listed institutes, obtain consent, conduct interviews, and enter anonymized findings. Stop immediately on refusal.

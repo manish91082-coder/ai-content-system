@@ -7,6 +7,7 @@ on:
       - revenue-engine/phase-3-editorial-review
       - revenue-engine/phase-5-order-core
       - revenue-engine/phase-6-coaching-kit
+      - revenue-engine/phase-7-self-serve-validation
     paths:
       - "src/**"
       - "tests/**"
