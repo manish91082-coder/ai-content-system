@@ -1,4 +1,3 @@
-use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedSet;
 use near_sdk::json_types::U128;
 use near_sdk::serde_json;
@@ -183,7 +182,7 @@ mod tests {
 
     fn setup() -> AgentGuard {
         context(account("owner.testnet"), 1);
-        let mut contract = AgentGuard::new(account("owner.testnet"), U128(10), U128(20));
+        let mut contract = AgentGuard::new(account("owner.testnet"), U128(10), U128(15));
         contract.register_agent(account("worker.testnet"));
         contract.allow_recipient(account("vendor.testnet"));
         contract
