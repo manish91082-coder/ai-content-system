@@ -335,3 +335,12 @@ No primary route selected. The next pass must compare platform-native buyer/rewa
 The search has tested asset sales (Acquire/Flippa), software/API marketplaces (AWS/RapidAPI), security bounties (HackerOne/Bugcrowd/Intigriti), paid tasks/prizes (Outlier/Clickworker/UserTesting/Topcoder/Kaggle), creator/affiliate payout rails, and commission models against RBI PA and CBIC GST constraints.
 
 No route yet passes all gates. Continue only with AI-permitted platform-native rewards/transactions or documented user-controlled commercial assets. Do not disguise human gig work as automation, do not use the user's labour as a hidden input, and do not build a product to compensate for missing distribution.
+
+
+### Fifth-pass high-value security competition findings — 2026-11-09
+
+- Code4rena allows public Warden participation; typical submission windows are 1–3 weeks. Historical audit prize pools can be large, but individual awards are diluted by severity, uniqueness, duplicates and judge scoring.
+- Code4rena pays the first batch within one week of award announcement only for participants who have completed payout requirements by then. A second batch follows the 30-day tax-info window plus up to another week. Missing pre-announcement payout setup can therefore push funds beyond the mission deadline.
+- Code4rena awards are in USDC, not direct Indian bank credit. AI/automated tools may be used as a first pass, but LLM-generated reports are strongly discouraged; the Warden must validate findings and Solidity/EVM High/Medium reports generally require runnable PoCs.
+- Immunefi reviewed program lists a maximum $50,000 critical smart-contract reward, paid in USDC after KYC; rules prohibit low-quality automated scanner reports and unauthorized mainnet/public-testnet testing.
+- This is a bounded high-upside side-research candidate, not a predictable ₹10 crore primary route. Prior smart-contract project history does not prove audit expertise or accepted findings. Full analysis is in MISSION/REVENUE_OPPORTUNITY_AUDIT_2026-11-09.md.
