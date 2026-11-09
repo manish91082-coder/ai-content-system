@@ -639,3 +639,31 @@ No target has been tested against deployed systems. Only local source review and
 - Product storefronts and low-value microtask platforms remain secondary; no speculative sales forecast is counted.
 
 Verified revenue remains ₹0. No submission, accepted bounty, award, claimable balance or settled payout has been earned.
+
+
+## 2026-11-10 VERIFICATION ADDENDUM
+
+### CI state supersedes earlier pending checkpoints
+- AgentGuard latest commit 73cd52792b06b7ed0da27fd2d0b06446c5aacae5: Python 14/14 passed; Rust contract 11/11 passed; wasm32-unknown-unknown release build succeeded.
+- PayPal Sentinel latest commit 94249610e13743d9d435c5c6bb1bdc1b2015d224: compileall and 9/9 tests passed.
+- Neither project has a completed real-money transaction, testnet deployment, hackathon submission or award.
+
+### Preliminary Fluid / Instadapp source review — no reportable finding yet
+Reviewed current public mirror commit 404d73f91e6806f881f8dabeb30494f93f9e99b7 (5 Nov 2026) and focused on:
+- contracts/liquidity/userModule/main.sol — SKIP_TRANSFERS validation.
+- contracts/protocols/dex/poolT1/coreModule/helpers/secondaryHelpers.sol — current DEX T1 SKIP_TRANSFERS callsites.
+- contracts/oracleV2/stocks/chrStockOracle/ — recent Chronicle × Reality stock oracle.
+- contracts/oracleV2/stocks/usEquityMarketHours/ — session schedule.
+- contracts/oracleV2/common/sequencerL2.sol — shared L2 sequencer gate.
+
+A first static suspicion was that the SKIP_TRANSFERS validator compares signed amounts without an explicit same-sign check. The currently identified production DEX T1 callsites, however, pass same-sign supply/borrow pairs in each leg. No public user-controlled path to an exploitable mixed-sign SKIP_TRANSFERS call has been established. Treat this as an unconfirmed code-review question, not a vulnerability or bounty report.
+
+The new CHR stock-oracle SPEC/EDGE_CASES documents several accepted residuals (split desynchronization, anchor age-out, raw getters, delisting and setAnchor continuity). These documented residuals must be treated as known issues and excluded from any report. Continue only with a reproducible, in-scope, non-duplicate exploit path.
+
+Fluid program maximum caps are not expected earnings. The source repository's current license is Business Source License 1.1, not an open-source license for production reuse; source review for the bounty must not be repurposed into a competing production deployment.
+
+### Current route priority
+1. Finish NEAR AgentGuard demonstration and required submission materials before 14 Nov UTC deadline.
+2. Finish PayPal Sentinel sandbox end-to-end demo before its earlier deadline (13 Nov 01:30 IST). Prize timing is outside the 30/90-day cash window, so it is upside only.
+3. Continue one carefully selected, in-scope security bounty review only after duplicate/audit/scope checks; no automated spam or speculative report.
+4. Keep all prize pools and program maximums out of the revenue ledger until an award is formally confirmed.
