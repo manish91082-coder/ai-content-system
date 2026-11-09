@@ -49,7 +49,7 @@ Autonomous Internet Revenue Engine. Target: ₹10 crore actual settled revenue w
 - Actual settled revenue remains ₹0 until bank/payment settlement evidence is supplied.
 
 ## Remaining blockers
-- Gemini authentication and Groq bad-request failures remain unresolved.
+- Gemini authentication remains unresolved pending a valid key check; Groq's obsolete model ID was replaced, but a live request is still pending.
 - Telegram is not configured in the observed run.
 - No source citation/fact-check pipeline.
 - Supabase RLS requires redesign.
@@ -57,6 +57,6 @@ Autonomous Internet Revenue Engine. Target: ₹10 crore actual settled revenue w
 
 ## Next actions
 1. Run regression tests on the branch through GitHub Actions and inspect results.
-2. Verify current free AI providers and model identifiers using official documentation.
-3. Repair provider selection, authentication diagnostics and structured error reporting.
+2. Verify the Gemini key privately and execute one controlled inference test; never expose the key.
+3. Execute a controlled Groq inference test and confirm the active free-tier quota.
 4. Evaluate market opportunities and select a first revenue offer based on verifiable demand and India payout feasibility.
