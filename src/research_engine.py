@@ -264,7 +264,11 @@ class ResearchEngine:
         # 1. Google Trends
         trends = self.get_google_trends()
         for t in trends:
-            all_topics.append({"topic": t, "source": "google_trends", "category": "trending"})
+            all_topics.append({
+                "topic": t, "source": "google_trends", "category": "trending",
+                "source_url": "", "source_title": "", "source_summary": "",
+                "evidence_status": "no_source"
+            })
         
         # 2. RSS Feeds
         rss_topics = self.get_rss_topics()
