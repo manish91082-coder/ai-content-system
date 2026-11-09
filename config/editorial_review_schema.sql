@@ -53,7 +53,10 @@ DECLARE
     v_now timestamptz := clock_timestamp();
     v_status text;
 BEGIN
-    IF current_setting('request.jwt.claim.role', true) IS DISTINCT FROM 'service_role'
+    IF COALESCE(
+           NULLIF(current_setting('request.jwt.claim.role', true), ''),
+           current_setting('request.jwt.claims', true)::json->>'role'
+       ) IS DISTINCT FROM 'service_role'
        AND current_user <> 'service_role' THEN
         RAISE EXCEPTION 'service_role is required for editorial decisions'
             USING ERRCODE = '42501';
