@@ -25,7 +25,7 @@ Latest observed Daily AI Content Pipeline run #17 failed on 2026-11-08. Its logs
 3. `src/publisher.py`: duplicates the gate inside `publish_all` to prevent bypass through a direct publisher call.
 4. `src/main.py`: does not call publisher while gate is closed; reports blocked publishing distinctly.
 5. `.github/workflows/daily_content.yml`: scheduled runs force test mode; explicit repository variable gates live publishing; compile and unit tests run before pipeline.
-6. `tests/test_pipeline_safety_and_reports.py`: nine regression tests.
+6. `tests/test_pipeline_safety_and_reports.py`: ten regression tests.
 7. `src/content_generator.py` and `requirements.txt`: migrated from the deprecated Gemini SDK and retired model IDs to current free-tier model identifiers.
 
 ## Provider research
@@ -36,8 +36,9 @@ Latest observed Daily AI Content Pipeline run #17 failed on 2026-11-08. Its logs
 - Full source links: `MISSION/AI_PROVIDER_RESEARCH_2026-11-09.md`.
 
 ## Verification status
-- Eight equivalent gate/report sanity checks passed in local analysis.
-- Full repository tests and GitHub Actions execution remain pending. A container clone attempt failed because github.com DNS could not be resolved.
+- GitHub Actions CI run #3 succeeded: requirements installed, Python compile checks passed, all 10 regression tests passed. Run: https://github.com/manish91082-coder/ai-content-system/actions/runs/42648302328
+- CI runs #1 and #2 exposed the HTTPX dependency mismatch; it was resolved by upgrading Supabase from 2.9.1 to 2.34.1 and setting HTTPX 0.28.1.
+
 - No production publish action was attempted.
 - The repository variable `PUBLISH_ENABLED` was not enabled.
 - No changes from this branch have been merged into `master`.
