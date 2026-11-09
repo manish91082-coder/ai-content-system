@@ -241,8 +241,6 @@ mod tests {
         context(account("worker.testnet"), 1);
         let _ = contract.pay(account("vendor.testnet"), U128(1), "test".into());
     }
-}
-
 
     #[test]
     #[should_panic(expected = "agent not registered")]
@@ -263,3 +261,4 @@ mod tests {
         let _ = contract.pay(account("vendor.testnet"), U128(10), "day-two".into());
         assert_eq!(contract.spent_today, 10);
     }
+}
