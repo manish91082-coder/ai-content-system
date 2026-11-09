@@ -58,6 +58,19 @@ class ReceiptLog:
             except (OSError, UnicodeDecodeError, json.JSONDecodeError, KeyError, TypeError):
                 return False
 
+    def events(self) -> list[tuple[str, dict]]:
+        """Return verified timestamp/event pairs; corrupted history is never trusted."""
+        with self._lock:
+            if not self.verify():
+                raise RuntimeError("receipt log integrity failure; history refused")
+            if not self.path.exists():
+                return []
+            rows = [
+                json.loads(line)
+                for line in self.path.read_text(encoding="utf-8").splitlines()
+            ]
+            return [(row["timestamp"], row["event"]) for row in rows]
+
     def append(self, event: dict) -> Receipt:
         with self._lock:
             if not self.verify():
