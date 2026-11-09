@@ -304,3 +304,17 @@ Complete the full route census and evidence-backed scorecard. Do not begin produ
 No primary route selected yet. No currently researched channel has verified all five requirements together: high-value buyer discovery, new-seller access from ₹0, no manual calls/sales, autonomous fulfilment, and cleared Indian bank settlement by 2026-12-09.
 
 Do not build/list anything yet. Continue route discovery and verify whether any existing user-owned asset, software/IP, registered entity and required GST/tax eligibility actually exist before treating asset sale or AWS Marketplace as viable. Do not infer ownership, revenue, GSTIN, asset valuation or customer demand from past project mentions.
+
+
+### Third-pass legal and existing-asset gates — 2026-11-09
+
+- RBI's 15 September 2025 Payment Aggregator Master Direction defines PA activity around collecting customer funds and settling them to merchants; a PA may aggregate only for contracted merchants, and PA business shall not carry out marketplace business. Non-bank PAs have prescribed escrow requirements. Do not create an informal pooled-funds, wallet, escrow or seller-settlement mechanism.
+- CBIC explains that e-commerce operators have GST registration requirements irrespective of turnover; Section 52 TCS can apply where an operator collects consideration for taxable supplies made by other suppliers. A single-seller website is legally different from a multi-seller marketplace. Do not launch brokerage/marketplace mechanics without GST and legal-role analysis.
+- ASCI requires upfront disclosure of material connections including affiliate relationships; financial promotions have additional qualifications/registration constraints.
+- Prior-context retrieval found user-stated ownership/management/funding of seven gaushalas, but no established transferable commercial digital asset, domain, app, software/IP ownership, customer contract, revenue/profit, audience/traffic, Indian legal entity, GSTIN or e-invoicing eligibility. Gaushala assets are not presumed freely transferable and are excluded from this revenue strategy. Project proposals and repository code are not evidence of commercial IP ownership/value.
+- Therefore, Acquire/Flippa asset-sale route is not evidenced; AWS Marketplace India is conditional on legal entity/GSTIN/e-invoicing and India-only buyer eligibility; informal brokerage/payment aggregation is disqualified pending proper legal structure; RapidAPI payout remains too slow; bug bounty is high-variance only.
+- Expanded legal and asset gate analysis is in MISSION/REVENUE_OPPORTUNITY_AUDIT_2026-11-09.md.
+
+### Current decision state
+
+No primary route selected. The next pass must compare platform-native buyer/reward markets where a new India-based participant can receive money for a verified outcome or self-serve transaction, with zero inventory/upfront working capital, no calls/manual sales, and bank settlement before 2026-12-09. No product, marketplace, storefront, API or broker platform is to be built until a route passes all hard gates.
