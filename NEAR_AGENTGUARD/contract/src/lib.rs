@@ -103,6 +103,7 @@ impl AgentGuard {
         );
         assert!(amount.0 > 0, "amount must be positive");
         assert!(amount.0 <= self.max_single, "single payment limit exceeded");
+        assert!(memo.len() <= 256, "memo too long");
 
         let today = env::block_timestamp() / NANOS_PER_DAY;
         if today != self.spend_day {
