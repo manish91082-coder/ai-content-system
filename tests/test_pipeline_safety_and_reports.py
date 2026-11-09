@@ -12,6 +12,7 @@ from telegram_bot import TelegramBot
 from publisher import Publisher
 from content_generator import ContentGenerator
 from editorial_qa import topic_is_generation_eligible, build_editorial_context, build_source_metadata, editorial_package_approved, content_review_hash
+from database import Database
 
 
 class PublishingSafetyTests(unittest.TestCase):
@@ -145,6 +146,42 @@ class EditorialEvidenceTests(unittest.TestCase):
             result = publisher.publish_all(package, {}, {})
         self.assertFalse(result["editorial_approval"]["success"])
         self.assertEqual(result["editorial_approval"]["status"], "pending_review")
+
+
+class SupabaseRestPersistenceTests(unittest.TestCase):
+    def setUp(self):
+        self.db = object.__new__(Database)
+        self.db.client = None
+        self.db.use_rest = True
+        self.db._mock_data = {"topics": [], "content": [], "posts": []}
+
+    def test_save_content_uses_json_objects_and_rest_api(self):
+        row_id = "00000000-0000-0000-0000-000000000001"
+        with patch("database._rest_request", return_value=[{"id": row_id}]) as request:
+            result = self.db.save_content(
+                "topic-1", "youtube_short", "Title", "Script",
+                {"description": "Full description", "hashtags": ["#AI"]}
+            )
+        self.assertEqual(result, row_id)
+        payload = request.call_args.args[2]
+        self.assertIsInstance(payload["metadata"], dict)
+        self.assertEqual(payload["metadata"]["description"], "Full description")
+
+    def test_update_content_status_supports_rest_patch_and_json_paths(self):
+        with patch("database._rest_request", return_value=[]) as request:
+            self.db.update_content_status(
+                "content-1", "pending_editorial_review", {"videos": {"short": "/tmp/a.mp4"}}
+            )
+        self.assertEqual(request.call_args.args[0], "PATCH")
+        payload = request.call_args.args[2]
+        self.assertIsInstance(payload["file_paths"], dict)
+        self.assertEqual(payload["status"], "pending_editorial_review")
+
+    def test_pending_content_reads_through_rest_api(self):
+        rows = [{"id": "content-1", "status": "ready_to_publish"}]
+        with patch("database._rest_request", return_value=rows) as request:
+            self.assertEqual(self.db.get_pending_content(), rows)
+        self.assertEqual(request.call_args.args[0], "GET")
 
 
 class EditorialFingerprintTests(unittest.TestCase):
