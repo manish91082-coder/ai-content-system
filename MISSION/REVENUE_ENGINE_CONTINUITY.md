@@ -288,3 +288,19 @@ The current master tree was verified after the reset. Old Git history remains in
 ### Next task
 
 Complete the full route census and evidence-backed scorecard. Do not begin product development, generic content production, storefront setup, or user-facing selling until the route decision is made. Then execute the selected path directly, requiring the user only for unavoidable KYC/account/authorization gates.
+
+
+### Second-pass route findings — 2026-11-09
+
+- Acquire.com has high-ticket buyer discovery but explicitly requires buyer evaluation, NDA/data-room access, LOI, due diligence, legal asset purchase agreement and escrow; its seller guide discusses buyer conversations and live calls. Fees are 6–8% at close plus $25–$100 monthly listing. Not compatible with the strict no-calls/no-manual-sales constraint as a primary route.
+- Flippa offers genuine buyer discovery for existing websites/apps/domains/businesses, but charges listing fees whether or not the asset sells. Its 30-day buyer-interest guarantee is only a listing-fee refund condition, not a sale guarantee; qualified interest can be calls/meetings. Escrow requires asset transfer and buyer acceptance, with inspection periods (7 days website/business, 3 days app, 2 days domain). Only relevant if a real, transferable user-owned asset is verified.
+- RapidAPI provider payments are consolidated monthly and paid at the end of the following month; current fee page states 25% marketplace fee and PayPal-only payouts. Exclude from the 30-day bank-credit core.
+- AWS Marketplace India is conditional, not a default: seller onboarding requires standalone account, GSTIN, PAN, seller signature, e-invoicing enabled, matching legal identity and Indian bank. India sellers can sell only to India buyers. Daily INR disbursement preference exists, but first-sale-to-bank timing must be verified; public listing does not guarantee buyer discovery.
+- HackerOne requires current identity verification, payment method and approved tax form; payment processing can be daily after an awarded valid/resolved bounty. Bugcrowd says weekly Wednesday payments; Intigriti supports UPI for India. All require an accepted valid in-scope vulnerability, so bounty is a high-variance side experiment, not a predictable primary income plan.
+- Expanded evidence and route classification are in MISSION/REVENUE_OPPORTUNITY_AUDIT_2026-11-09.md.
+
+### Updated route decision
+
+No primary route selected yet. No currently researched channel has verified all five requirements together: high-value buyer discovery, new-seller access from ₹0, no manual calls/sales, autonomous fulfilment, and cleared Indian bank settlement by 2026-12-09.
+
+Do not build/list anything yet. Continue route discovery and verify whether any existing user-owned asset, software/IP, registered entity and required GST/tax eligibility actually exist before treating asset sale or AWS Marketplace as viable. Do not infer ownership, revenue, GSTIN, asset valuation or customer demand from past project mentions.
