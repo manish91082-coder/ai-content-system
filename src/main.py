@@ -27,7 +27,7 @@ from publisher import Publisher
 from telegram_bot import TelegramBot
 from database import Database
 from pipeline_safety import publishing_is_enabled
-from editorial_qa import topic_is_generation_eligible
+from editorial_qa import topic_is_generation_eligible, editorial_package_approved
 
 # Setup logging
 Path("logs").mkdir(exist_ok=True)
@@ -136,18 +136,18 @@ def run_daily_pipeline():
                     logger.warning("Voice generation failed, skipping video")
                     video_paths = {}
                 
-                # Update DB status
+                # Generated assets must enter the human review queue, never auto-approve.
                 db.update_content_status(
-                    content_id, "ready_to_publish",
+                    content_id, "pending_editorial_review",
                     {"images": image_paths, "videos": video_paths}
                 )
-                
+
                 # ─────────────────────────────────────────
                 # STEP 3: PUBLISH
                 # ─────────────────────────────────────────
                 logger.info("STEP 3: Publishing to all platforms...")
-                
-                if video_paths and publish_enabled:
+
+                if video_paths and publish_enabled and editorial_package_approved(content_package):
                     publish_results = publisher.publish_all(
                         content_package=content_package,
                         video_paths=video_paths,
@@ -165,6 +165,15 @@ def run_daily_pipeline():
                                 post_id=result.get("post_id", ""),
                                 status="success" if result.get("success") is True else "failed"
                             )
+                elif video_paths and publish_enabled:
+                    logger.warning("Publishing blocked: human editorial approval is missing.")
+                    all_publish_results[topic_name[:30]] = {
+                        "editorial_approval": {
+                            "success": False,
+                            "status": "pending_review",
+                            "error": "Human editorial approval metadata is required before publishing."
+                        }
+                    }
                 elif video_paths:
                     logger.warning("Publishing blocked by safety gate; generated assets retained.")
                     all_publish_results[topic_name[:30]] = {
