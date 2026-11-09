@@ -497,3 +497,58 @@ Official references:
 
 ### AgentGuard checkpoint correction — latest branch state
 The test file's JSONL newline fixture was corrected after re-reading the committed file. Latest AgentGuard branch commit is now d31b6347e393c3d7a39ccb5c2f9e2143271cee7f. This is a source correction only; no tests have yet been executed and no CI run is visible. Treat all AgentGuard tests as unverified until a real run and logs are inspected.
+
+
+
+## EXECUTION LEAD AUTHORIZATION AND 2026-11-10 UPDATE
+
+The user explicitly granted full permission and delegated execution decisions to the assistant. This authorizes normal engineering commits and project execution within the stated safety limits. It does not authorize disclosure of secrets, uncontrolled real-money transactions, production wallet custody, unsafe testing, or false claims. Human-only steps remain account registration, credential creation, KYC, wallet ownership/address confirmation, public identity/video publication, and final submission attestations where required.
+
+### AgentGuard — NEAR Security & Defense
+
+Repository branch: near-hackathon/agentguard-v0
+Project: NEAR_AGENTGUARD/
+Latest source commit as of this update: f502f26eb56352fc85991d5fd0b71df505fa8294
+Project link: https://github.com/manish91082-coder/ai-content-system/tree/near-hackathon/agentguard-v0/NEAR_AGENTGUARD
+
+Verified CI at commit e394ac7444f270233b31e649333309ae3d197e0d:
+- Python CI: 14 tests passed; benign demo ALLOW; prompt-injection attempt BLOCK before simulated signer.
+- Rust contract CI: 10 unit tests passed; cargo test succeeded.
+- Rust WASM release build validation has since been added to the workflow. The latest CI run after adding WASM validation and memo-size enforcement is pending; do not claim it passed until logs confirm.
+- Rust contract is not deployed. No testnet or mainnet transaction occurred. No real NEAR funds or wallet credentials used.
+- Contract memo length is now capped at 256 bytes.
+- NEAR Agent API remains excluded because it is experimental mainnet-only and uses real funds in its quickstart.
+- Primary track is AI Security & Defense only; do not claim Agent Economy without a real agent hiring/service-payment workflow.
+- Submission still requires public X demo post with @NEARProtocol and #NEARHackathon, working video/screenshots, and a NEAR wallet address in the official form. User-owned account/wallet details must not be fabricated.
+
+### PayPal Sentinel — separate PayPal AI Hackathon project
+
+Repository branch: paypal-hackathon/paypal-sentinel-v1
+Project: PAYPAL_SENTINEL/
+Latest known source commit: 4284bde945fa50fd6e8e65a1feb1bcef2d3f32db
+Project link: https://github.com/manish91082-coder/ai-content-system/tree/paypal-hackathon/paypal-sentinel-v1/PAYPAL_SENTINEL
+
+Implementation:
+- Gemini 3.8 Flash parses a natural-language purchase request into a fixed catalog SKU, quantity and risk flags.
+- Server-side deterministic policy calculates the amount; AI cannot set prices or override ALLOW/WARN/BLOCK.
+- WARN uses a one-time, short-lived approval token stored by hash.
+- SQLite reserves daily spend with exact Decimal accounting and prevents reuse of a purchase plan.
+- PayPal Orders v2 sandbox create/capture integration uses server-side OAuth credentials and idempotency request IDs.
+- Capture state is atomically locked; uncertain capture is frozen for manual reconciliation rather than blindly retried.
+- Live PayPal mode is explicitly disabled.
+- CI: 9 tests passed, compileall passed. This does not prove live sandbox credentials or end-to-end checkout; no sandbox account credentials have been configured and no PayPal transaction has occurred.
+- Project-level MIT LICENSE exists inside PAYPAL_SENTINEL. The repository root has no blanket license; do not claim GitHub About license metadata is satisfied. A separate repo or explicitly scoped root license may be needed for strict Devpost compliance.
+- Requires user-owned PayPal Developer sandbox app credentials and Gemini API key set locally. Never request secrets in chat or commit them.
+- Official Devpost deadline: 12 Nov 2026, 12:00 PST = 13 Nov 2026, 01:30 IST. Winners announced around 21 Dec 2026. Prize delivery is within 60 days after completed winner forms; this is not a Day-30 or reliably Day-90 cash route. Treat it as long-horizon upside, not current earnings.
+- Official submission requires functional demo, public repo with visible open-source license, and a public YouTube demo video under 3 minutes. Submission/award status remains pending.
+
+### Revenue accounting
+Verified earned/awarded/claimable/settled revenue remains ₹0. CI success and project creation are not earnings. PayPal hackathon prizes are not received and are not to be counted as mission progress until an actual award is confirmed.
+
+### Immediate execution gates
+1. Complete latest NEAR Rust test + WASM build CI and inspect logs.
+2. Complete PayPal Sentinel regression CI; add local/integration tests where possible without secrets.
+3. Prepare demo scripts and reproducible setup for both hackathons.
+4. For PayPal, user must create/confirm sandbox app and Gemini key, then set them locally; no secrets in chat.
+5. For NEAR, deploy only after test + WASM CI pass, on testnet with faucet funds and reviewed scoped FunctionCall access key.
+6. Final public video, X post, Devpost form, wallet address, and legal attestations require the user's actual account and truthful identity/ownership details.
