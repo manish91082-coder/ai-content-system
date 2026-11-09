@@ -22,9 +22,10 @@ Latest observed Daily AI Content Pipeline run #17 failed on 2026-11-08. Its logs
 ## Phase 1 code changes on isolated branch
 1. `src/telegram_bot.py`: nested report formatter, legacy flat result support, malformed result handling, HTML escaping.
 2. `src/pipeline_safety.py`: fail-closed publishing gate. Requires explicit `PUBLISH_ENABLED=true` and `TEST_MODE=false`.
-3. `src/main.py`: does not call publisher while gate is closed; reports blocked publishing distinctly.
-4. `.github/workflows/daily_content.yml`: scheduled runs force test mode; explicit repository variable gates live publishing; compile and unit tests run before pipeline.
-5. `tests/test_pipeline_safety_and_reports.py`: eight regression tests.
+3. `src/publisher.py`: duplicates the gate inside `publish_all` to prevent bypass through a direct publisher call.
+4. `src/main.py`: does not call publisher while gate is closed; reports blocked publishing distinctly.
+5. `.github/workflows/daily_content.yml`: scheduled runs force test mode; explicit repository variable gates live publishing; compile and unit tests run before pipeline.
+6. `tests/test_pipeline_safety_and_reports.py`: nine regression tests.
 
 ## Verification status
 - Eight equivalent gate/report sanity checks passed in local analysis.
