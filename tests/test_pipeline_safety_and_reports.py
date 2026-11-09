@@ -8,6 +8,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from pipeline_safety import publishing_is_enabled
 from telegram_bot import TelegramBot
 from publisher import Publisher
+from content_generator import ContentGenerator
 
 
 class PublishingSafetyTests(unittest.TestCase):
@@ -31,6 +32,37 @@ class PublishingSafetyTests(unittest.TestCase):
         self.assertFalse(publishing_is_enabled({
             "PUBLISH_ENABLED": "sometimes", "TEST_MODE": "false"
         }))
+
+    def test_permanent_auth_errors_trip_provider_circuit_breaker(self):
+        class AuthError(Exception):
+            code = 401
+        self.assertTrue(ContentGenerator._is_permanent_provider_error(AuthError("unauthorized")))
+
+    def test_rate_limit_is_not_permanent_provider_error(self):
+        class RateLimitError(Exception):
+            status_code = 429
+        self.assertFalse(ContentGenerator._is_permanent_provider_error(RateLimitError("rate limited")))
+
+    def test_gemini_auth_failure_falls_back_and_is_skipped_afterward(self):
+        class AuthError(Exception):
+            code = 401
+        generator = object.__new__(ContentGenerator)
+        generator.gemini_client = object()
+        generator.groq_client = object()
+        generator._last_provider = None
+        calls = {"gemini": 0, "groq": 0}
+        def fail_gemini(prompt):
+            calls["gemini"] += 1
+            raise AuthError("invalid key")
+        def use_groq(prompt):
+            calls["groq"] += 1
+            return "fallback response"
+        generator._call_gemini = fail_gemini
+        generator._call_groq = use_groq
+        self.assertEqual(generator._call_ai("prompt"), "fallback response")
+        self.assertIsNone(generator.gemini_client)
+        self.assertEqual(generator._call_ai("second prompt"), "fallback response")
+        self.assertEqual(calls, {"gemini": 1, "groq": 2})
 
     def test_publisher_itself_blocks_live_calls_by_default(self):
         publisher = object.__new__(Publisher)
