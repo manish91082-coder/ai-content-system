@@ -79,15 +79,22 @@ def gh_get(url, retries=3):
 def parse_issue_url(url):
     try:
         parsed = urlparse(str(url))
-        if parsed.netloc.lower() not in ("github.com", "www.github.com"):
+        host = parsed.netloc.lower()
+        parts = [x for x in parsed.path.split('/') if x]
+        if host in ('oss.issuehunt.io', 'www.oss.issuehunt.io'):
+            if len(parts) >= 5 and parts[0] == 'r' and parts[3] in ('issues', 'pull'):
+                owner, repository, kind, number = parts[1:5]
+                if number.isdigit():
+                    return owner + '/' + repository, int(number), kind
             return None
-        parts = [x for x in parsed.path.split("/") if x]
-        if len(parts) < 4 or parts[2] not in ("issues", "pull"):
+        if host not in ('github.com', 'www.github.com'):
             return None
-        owner, repo, kind, number = parts[:4]
+        if len(parts) < 4 or parts[2] not in ('issues', 'pull'):
+            return None
+        owner, repository, kind, number = parts[:4]
         if not number.isdigit():
             return None
-        return owner + "/" + repo, int(number), kind
+        return owner + '/' + repository, int(number), kind
     except Exception:
         return None
 
@@ -110,7 +117,7 @@ def is_cashworthy(item):
     except (TypeError, ValueError):
         return False
     threshold = 25 if currency == "USD" else 10 if currency in ("USDC", "USDT") else float("inf")
-    return amount >= threshold and item.get("payment_state") == "escrowed" and item.get("claims_open") is True and item.get("lane") == "agent" and item.get("payout_grade") in ("A-", "B", "B-")
+    return amount >= threshold and item.get("payment_state") == "escrowed" and item.get("claims_open") is True and item.get("lane") == "agent" and item.get("payout_grade") in ("A-", "B", "B-", "C+", "C")
 
 def classify_source(item, issue, comments):
     if not isinstance(issue, dict):
