@@ -82,6 +82,20 @@ def test_empty_recipient_allowlist_fails_closed():
     assert "recipient_allowlist_not_configured" in result.reasons
 
 
+
+def test_empty_contract_allowlist_fails_closed():
+    policy = replace(default_demo_policy(), allowed_contracts=frozenset())
+    result = evaluate(scoped_intent(), policy, Decimal("0"))
+    assert result.decision == Decision.BLOCK
+    assert result.reasons == ("contract_allowlist_not_configured",)
+
+
+def test_empty_method_allowlist_fails_closed():
+    policy = replace(default_demo_policy(), allowed_methods=frozenset())
+    result = evaluate(scoped_intent(), policy, Decimal("0"))
+    assert result.decision == Decision.BLOCK
+    assert result.reasons == ("method_allowlist_not_configured",)
+
 def test_missing_contract_or_method_fails_closed():
     intent = PaymentIntent("agent", "vendor.near", Decimal("1"))
     result = evaluate(intent, default_demo_policy(), Decimal("0"))
