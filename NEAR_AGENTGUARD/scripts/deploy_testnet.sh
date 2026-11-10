@@ -59,7 +59,7 @@ ADD_KEY_OUTPUT="$(near account add-key "$WORKER_ACCOUNT" \
   --function-names pay \
   autogenerate-new-keypair save-to-keychain \
   network-config testnet sign-with-keychain send)"
-printf '%s\\n' "$ADD_KEY_OUTPUT"
+printf '%s\n' "$ADD_KEY_OUTPUT"
 mapfile -t FUNCTION_CALL_KEYS < <(
   grep -oE 'Added access key = ed25519:[A-Za-z0-9]+' <<< "$ADD_KEY_OUTPUT" \
     | grep -oE 'ed25519:[A-Za-z0-9]+' || true
@@ -80,7 +80,7 @@ near account delete-keys "$WORKER_ACCOUNT" public-keys "$WORKER_FULL_KEY" \
 
 echo "Verifying least-privilege access before any payment..."
 ACCESS_KEYS_OUTPUT="$(near account list-keys "$WORKER_ACCOUNT" network-config testnet now)"
-printf '%s\\n' "$ACCESS_KEYS_OUTPUT"
+printf '%s\n' "$ACCESS_KEYS_OUTPUT"
 mapfile -t REMAINING_KEYS < <(
   grep -oE 'ed25519:[A-Za-z0-9]+' <<< "$ACCESS_KEYS_OUTPUT" || true
 )
@@ -92,7 +92,7 @@ if grep -Eiq 'full access' <<< "$ACCESS_KEYS_OUTPUT"; then
   echo "A FullAccess key remains on the worker. No payment will be attempted." >&2
   exit 1
 fi
-EXPECTED_SCOPE="only do [\\"pay\\"] function calls on $CONTRACT_ACCOUNT"
+EXPECTED_SCOPE="only do [\"pay\"] function calls on $CONTRACT_ACCOUNT"
 if ! grep -Fq "$EXPECTED_SCOPE" <<< "$ACCESS_KEYS_OUTPUT"; then
   echo "Worker key is not visibly scoped to this contract and pay method. No payment will be attempted." >&2
   exit 1
