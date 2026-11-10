@@ -56,3 +56,32 @@ A budget field in a bid-flow Bounty is only a pricing signal. Only the accepted 
 - Latest BountyBoard public homepage evidence: 6 open bounties; the visible sample is mostly geolocation/iPhone/photo tasks, and a $1 writing-schoolwork task. The latter is excluded for academic-integrity risk. Current open sample has no qualified autonomous cash candidate.
 - BountyBoard documents a 10% approval-only fee and Stripe Express payout onboarding; supported bounty currencies are USD, EUR, PLN, CZK and HUF. India-specific connected-account approval is not yet verified. Treat its escrow claims as platform-reported until independent payout history is reconciled.
 - BountyBoard Terms (last updated 17 July 2026) include a placeholder legal-jurisdiction section, so account/contract onboarding remains deferred pending legal/operator review.
+
+
+## Phase 4 — MoltJobs all-open discovery and escrow transition watch
+
+- Primary scanner now queries both the full public open MoltJobs feed and the funded=true feed, paginates and deduplicates across both. A funded search filter is never accepted as independent escrow proof; explicit funded, escrowTxHash, and payment status fields are preserved.
+- cloud-work-engine/moltjobs_watchlist.py converts only independent open marketplace jobs into a prioritized watchlist. It excludes referral/forum rewards, low-value cash items, regulated investment/asset-management assignments, and non-marketplace tasks.
+- Watchlist state is persisted in .nexus_state/moltjobs_funding_state.json. A transition to funded=true with a transaction hash is emitted as ESCROW_BECAME_FUNDED. That event still requires chain receipt verification and authorized agent assignment; it is not recognized as income.
+- Primary hourly workflow now restores/saves this state, runs scanner, builds watchlist, and uploads both report and state artifacts.
+
+### Latest verified MoltJobs result
+- GitHub Actions run 42906246301 succeeded; unit tests, all read-only discovery adapters, MoltJobs watchlist build, and artifact upload completed.
+- Artifact nexus-funded-jobs-42906246301 (ID 13803779486) contains 58 total records: MoltJobs 18 (10 referral/forum excluded, 8 independent marketplace tasks), Dealwork 20 (unfunded), Taskmarket 4, BasedAgents 16 (10 blocked, 6 excluded).
+- Exactly two MoltJobs tasks remain on the high-priority watchlist:
+  - WharfUp.com Landing Page — listed budget 150 USDC, 6 acceptance criteria, deadline 2026-11-12 08:11:12 UTC (13:41:12 IST), participation mode BID, funded=false, no escrow transaction/payment status.
+  - Landing page for pedex.org — listed budget 150 USDC, 6 acceptance criteria, deadline 2026-11-12 08:10:40 UTC (13:40:40 IST), participation mode BID, funded=false, no escrow transaction/payment status.
+- These are budgets in an open bid flow, not secured payments. No claim, bid, account registration, or task submission occurred. Both are watch-only until the original platform changes funding and the agent is validly assigned.
+- Remaining six independent MoltJobs tasks were excluded for low budget, missing acceptance criteria, or finance/asset-management/sovereign-wealth/CBDC regulatory exposure.
+- The two task details are publicly visible from the listing feed, but private detail reads require a MoltJobs API key; do not invent missing poster messages or full terms.
+
+### Other new public marketplace probes
+- WorkPNP: public API currently returns one open task. Its listed 2 USDC reward and competitive bid count make it low-priority; agent onboarding/email-social verification and a wallet are required. No registration or bid.
+- BountyBoard.xyz: queried public tasks and stats endpoints returned HTTP 404 from cloud runner. Separate platform docs identify its current Solana Devnet environment; devnet rewards are not counted as income.
+- Atelier: public platform endpoints returned HTTP 402 from cloud runner; authenticated/service-owner flow not set up.
+- TaskForce: agent task endpoint returned HTTP 401; no API key or agent registration created.
+- Agent Souk public API routes were not reachable from cloud runner in this pass. Its payment design is wallet-to-wallet, not escrow; keep lower priority until live demand and counterparties are verified.
+- BountyBoard.work public board had only a small set of open tasks, chiefly physical local-photo collection and a schoolwork-like item; excluded from autonomous execution. AgentMesh has non-withdrawable credits and no cash payout.
+
+### Economic rule
+A task budget, source feed escrow label, API registration, bid acceptance, or completed work event is not revenue. Only an actual transfer to an authorized payout destination, matched to the task and net of fees/costs, counts as realized income.
