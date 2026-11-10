@@ -262,3 +262,52 @@ The assistant must then:
 3. If Actions are disabled or the connector lacks write permission, choose another genuinely zero-cost cloud executor with an assistant-accessible deployment/control path. Do not claim deployment is live merely because YAML exists.
 4. Once cloud execution is proven, inspect logs/artifact and correct any API/parser errors.
 5. Keep MoltJobs write operations disabled until agent account authorization, task-specific automation permission, funding, settlement rail, and payment route are verified.
+
+
+## 12. Verified cloud run + marketplace expansion audit — 2026-11-11
+
+### First cloud execution is now VERIFIED
+- GitHub Actions run: https://github.com/manish91082-coder/ai-content-system/actions/runs/42893727598
+- Run ID: `42893727598`; conclusion: `success`.
+- Steps verified successful: checkout, scanner unit tests, read-only scanner, artifact upload.
+- Artifact ID: `13800205921`; artifact name `nexus-funded-jobs-42893727598`; report timestamp `2026-11-10T20:17:01Z`.
+- Report contained 10 open funded listings.
+- All 10 were `purpose=PLATFORM_REFERRAL`, `participationMode=AUTOMATIC_FORUM_REWARD`, each with `budgetUsdc=0.2`, titles like “Referral bounty — bring an agent that posts on the forum”. These are not ordinary paid work assignments and require referral/new-owner conditions. Do not pursue them as the user's work-to-earn path.
+
+### Candidate filter implemented and verified
+- Scanner now classifies funded listings and excludes platform referral/forum reward campaigns from the ordinary paid-task candidate pool.
+- Added tests for referral exclusion and normal task pass-through to next-stage review.
+- A subsequent Actions run ID `42893846494` completed with conclusion `success`; unit tests, scanner, and artifact upload all passed.
+- Artifact ID `13799612084`; report timestamp `2026-11-10T20:17:43Z`.
+- Report metrics: `funded_open_jobs_count=10`, `eligible_task_candidates_count=0`, `excluded_by_policy_count=10`.
+- This is the first meaningful verified marketplace finding: **MoltJobs currently returned no ordinary funded task candidates in this scan**, despite 10 funded open listings. No bid, claim, work, submission, wallet action, or payment occurred.
+
+### Dealwork current official skill audit
+- Current skill file: https://api.dealwork.ai/skill.md (version 1.6.5 at research time).
+- API base: `https://api.dealwork.ai/api/v1`.
+- Browse jobs: `GET /api/v1/jobs?per_page=20&sort=newest`; docs say poll no more than once every few minutes and respect 429 Retry-After.
+- Agent quick onboarding may be performed via `POST /api/v1/agents/onboard` with `autonomous=true`, but the Terms still make a responsible human/legal-entity owner fully accountable for agent bids, deliveries, spending, and conduct. Do not register or accept terms without required authorization.
+- Account credentials include API key and HMAC secret, shown once. Keep them in a secret store, never logs/repo/chat.
+- Fees shown in current public docs: 10% standard contracts; 3% AI-to-AI. Terms dated 2026-07-15. On-chain top-ups/payouts use USDC on Polygon; fiat payout methods are shown in account wallet, not guaranteed for India.
+- Current docs explicitly require never starting work before escrow locks; buyer review can auto-approve after 24 hours. Must build this into the risk/acceptance logic.
+- Public image arena is free but has no prize/escrow; it is reputation, not revenue. Do not count as earnings.
+
+### Taskmarket current official API audit
+- API docs: https://docs.taskmarket.dev/api/reference; developer overview: https://docs.taskmarket.dev/developer/overview; live public board: https://api.taskmarket.dev/.
+- Production API base: `https://api.taskmarket.dev`; REST endpoints under `/api`.
+- Public task discovery: `GET /api/tasks`, supports status, phase, mode, requester actor type, tags, min/max reward, deadline, sort, limit, cursor. Response includes tasks, hasMore, nextCursor.
+- Task modes include bounty, claim, pitch, benchmark, auction.
+- Network/token: Base chain 8453 with USDC; Tempo chain 4217 with OUSD. No default chain; network must be explicit.
+- Some write operations require wallet signatures and x402/MPP payment. Pitch and service actions may incur protocol charges. Do not attempt claims, pitches, submissions, or payment actions until an authorized wallet and cost policy exist.
+- Public live homepage search result showed open examples at 15 USDC, 100 OUSD, 2.5 USDC, and 0.05 OUSD; these are listing examples only and not yet individually verified for eligibility/funding or India payout.
+
+### Immediate next engineering sequence
+1. Extend the GitHub Actions read-only scanner with separate Dealwork and Taskmarket adapters, no credentials and no writes.
+2. Use Dealwork docs to query open jobs; validate whether public GET requires auth and how funded/escrow status is represented. Filter human-only work and AI-disallowed work.
+3. Use Taskmarket `GET /api/tasks?status=open&limit=...` to discover public tasks; capture reward units, mode, expiry, escrow state, chain, and requester/worker actor type. Never pay x402/MPP in read-only discovery.
+4. Normalize all marketplace results into a common opportunity schema with provenance and policy exclusions.
+5. Add economic qualification: fees, expected model/compute costs, task effort, settlement and withdrawal path, acceptance risk, and minimum net payout. No fabricated cost estimates.
+6. Update continuity after every significant implementation/run.
+
+### Important verified state correction
+- Earlier continuity sections said the first run was unverified. This section supersedes that status: the GitHub Actions cloud workflow has now run successfully twice and artifacts were downloaded and inspected. Keep the old history for audit, but use this latest section as current state.
