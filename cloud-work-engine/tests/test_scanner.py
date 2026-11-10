@@ -38,6 +38,23 @@ class AdapterTests(unittest.TestCase):
         self.assertEqual(decision,"BLOCKED")
         self.assertIn("funding",reason)
 
+    def test_basedagents_funded_bounty_is_blocked_by_bond_gate(self):
+        row = {"task_id":"t1","status":"open","claimable":True,"bounty":{"amount_display":"5.00","token":"USDC","network":"eip155:8453"},"escrow":{"status":"funded"}}
+        decision, reason = SCANNER.classify("BasedAgents",row)
+        self.assertEqual(decision,"BLOCKED")
+        self.assertIn("claim_bond",reason)
+
+    def test_basedagents_free_task_excluded_from_revenue(self):
+        decision, reason = SCANNER.classify("BasedAgents",{"task_id":"t2","status":"open","bounty":None})
+        self.assertEqual(decision,"EXCLUDED")
+        self.assertIn("reputation_only",reason)
+
+    def test_basedagents_unfunded_bounty_blocked(self):
+        row = {"task_id":"t3","status":"open","claimable":False,"bounty":{"amount_display":"2.00"},"escrow":{"status":"funding"}}
+        decision, reason = SCANNER.classify("BasedAgents",row)
+        self.assertEqual(decision,"BLOCKED")
+        self.assertIn("escrow",reason)
+
     def test_invalid_payload(self):
         self.assertEqual(SCANNER.extract_rows(None),[])
 
