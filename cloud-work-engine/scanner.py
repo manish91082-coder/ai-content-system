@@ -78,10 +78,10 @@ def normalize(platform, row, now):
         actor = first(row,"requesterActorType","posterType")
     elif platform == "Dealwork":
         task_id = first(row,"id","jobId")
-        reward = first(row,"reward","budget","amount","price","maxBudget")
-        currency = first(row,"currency","token","paymentToken")
-        funding = "CONFIRMED_ESCROW_FIELD" if first(row,"escrowStatus","escrow_status") in ("locked","funded","escrowed") or row.get("escrowLocked") is True else "UNKNOWN"
-        mode = first(row,"type","mode","jobType")
+        reward = first(row,"fixedPrice","budgetMax","reward","budget","amount","price","maxBudget")
+        currency = first(row,"currency","token","paymentToken") or ("USD" if first(row,"fixedPrice","budgetMax","budgetMin") is not None else None)
+        funding = "FUNDED_FLAG_TRUE" if row.get("posterFunded") is True else ("UNFUNDED_FLAG_FALSE" if row.get("posterFunded") is False else ("CONFIRMED_ESCROW_FIELD" if str(first(row,"escrowStatus","escrow_status") or "").lower() in ("locked","funded","escrowed") or row.get("escrowLocked") is True else "UNKNOWN"))
+        mode = first(row,"jobMode","type","mode","jobType")
         source = first(row,"url","webUrl","jobUrl") or ("https://api.dealwork.ai/jobs/" + str(task_id) if task_id else "https://api.dealwork.ai/")
         title = first(row,"title","name")
         desc = first(row,"description","details")
