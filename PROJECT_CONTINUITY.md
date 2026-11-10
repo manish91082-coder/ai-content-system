@@ -311,3 +311,39 @@ The assistant must then:
 
 ### Important verified state correction
 - Earlier continuity sections said the first run was unverified. This section supersedes that status: the GitHub Actions cloud workflow has now run successfully twice and artifacts were downloaded and inspected. Keep the old history for audit, but use this latest section as current state.
+
+
+## 13. Multi-marketplace discovery — live cloud verification (2026-11-11)
+
+### Implemented
+- Replaced the single-source scanner with three public read-only adapters: MoltJobs, Dealwork, and Taskmarket.
+- Added a common opportunity schema with platform/task ID, title/description, reward amount, raw Taskmarket base units, currency, chain, funding evidence state, actor type, task mode, deadline, tags, acceptance criteria, source URL, fetched timestamp, raw record, and policy decision.
+- Taskmarket reward conversion uses Decimal and six-decimal base units; raw amount is retained.
+- Added explicit UNKNOWN / BLOCKED / REVIEW_REQUIRED classifications. An escrow transaction hash is not treated as independently verified on-chain proof.
+- Added tests for envelopes, six-decimal conversion, Taskmarket escrow evidence gate, MoltJobs referral exclusion, and Dealwork unfunded gate.
+- All writes remain disabled.
+
+### Verified Actions runs
+- Initial multi-marketplace run 42894201962 succeeded; artifact showed all three public APIs responded, but Dealwork status/funding classifier was still being corrected.
+- A classifier test initially failed in run 42894338073; logs identified a stale expectation in the Dealwork test. It was corrected.
+- Final verified run: 42894478350, conclusion SUCCESS.
+  - Job: 130103840159; checkout, unit tests, scanner, and artifact upload all succeeded.
+  - Artifact ID: 13798679626; name: nexus-funded-jobs-42894478350.
+  - Artifact report timestamp: 2026-11-10T20:20:42Z.
+- Final report totals: 35 public listings discovered: MoltJobs 10, Dealwork 20, Taskmarket 5.
+  - MoltJobs: 10/10 excluded as platform referral/forum reward campaigns.
+  - Dealwork: 20/20 blocked; live records report posterFunded=false, with claimBlockedReason values including underfunded and poster_unfunded. Listed USD budgets are not funded work.
+  - Taskmarket: 5/5 open tasks have an escrowTxHash reference and remain REVIEW_REQUIRED. The hash has not yet been independently checked on-chain, and task terms/AI permissions/payout remain unverified.
+- Economic gate remains NOT_EVALUATED; no task execution, submission, acceptance, or payment occurred.
+
+### Current next action
+1. Enrich the five Taskmarket opportunities with canonical GET /api/tasks/{taskId} details and GET /api/tasks/{taskId}/terms (public read-only only).
+2. Verify chain-specific transaction receipts for Base (8453) and Tempo (4217) using authoritative explorers/RPC evidence; do not equate a nonempty hash with confirmed escrow.
+3. Inspect full task requirements, expiry, acceptance/review windows, worker type, stake, rejection fee, and settlement costs.
+4. Determine which tasks are genuinely executable by an autonomous AI without external purchases, paid protocol actions, or human-only activity.
+5. Only then calculate conservative net payout and select one small pilot. No wallet actions or write operations until explicit authorization and all gates pass.
+
+### Live marketplace evidence from the final artifact
+- Dealwork public list returned 20 records with page 1, per_page 20, total 138; all 20 records in the returned sample had posterFunded=false.
+- Taskmarket public list returned 5 tasks with hasMore=false; reward values included 1 OUSD, 1 USDC, 15 USDC, 100 OUSD, and 10 OUSD. These are listed rewards, not earned revenue.
+- The five Taskmarket task modes were all bounty; expiry times are retained in the artifact. One listed task had a deadline earlier than the scan timestamp, so expiry must be rechecked before any further consideration.
