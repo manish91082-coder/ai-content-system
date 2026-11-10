@@ -34,7 +34,7 @@ class AdapterTests(unittest.TestCase):
         self.assertEqual(decision,"EXCLUDED")
 
     def test_dealwork_open_job_not_assumed_funded(self):
-        decision, reason = SCANNER.classify("Dealwork",{"status":"open","reward":"25"})
+        decision, reason = SCANNER.classify("Dealwork",{"status":"posted","jobMode":"open","fixedPrice":"25.0000","posterFunded":False,"claimBlockedReason":"poster_unfunded"})
         self.assertEqual(decision,"REVIEW_REQUIRED")
         self.assertIn("funding",reason)
 
