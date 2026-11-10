@@ -8,6 +8,8 @@ on:
     paths:
       - "cloud-work-engine/bounty_agent.py"
       - "cloud-work-engine/event_recovery.py"
+      - "cloud-work-engine/work_ledger.py"
+      - "cloud-work-engine/tests/test_work_ledger.py"
       - "cloud-work-engine/task_triage.py"
       - "cloud-work-engine/model_gateway.py"
       - "cloud-work-engine/draft_executor.py"
@@ -51,6 +53,8 @@ jobs:
         run: python cloud-work-engine/bounty_agent.py
       - name: Recover lifecycle events (read-only)
         run: python cloud-work-engine/event_recovery.py
+      - name: Reconcile work and settlement state
+        run: python cloud-work-engine/work_ledger.py
       - name: Triage opportunities (no writes)
         run: python cloud-work-engine/task_triage.py
       - name: Check free model gateway readiness
