@@ -152,3 +152,33 @@ Continue from this live checkpoint and the two canonical MISSION files. Do not r
 
 ### Next engineering decision
 Review the testnet script and contract accounting edge cases before any deployment. Preserve the scoped FunctionCall key; no FullAccess key for agent; testnet faucet tokens only. Prepare actual local demo/video and owner-confirmed form values only after reproducibility audit. Keep PR draft; do not merge or submit automatically.
+
+
+---
+
+## 2026-11-10 — DEPLOYMENT KEY-SAFETY TEST CHECKPOINT
+
+### Deployment helper hardening
+The AgentGuard testnet helper now:
+- Requires exactly one original worker public key before changing access.
+- Captures exactly one newly created FunctionCall public key; if it cannot identify it, it does not delete the original FullAccess key.
+- Deletes the original worker FullAccess key only after the new key is positively identified.
+- Queries on-chain worker keys and requires exactly one remaining key, matching the new FunctionCall key.
+- Stops before registration/payment if FullAccess remains or the displayed receiver/method scope does not include the AgentGuard contract and `pay`.
+- Never uses mainnet; testnet faucet only.
+
+A mock-based no-network test is part of CI. It covers (a) the correctly scoped single FunctionCall key proceeds, (b) residual FullAccess stops execution, and (c) wrong receiver scope stops execution before contract calls. The first test-harness run failed because the test invoked a non-executable checked-out shell script directly; it was corrected to invoke Bash. The current run is the successful run below.
+
+### New source commits
+- Deployment access-key guard: `7e474e494d785f2cc6a4a4ab8587d06c77c45bfb`
+- Shell output/guard normalization: `02a936253cba05be85e86e54d3ace74e080829cb`
+- Scope assertion simplified: `05a0dae5de70769a672ee486acdc5a33e1691e60`
+- Mock deployment guard test: `4f3992881d2d7e5fad5b7da77a11117b8591db2b`
+- Mock test payment-call assertion: `0d57132aff4a1ee6705be04ea11a27884cdc0f2e`
+- Mock negative assertion corrected: `1a0f404c558aa145287ee9cf7a2c05d14dca9942`
+- Test runner now invokes Bash: `2d1051bed899cfd2063a9574f7c835bf4415da06` (current head at this checkpoint).
+
+### Latest verification
+- Python Actions run #63, run ID `42776847117`, job ID `129697239134`: **17 passed**; attack demo pass; `bash -n` pass; mocked deploy-script safety test pass. The log explicitly reports: “PASS: valid scoped key proceeds; FullAccess and wrong-scope keys stop before contract calls.”
+- Rust source/contract remains unchanged; last Rust Actions run #17 passed rustfmt, 11 unit tests and release WASM build. A newer PR run #26 is being checked separately.
+- No real testnet deployment, wallet or funds. No hackathon submission or revenue. Verified revenue remains **₹0**.
