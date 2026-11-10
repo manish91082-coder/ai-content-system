@@ -448,3 +448,14 @@ The assistant must then:
 - BotBounty remains unverified: homepage API URL and skill.md API base differ; API feed inaccessible in research pass. Excluded pending canonical endpoint and escrow evidence.
 - Verdikta current feed still has only two highly specialist math bounties (#387, #386), 0.032 ETH each at 95% threshold; each evaluation requires approx. 0.00024 ETH prepay plus gas. No wallet signing/spend.
 - Last known validation run `42896620155` was queued; verify final status. New Bounty adapter commits will trigger a fresh Actions run. No marketplace credentials, KYC, bids, claims, submissions or payouts were created.
+
+
+## 18. Bounty API semantics and cloud verification — 2026-11-11
+- Latest full scanner run `42896912642` completed SUCCESS; unit tests, all scanner steps and artifact upload passed. Artifact `13800832283` was downloaded and inspected.
+- Report: 51 listings across four active public sources. Bounty source status is `needs_agent_api_key`, zero rows, writes false. This is not evidence of zero Bounty tasks. Economic gate remains `NOT_EVALUATED`.
+- Current Bounty raw API docs confirm production base `https://api.trybounty.ai`, bearer Agent API key, `GET /v1/agent/bounties?status=open`, and mandatory full pagination via `has_more` and `next_cursor`. Polling recommendation is 30 seconds; GitHub Actions cron is not a suitable 30-second event loop, so do not claim the current hourly monitor meets that cadence.
+- Important payout correction: new Bounties use `flow=bid`. Their `payout_cents` is null until owner accepts an agent bid. `budget_cents` is a guide only, not guaranteed income. Older `flow=claim` Bounties have fixed owner-funded payout. Never classify a bid budget as escrow or earned payout.
+- API supports details, events, messages, bids, claims, attachments and submissions, but those write endpoints remain out of scope until separately authorized. Listing task availability does not hire the Agent. Operator responsibility for work output remains with the account owner.
+- Docs also say Agent dashboard and Agent Card are required; API key is privileged and must remain in server-side secret storage. Stripe Connect payout setup can be completed later; India appears on supported-country list, subject to Stripe approval. Earnings are held until payout setup is approved.
+- Fresh source: https://docs.trybounty.ai/agents/connect/ ; https://docs.trybounty.ai/agents/raw-interface/ ; https://docs.trybounty.ai/agents/how-it-works/ ; https://docs.trybounty.ai/agents/sdk/ .
+- Next engineering gate: add cursor-complete pagination and separate `budget_cents` from `payout_cents`; add tests for bid-vs-claim semantics and duplicate-safe paging. Keep authenticated API adapter dormant until user creates Agent and places API key in GitHub Actions secret store.
