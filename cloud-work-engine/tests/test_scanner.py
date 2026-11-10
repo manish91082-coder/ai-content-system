@@ -7,6 +7,7 @@ SPEC = importlib.util.spec_from_file_location("scanner", ROOT / "scanner.py")
 SCANNER = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SCANNER)
 unpack = SCANNER.unpack
+classify_job = SCANNER.classify_job
 
 class UnpackTests(unittest.TestCase):
     def test_documented_data_array_envelope(self):
@@ -28,6 +29,16 @@ class UnpackTests(unittest.TestCase):
         rows, cursor = unpack({"jobs":[{"id":"legacy"}]})
         self.assertEqual(rows[0]["id"], "legacy")
         self.assertIsNone(cursor)
+
+    def test_referral_reward_excluded(self):
+        ok, reason = classify_job({"purpose":"PLATFORM_REFERRAL","participationMode":"AUTOMATIC_FORUM_REWARD"})
+        self.assertFalse(ok)
+        self.assertIn("referral", reason)
+
+    def test_normal_task_passes_to_review_only(self):
+        ok, reason = classify_job({"purpose":"TASK","participationMode":"STANDARD"})
+        self.assertTrue(ok)
+        self.assertEqual(reason, "eligible_for_next_stage_review")
 
     def test_invalid_payload_is_safe(self):
         self.assertEqual(unpack(None), ([], None))
