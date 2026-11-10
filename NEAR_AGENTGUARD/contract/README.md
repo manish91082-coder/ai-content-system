@@ -23,3 +23,7 @@ cargo build --target wasm32-unknown-unknown --release
 ```
 
 Do not deploy until tests pass. Deploy only to NEAR testnet, fund only with faucet test tokens, and verify the contract account, code hash, access-key scope and transaction receipts.
+
+## License
+
+This contract is part of the `NEAR_AGENTGUARD/` project and is covered by [the project MIT License](../LICENSE).
