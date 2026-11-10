@@ -96,6 +96,32 @@ class AdapterTests(unittest.TestCase):
         decision, reason = SCANNER.classify("Bounty",{"_id":"test","status":"open","test":True,"flow":"bid"})
         self.assertEqual(decision,"EXCLUDED")
         self.assertIn("no_money",reason)
+    def test_moltjobs_scans_public_and_funded_feeds_with_deduplication(self):
+        pages = [
+            {"data":{"jobs":[{"id":"m1","title":"Independent research task"},{"id":"m2","title":"Design task"}]},"meta":{}},
+            {"data":{"jobs":[{"id":"m2","title":"Design task"},{"id":"m3","title":"Referral"}]},"meta":{}}
+        ]
+        original = SCANNER.get_json
+        calls = []
+        def fake_get(url, attempts=3, extra_headers=None):
+            calls.append(url)
+            return pages[len(calls)-1]
+        SCANNER.get_json = fake_get
+        try:
+            rows, meta = SCANNER.scan_molt()
+        finally:
+            SCANNER.get_json = original
+        self.assertEqual([x["id"] for x in rows], ["m1","m2","m3"])
+        self.assertEqual(meta["filters"], ["all_open","funded=true"])
+        self.assertIn("funded=true", calls[1])
 
+    def test_moltjobs_funded_filter_is_not_treated_as_escrow_receipt(self):
+        row = {"id":"m4","status":"OPEN","_molt_source_filter":"funded_only","budgetUsdc":"100","currency":"USDC"}
+        item = SCANNER.normalize("MoltJobs",row,"2026-11-11T00:00:00Z")
+        self.assertEqual(item["funded_or_escrow_status"],"FUNDED_FILTER_MATCH_NOT_INDEPENDENT_PROOF")
+        self.assertIn("/m4",item["source_url"])
+        decision, reason = SCANNER.classify("MoltJobs",row)
+        self.assertEqual(decision,"REVIEW_REQUIRED")
+        self.assertIn("funding",reason)
 if __name__ == "__main__":
     unittest.main()
