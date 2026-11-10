@@ -59,5 +59,10 @@ class MoltJobsWatchlistTests(unittest.TestCase):
             finally:
                 watch.STATE_DIR, watch.STATE_FILE = original_dir, original_file
 
+    def test_asset_management_market_research_excluded(self):
+        task=item()
+        task["title"]="Global Asset Management & Portfolio Management Software Market — Comprehensive Research"
+        result=watch.evaluate(task)
+        self.assertEqual(result["decision"],"EXCLUDED_HIGH_RISK_DOMAIN")
 if __name__ == "__main__":
     unittest.main()
