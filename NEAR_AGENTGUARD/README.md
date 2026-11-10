@@ -72,3 +72,7 @@ The AgentGuard implementation in this directory is newly authored for the NEAR H
 
 ## Limitations
 This is a prototype, not an audited wallet, custody service, production signing system or financial product. The in-memory approval nonce store and process-local locks are suitable only for the local demonstration; production requires authenticated approval identity, durable atomic nonce storage, concurrency-safe spend accounting, external evidence provenance and independent security review. Do not connect a production wallet.
+
+## License
+
+This project directory is licensed under the MIT License. See [LICENSE](LICENSE). The license does not extend to unrelated content elsewhere in the parent repository.
