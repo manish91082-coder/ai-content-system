@@ -149,9 +149,22 @@ def classify_source(item, issue, comments):
     if claim_hits or pr_hits:
         return "EXCLUDED_COMPETITION", "existing_attempts_or_pull_requests_detected"
     bounty_labels = [label for label in labels if "bounty" in label or "$" in label]
-    if not bounty_labels and str(item.get("source_board") or "").lower() in ("algora", "issuehunt", "bountyhub"):
-        return "SOURCE_REVIEW_REQUIRED", "no_bounty_label_on_issue; confirm original board terms and payout"
     issue_updated = issue.get("updated_at")
+    board = str(item.get("source_board") or "").lower()
+    meta = item.get("raw_metadata") if isinstance(item.get("raw_metadata"), dict) else {}
+    extra = meta.get("extra") if isinstance(meta.get("extra"), dict) else {}
+    funded_at = parse_cache_time(extra.get("funded_at"))
+    if board == "issuehunt" and not bounty_labels:
+        funded_age = (datetime.now(timezone.utc) - funded_at).days if funded_at else None
+        try:
+            last_activity = datetime.fromisoformat(str(issue_updated).replace("Z", "+00:00")).astimezone(timezone.utc)
+            issue_age = (datetime.now(timezone.utc) - last_activity).days
+        except (ValueError, TypeError):
+            issue_age = None
+        if (funded_age is None or funded_age > 365) and (issue_age is None or issue_age > 180):
+            return "EXCLUDED_STALE_UNCONFIRMED_FUNDING", "IssueHunt funding is old and original issue has no bounty label or recent activity"
+        return "SOURCE_REVIEW_REQUIRED", "no_bounty_label_on_issue; confirm original board reward terms"
+        
     try:
         updated = datetime.fromisoformat(str(issue_updated).replace("Z", "+00:00"))
         if (datetime.now(timezone.utc) - updated).days > 180:
