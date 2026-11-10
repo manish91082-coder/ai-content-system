@@ -142,6 +142,8 @@ def classify(platform, row):
         if not bounty:
             return "EXCLUDED", "free_task_reputation_only_no_cash_reward"
         escrow = row.get("escrow") if isinstance(row.get("escrow"),dict) else {}
+        if not escrow:
+            return "BLOCKED", "sign_at_accept_bounty_not_prefunded_no_guaranteed_payment"
         if escrow.get("status") != "funded" or row.get("claimable") is not True:
             return "BLOCKED", "escrow_not_confirmed_funded_or_claimable"
         return "BLOCKED", "1_USDC_claim_bond_and_payout_wallet_required_not_authorized"
