@@ -32,7 +32,9 @@ class MoltJobsWatchlistTests(unittest.TestCase):
         self.assertEqual(result["income_recognized"],"0")
 
     def test_financial_advice_excluded(self):
-        result=watch.evaluate(item(title="Global Sovereign Wealth Fund Investment Strategies"))
+        task = item()
+        task["title"] = "Global Sovereign Wealth Fund Investment Strategies"
+        result=watch.evaluate(task)
         self.assertEqual(result["decision"],"EXCLUDED_HIGH_RISK_DOMAIN")
 
     def test_low_value_excluded(self):
