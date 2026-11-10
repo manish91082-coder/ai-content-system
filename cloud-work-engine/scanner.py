@@ -13,6 +13,7 @@ HEADERS = {"Accept":"application/json","User-Agent":"NexusCloudWorkEngine/0.2"}
 MOLT = os.getenv("MOLTJOBS_API_BASE", "https://api.moltjobs.io/v1")
 DEALWORK = os.getenv("DEALWORK_API_BASE", "https://api.dealwork.ai/api/v1")
 TASKMARKET = os.getenv("TASKMARKET_API_BASE", "https://api.taskmarket.dev")
+BASEDAGENTS = os.getenv("BASEDAGENTS_API_BASE", "https://api.basedagents.ai")
 
 def get_json(url, attempts=3):
     last = None
@@ -90,6 +91,22 @@ def normalize(platform, row, now):
         tags = row.get("tags") or []
         expiry = first(row,"deadline","expiresAt","dueDate")
         actor = first(row,"requesterActorType","posterType")
+    elif platform == "BasedAgents":
+        task_id = first(row,"task_id","id")
+        bounty = row.get("bounty") if isinstance(row.get("bounty"),dict) else {}
+        reward = first(bounty,"amount_display")
+        currency = first(bounty,"token")
+        chain = first(bounty,"network")
+        escrow = row.get("escrow") if isinstance(row.get("escrow"),dict) else {}
+        funding = "ESCROW_FUNDED" if escrow.get("status") == "funded" and row.get("claimable") is True else ("ESCROW_NOT_READY" if bounty and escrow.get("status") != "funded" else "NO_BOUNTY")
+        mode = "agent_task"
+        source = "https://basedagents.ai/tasks/" + str(task_id) if task_id else "https://basedagents.ai/tasks"
+        title = first(row,"title")
+        desc = first(row,"description")
+        status = first(row,"status")
+        tags = row.get("required_capabilities") or []
+        expiry = first(row,"expires_at")
+        actor = first(row,"creator_kind")
     else:
         task_id = first(row,"id","taskId")
         raw_reward = first(row,"reward")
@@ -118,6 +135,16 @@ def normalize(platform, row, now):
     }
 
 def classify(platform, row):
+    if platform == "BasedAgents":
+        bounty = row.get("bounty") if isinstance(row.get("bounty"),dict) else None
+        if str(first(row,"status") or "").lower() != "open":
+            return "EXCLUDED", "task_not_open"
+        if not bounty:
+            return "EXCLUDED", "free_task_reputation_only_no_cash_reward"
+        escrow = row.get("escrow") if isinstance(row.get("escrow"),dict) else {}
+        if escrow.get("status") != "funded" or row.get("claimable") is not True:
+            return "BLOCKED", "escrow_not_confirmed_funded_or_claimable"
+        return "BLOCKED", "1_USDC_claim_bond_and_payout_wallet_required_not_authorized"
     if platform == "MoltJobs":
         purpose = str(first(row,"purpose") or "").upper()
         mode = str(first(row,"participationMode") or "").upper()
@@ -246,11 +273,20 @@ def scan_taskmarket():
                   "next_cursor_present":bool(payload.get("nextCursor")) if isinstance(payload,dict) else False,
                   "details_attempted":len(enriched),"details_with_errors":sum(bool(x.get("_detail_read_errors")) for x in enriched)}
 
+
+def scan_basedagents():
+    url=BASEDAGENTS.rstrip("/")+"/v1/tasks?"+urlencode({"status":"open","limit":100,"offset":0})
+    payload=get_json(url)
+    rows=payload.get("tasks",[]) if isinstance(payload,dict) else []
+    if not isinstance(rows,list):
+        raise RuntimeError("BasedAgents response schema mismatch: tasks is not an array")
+    return rows,{"status_filter":"open","limit":100,"offset":0,"has_more_unknown":len(rows)==100}
+
 def main():
     now=datetime.now(timezone.utc).isoformat()
     sources={}
     normalized=[]
-    for platform, fn in (("MoltJobs",scan_molt),("Dealwork",scan_dealwork),("Taskmarket",scan_taskmarket)):
+    for platform, fn in (("MoltJobs",scan_molt),("Dealwork",scan_dealwork),("Taskmarket",scan_taskmarket),("BasedAgents",scan_basedagents)):
         try:
             rows, meta=fn()
             sources[platform]={"status":"ok","raw_count":len(rows),"meta":meta}
@@ -280,6 +316,7 @@ def main():
         "Listings and advertised rewards are not realized income.",
         "Unknown funding, fees, payout route, or AI permissions remain UNKNOWN/BLOCKED.",
         "Taskmarket reward_amount is converted from six-decimal base units; raw units are retained.",
+        "BasedAgents bounty tasks require a 1 USDC claim bond per concurrent bounty claim and a matching payout wallet; this scanner never claims.",
         "An escrow transaction reference is not independently verified on-chain by this scanner.",
         "No marketplace write operation or wallet action was performed."
       ]
