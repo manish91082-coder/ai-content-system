@@ -1,8 +1,10 @@
 import importlib.util
 import pathlib
+import sys
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 SPEC = importlib.util.spec_from_file_location("scanner", ROOT / "scanner.py")
 SCANNER = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SCANNER)
@@ -73,6 +75,27 @@ class AdapterTests(unittest.TestCase):
 
     def test_invalid_payload(self):
         self.assertEqual(SCANNER.extract_rows(None),[])
+
+    def test_bounty_underscore_id_and_budget_separation(self):
+        row = {"_id":"bounty-1","status":"open","flow":"bid","payout_cents":None,"budget_cents":25000,"currency":"USD"}
+        item = SCANNER.normalize("Bounty",row,"2026-11-11T00:00:00Z")
+        self.assertEqual(item["task_id"],"bounty-1")
+        self.assertIsNone(item["reward_amount"])
+        self.assertEqual(item["budget_amount"],"250")
+        decision, reason = SCANNER.classify("Bounty",row)
+        self.assertEqual(decision,"REVIEW_REQUIRED")
+        self.assertIn("not_guaranteed",reason)
+
+    def test_bounty_fixed_claim_requires_review_not_auto_claim(self):
+        row = {"_id":"bounty-2","status":"open","flow":"claim","payout_cents":8000}
+        decision, reason = SCANNER.classify("Bounty",row)
+        self.assertEqual(decision,"REVIEW_REQUIRED")
+        self.assertIn("fixed_claim",reason)
+
+    def test_bounty_test_task_excluded_from_revenue(self):
+        decision, reason = SCANNER.classify("Bounty",{"_id":"test","status":"open","test":True,"flow":"bid"})
+        self.assertEqual(decision,"EXCLUDED")
+        self.assertIn("no_money",reason)
 
 if __name__ == "__main__":
     unittest.main()
