@@ -64,6 +64,12 @@ def atomic_write(path, content):
 
 def fetch_feed():
     state = load_state()
+    now = datetime.now(timezone.utc)
+    cached_body = state.get("feed_body")
+    last_request = parse_datetime(state.get("last_request_utc"))
+    if isinstance(cached_body, str) and cached_body and last_request and (now - last_request).total_seconds() < 3600:
+        payload = json.loads(cached_body)
+        return payload, {"http_status": 0, "cached_without_request": True, "etag_present": bool(state.get("etag")), "poll_window_seconds": 3600}
     query = urlencode({"lane": "agent", "limit": "1000"})
     url = BASE + ("&" if "?" in BASE else "?") + query
     headers = dict(HEADERS)
@@ -81,7 +87,8 @@ def fetch_feed():
                 raise RuntimeError("Jobbi JSON Feed schema mismatch: items must be an array")
             state["etag"] = response.headers.get("ETag") or state.get("etag")
             state["last_modified"] = response.headers.get("Last-Modified")
-            state["fetched_at_utc"] = datetime.now(timezone.utc).isoformat()
+            state["fetched_at_utc"] = now.isoformat()
+            state["last_request_utc"] = now.isoformat()
             state["feed_hash"] = hashlib.sha256(body.encode("utf-8")).hexdigest()
             state["feed_body"] = body
             atomic_write(STATE_FILE, json.dumps(state, ensure_ascii=False, indent=2))
@@ -92,7 +99,9 @@ def fetch_feed():
             if not isinstance(body, str) or not body:
                 raise RuntimeError("Jobbi returned 304 but no cached feed exists")
             payload = json.loads(body)
-            return payload, {"http_status": 304, "not_modified": True, "etag_present": True}
+            state["last_request_utc"] = now.isoformat()
+            atomic_write(STATE_FILE, json.dumps(state, ensure_ascii=False, indent=2))
+            return payload, {"http_status": 304, "not_modified": True, "cached_without_request": False, "etag_present": True}
         raise RuntimeError("Jobbi feed HTTP " + str(exc.code)) from None
     except (URLError, TimeoutError) as exc:
         raise RuntimeError("Jobbi feed connection failed: " + type(exc).__name__) from None
