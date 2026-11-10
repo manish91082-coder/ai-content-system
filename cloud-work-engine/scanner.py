@@ -14,12 +14,14 @@ MOLT = os.getenv("MOLTJOBS_API_BASE", "https://api.moltjobs.io/v1")
 DEALWORK = os.getenv("DEALWORK_API_BASE", "https://api.dealwork.ai/api/v1")
 TASKMARKET = os.getenv("TASKMARKET_API_BASE", "https://api.taskmarket.dev")
 BASEDAGENTS = os.getenv("BASEDAGENTS_API_BASE", "https://api.basedagents.ai")
+TRYBOUNTY = os.getenv("TRYBOUNTY_API_BASE", "https://api.trybounty.ai")
+TRYBOUNTY_API_KEY = os.getenv("BOUNTY_AGENT_API_KEY", "")
 
-def get_json(url, attempts=3):
+def get_json(url, attempts=3, extra_headers=None):
     last = None
     for n in range(attempts):
         try:
-            req = Request(url, headers=HEADERS)
+            req = Request(url, headers={**HEADERS, **(extra_headers or {})})
             with urlopen(req, timeout=20) as res:
                 return json.loads(res.read().decode("utf-8"))
         except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as exc:
@@ -91,6 +93,20 @@ def normalize(platform, row, now):
         tags = row.get("tags") or []
         expiry = first(row,"deadline","expiresAt","dueDate")
         actor = first(row,"requesterActorType","posterType")
+    elif platform == "Bounty":
+        task_id = first(row,"id","bounty_id")
+        reward = first(row,"payout_cents")
+        currency = first(row,"currency") or "USD"
+        chain = "Stripe Connect"
+        funding = "FUNDED_CLAIM_FLOW" if first(row,"flow") == "claim" and reward is not None else "BID_FLOW_NO_CONFIRMED_PAYOUT"
+        mode = first(row,"flow")
+        source = "https://trybounty.ai"
+        title = first(row,"title")
+        desc = first(row,"description")
+        status = first(row,"status")
+        tags = row.get("categories") or row.get("required_capabilities") or []
+        expiry = first(row,"expires_at","deadline")
+        actor = "agent_operator"
     elif platform == "BasedAgents":
         task_id = first(row,"task_id","id")
         bounty = row.get("bounty") if isinstance(row.get("bounty"),dict) else {}
@@ -135,6 +151,13 @@ def normalize(platform, row, now):
     }
 
 def classify(platform, row):
+    if platform == "Bounty":
+        if str(first(row,"status") or "").lower() != "open":
+            return "EXCLUDED", "bounty_not_open"
+        payout = first(row,"payout_cents")
+        if payout is None or int(payout) <= 0:
+            return "REVIEW_REQUIRED", "bid_flow_or_payout_not_yet_set_by_owner"
+        return "REVIEW_REQUIRED", "funded_claim_or_payout_candidate_requires_detail_and_stripe_operator_payout_setup"
     if platform == "BasedAgents":
         bounty = row.get("bounty") if isinstance(row.get("bounty"),dict) else None
         if str(first(row,"status") or "").lower() != "open":
@@ -284,11 +307,18 @@ def scan_basedagents():
         raise RuntimeError("BasedAgents response schema mismatch: tasks is not an array")
     return rows,{"status_filter":"open","limit":100,"offset":0,"has_more_unknown":len(rows)==100}
 
+def scan_trybounty():
+    if not TRYBOUNTY_API_KEY:
+        return [], {"status":"needs_agent_api_key","endpoint":"/v1/agent/bounties?status=open","writes":False}
+    payload=get_json(TRYBOUNTY.rstrip("/")+"/v1/agent/bounties?status=open",extra_headers={"Authorization":"Bearer "+TRYBOUNTY_API_KEY})
+    rows=extract_rows(payload,("bounties",))
+    return rows,{"status":"authenticated_read_only","count":len(rows),"has_more":payload.get("has_more") if isinstance(payload,dict) else None,"next_cursor_present":bool(payload.get("next_cursor")) if isinstance(payload,dict) else False}
+
 def main():
     now=datetime.now(timezone.utc).isoformat()
     sources={}
     normalized=[]
-    for platform, fn in (("MoltJobs",scan_molt),("Dealwork",scan_dealwork),("Taskmarket",scan_taskmarket),("BasedAgents",scan_basedagents)):
+    for platform, fn in (("MoltJobs",scan_molt),("Dealwork",scan_dealwork),("Taskmarket",scan_taskmarket),("BasedAgents",scan_basedagents),("Bounty",scan_trybounty)):
         try:
             rows, meta=fn()
             sources[platform]={"status":"ok","raw_count":len(rows),"meta":meta}
@@ -319,6 +349,7 @@ def main():
         "Unknown funding, fees, payout route, or AI permissions remain UNKNOWN/BLOCKED.",
         "Taskmarket reward_amount is converted from six-decimal base units; raw units are retained.",
         "BasedAgents bounty tasks require a 1 USDC claim bond per concurrent bounty claim and a matching payout wallet; this scanner never claims.",
+        "Bounty discovery requires BOUNTY_AGENT_API_KEY; Stripe Connect payout onboarding is operator-controlled and never automated by this scanner.",
         "An escrow transaction reference is not independently verified on-chain by this scanner.",
         "No marketplace write operation or wallet action was performed."
       ]
