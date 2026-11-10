@@ -113,7 +113,7 @@ def normalize(platform, row, now):
         "reward_currency":currency, "chain":chain, "funded_or_escrow_status":funding,
         "actor_type":actor, "task_mode":mode, "status":status, "deadline":expiry,
         "tags":tags if isinstance(tags,list) else [], "acceptance_criteria":first(row,"acceptanceCriteria","criteria"),
-        "source_url":source, "fetched_at":now, "raw":row,
+        "source_url":source, "fetched_at":now, "settlement_terms":row.get("terms"), "computed_settlement_terms":row.get("_terms_response"), "detail_read_errors":row.get("_detail_read_errors",[]), "receipt_verification":row.get("_receipt_verification"), "pending_actions":row.get("pendingActions"), "awards":row.get("awards"), "raw":row,
         "write_actions_enabled":False
     }
 
@@ -169,6 +169,43 @@ def scan_dealwork():
     meta=payload.get("meta",{}) if isinstance(payload,dict) else {}
     return rows, {"page":meta.get("page"),"per_page":meta.get("per_page"),"total":meta.get("total")}
 
+def rpc_json(url, method, params):
+    body=json.dumps({"jsonrpc":"2.0","id":1,"method":method,"params":params}).encode("utf-8")
+    req=Request(url,data=body,headers={**HEADERS,"Content-Type":"application/json"},method="POST")
+    with urlopen(req,timeout=20) as res:
+        payload=json.loads(res.read().decode("utf-8"))
+    if payload.get("error"):
+        raise RuntimeError(str(payload["error"]))
+    return payload.get("result")
+
+def verify_taskmarket_receipt(row):
+    tx=first(row,"escrowTxHash")
+    chain=first(row,"chainId")
+    if not tx or chain not in (8453,4217):
+        return {"status":"UNKNOWN","reason":"missing_tx_hash_or_unsupported_chain"}
+    rpc="https://mainnet.base.org" if int(chain)==8453 else "https://rpc.tempo.xyz"
+    token="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" if int(chain)==8453 else "0x20c0000000000000000000006a37da5c996874be"
+    diamond="0xDDc6cC3e4D11c1f3527B867C7DAD4ED9869C33f7" if int(chain)==8453 else "0xF4f4a00011B080EbC1E599A765D8bCE7557B97e7"
+    receipt=rpc_json(rpc,"eth_getTransactionReceipt",[tx])
+    if receipt is None:
+        return {"status":"NOT_FOUND_OR_PENDING","rpc":rpc}
+    if receipt.get("status")!="0x1":
+        return {"status":"FAILED_RECEIPT","receipt_status":receipt.get("status"),"block_number":receipt.get("blockNumber"),"rpc":rpc}
+    transfer_topic="0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+    token_transfers=[]
+    for log in receipt.get("logs",[]):
+        topics=log.get("topics") or []
+        if str(log.get("address","")).lower()==token.lower() and len(topics)>=3 and str(topics[0]).lower()==transfer_topic:
+            recipient="0x"+str(topics[2])[-40:]
+            amount=int(log.get("data","0x0"),16)
+            token_transfers.append({"to":recipient,"amount_base_units":str(amount),"to_taskmarket_diamond":recipient.lower()==diamond.lower()})
+    deposited=sum(int(x["amount_base_units"]) for x in token_transfers if x["to_taskmarket_diamond"])
+    reward=int(str(first(row,"reward") or "0"))
+    return {"status":"SUCCESS_RECEIPT","block_number":receipt.get("blockNumber"),"tx_to":receipt.get("to"),
+            "token_contract":token,"taskmarket_diamond":diamond,"matching_token_transfers":token_transfers,
+            "token_transfer_to_diamond_base_units":str(deposited),"listed_reward_base_units":str(reward),
+            "deposit_transfer_covers_listed_reward":deposited>=reward,"rpc":rpc}
+
 def scan_taskmarket():
     url=TASKMARKET.rstrip("/")+"/api/tasks?"+urlencode({"status":"open","limit":50,"sort":"newest"})
     payload=get_json(url)
@@ -198,7 +235,7 @@ def scan_taskmarket():
             merged["awards"]=detail.get("awards")
         if isinstance(terms,dict):
             merged["_terms_response"]=terms
-        merged["_detail_read_errors"]=errors
+        merged["_detail_read_errors"]=errors\n        try:\n            merged["_receipt_verification"]=verify_taskmarket_receipt(row)\n        except Exception as exc:\n            merged["_receipt_verification"]={"status":"ERROR","error":str(exc)}
         enriched.append(merged)
         time.sleep(0.25)
     return enriched, {"has_more":payload.get("hasMore") if isinstance(payload,dict) else None,
