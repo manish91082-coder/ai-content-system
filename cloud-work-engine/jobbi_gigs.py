@@ -128,8 +128,9 @@ def normalize(item):
     reward = meta.get("reward") if isinstance(meta.get("reward"), dict) else {}
     amount = number(reward.get("amount"))
     currency = str(reward.get("currency") or "").upper()
-    source_meta = meta.get("source") if isinstance(meta.get("source"), dict) else {}
-    source = field(source_meta, "key", "board", "name") or (source_meta if isinstance(source_meta, str) else None)
+    source_raw = meta.get("source")
+    source_meta = source_raw if isinstance(source_raw, dict) else {}
+    source = field(source_meta, "key", "board", "name") or (source_raw if isinstance(source_raw, str) else None)
     expires = meta.get("expires")
     return {
         "id": str(item.get("id") or ""),
