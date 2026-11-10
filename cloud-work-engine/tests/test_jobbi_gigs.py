@@ -85,5 +85,24 @@ class JobbiTests(unittest.TestCase):
         self.assertEqual(decision,"SOURCE_REVIEW_REQUIRED")
         self.assertFalse(item.get("execute"))
 
+    def test_feed_fetch_uses_cached_body_inside_one_hour_window(self):
+        import json, tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        original_state = jobbi.STATE_FILE
+        with tempfile.TemporaryDirectory() as tmp:
+            jobbi.STATE_FILE = Path(tmp) / "state.json"
+            cached = {"title": "cached feed", "items": []}
+            state = {"feed_body": json.dumps(cached), "last_request_utc": NOW.isoformat(), "etag": "\"abc\""}
+            jobbi.STATE_FILE.write_text(json.dumps(state), encoding="utf-8")
+            try:
+                with patch.object(jobbi, "urlopen", side_effect=AssertionError("network must not be called")):
+                    payload, meta = jobbi.fetch_feed()
+            finally:
+                jobbi.STATE_FILE = original_state
+        self.assertEqual(payload["title"], "cached feed")
+        self.assertTrue(meta["cached_without_request"])
+        self.assertEqual(meta["poll_window_seconds"], 3600)
+
 if __name__ == "__main__":
     unittest.main()
