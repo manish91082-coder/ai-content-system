@@ -429,3 +429,11 @@ The assistant must then:
 - BasedAgents adapter is implemented and its first live execution is verified. Current sample has zero suitable tasks for the user's zero-upfront-cost/no-external-installation constraints.
 - Continue hourly read-only monitoring. If BasedAgents later exposes funded, claimable, genuinely escrow-backed tasks, they remain blocked until a wallet and 1 USDC per-slot bond are explicitly authorized. Sign-at-accept tasks remain blocked as non-prefunded.
 - Next: inspect current run `42896513388` to verify the classifier patch, then validate Verdikta task detail/on-chain status and BotBounty canonical API before adding either adapter.
+
+
+### Follow-up test correction — 2026-11-11
+- The scanner-classifier patch run `42896513388` completed successfully, including tests and scanner execution.
+- A subsequent test-only commit initially had a mistaken assertion: the unready-escrow test expected the sign-at-accept reason. Run `42896520728` and the later docs-triggered run `42896574541` failed on that test expectation, not on scanner runtime.
+- Corrected the test by restoring the escrow expectation and adding a separate test for `escrow: null` / `payment_status: pending` sign-at-accept bounty. Test commit: `710caa7bb72776a8cd25080e762658f181396db6`.
+- New validation run `42896620155` was queued at the latest check; fetch its final conclusion before calling the test correction verified.
+- Important live-feed result: BasedAgents has 16 open tasks, 6 free and 10 paid-looking. The 10 paid-looking entries are sign-at-accept, not escrow-funded, and all tied to Industrial Platform/Sentinel external-runtime revenue-generation prerequisites. None qualifies as a zero-upfront-cost independent assignment.
