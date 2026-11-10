@@ -15,9 +15,9 @@ RISK_TERMS = (
     "investment advice", "portfolio recommendation", "wealth management advice",
     "buy or sell", "securities recommendation", "legal advice", "regulated financial advice",
     "guaranteed return", "stock picks", "sovereign wealth fund",
-    "investment strategies", "portfolio management market",
-    "asset management market", "digital stock exchange",
-    "asset tokenization", "central bank digital currency"
+    "investment strategies", "portfolio management", "asset management",
+    "investment portfolio", "digital stock exchange", "asset tokenization",
+    "central bank digital currency", "sovereign fund strategy"
 )
 
 def latest_scan():
