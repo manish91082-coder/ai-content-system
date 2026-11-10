@@ -347,3 +347,38 @@ The assistant must then:
 - Dealwork public list returned 20 records with page 1, per_page 20, total 138; all 20 records in the returned sample had posterFunded=false.
 - Taskmarket public list returned 5 tasks with hasMore=false; reward values included 1 OUSD, 1 USDC, 15 USDC, 100 OUSD, and 10 OUSD. These are listed rewards, not earned revenue.
 - The five Taskmarket task modes were all bounty; expiry times are retained in the artifact. One listed task had a deadline earlier than the scan timestamp, so expiry must be rechecked before any further consideration.
+
+
+## 14. Taskmarket detail, terms and escrow receipt verification — 2026-11-11
+
+### Canonical details and settlement terms
+- Added bounded public read-only GET /api/tasks/{taskId} and GET /api/tasks/{taskId}/terms enrichment for up to 10 newest Taskmarket tasks.
+- Added chain-aware JSON-RPC eth_getTransactionReceipt checks: Base Mainnet via https://mainnet.base.org and Tempo Mainnet via https://rpc.tempo.xyz.
+- The verifier checks successful receipt status and ERC-20/TIP-20 Transfer logs from the documented settlement token to the correct Taskmarket Diamond. It compares total matching transfer amount with the task's listed reward. No transaction was sent.
+- Final verified cloud run: `42895409119`, conclusion `success`; job `130107123390`; unit tests, read-only scanner and artifact upload succeeded.
+- Artifact ID `13800032456`, name `nexus-funded-jobs-42895409119`; report timestamp `2026-11-10T20:27:14.299208+00:00`.
+- All five Taskmarket details and terms reads succeeded; all five transaction receipts were successful, and each had a token transfer to the chain-correct Taskmarket Diamond equal to the listed reward. This is evidence of escrow deposit, not a guarantee of worker award or payout.
+
+### Five Taskmarket opportunities reviewed
+1. `TSK-6RW06814` — 1 OUSD, Tempo, economics article, deadline 2026-11-11 07:59:04Z (13:29:04 IST). 42 submissions, zero awards at scan time. No stake; standard terms; reject fee amount 0.2 OUSD; decision deadline 2026-11-18 07:59:04Z. A draft article was prepared and committed at `cloud-work-engine/deliverables/taskmarket/TSK-6RW06814-parallel-fx-rates.md` (commit `22e2feeb1960dc89bc91f25c80e04a8ba4e60855`). Draft body is within the requested 800–1,500 word range. Not submitted. Taskmarket docs state first five bounty/benchmark submissions per task are free, then later submissions cost 0.001 token; with 42 submissions already recorded, a new submission is not zero-cost. No authorized/funded worker wallet exists.
+2. `TSK-J1WYKT0H` — 1 USDC, Base, FlapJax on-chain treasury audit. Requires first-timer status, a new worker wallet and handle, a public audit page, BSC wallet binding, and pays 100,000 FLAPJAX off-platform (the USDC listing deposit is not the worker payout). Exclude: identity/wallet requirements, off-platform token payout, and sybil/account-age rules.
+3. `TSK-836Z6Q65` — 15 USDC, Base, Lumen House shopping challenge. Requires buying several products/NFT and a pass, entrants bear purchase/network costs, no guaranteed prize, and the Help Map is limited to eligible U.S. purchasers. Exclude: requires spending and uncertain prize.
+4. `TSK-E4J7K6WE` — 100 OUSD, Tempo, 15-second Frontier cinematic. Three winners split 50/30/20 OUSD; requires a commercially licensable video-model workflow, source ZIP and process file; 93 submissions at scan time. Exclude from zero-cost pilot until a compliant free video-generation pipeline and time budget are proven.
+5. `TSK-JKVSTHB7` — 10 OUSD multiplayer strategy game; deadline 2026-11-10 21:16:20Z, already expired by the verified scan at 20:27:14Z? Re-check current status before any reuse. (At the user's local 2026-11-11 01:57 IST it had about 49 minutes remaining; it is now treated as time-critical and not selected due to insufficient build/deploy window.)
+
+### Research deliverable status
+- Created a source-backed economics article draft for the 1 OUSD bounty, citing IMF research and country reports on Egypt, Nigeria and Ethiopia. It is committed in the repository but has NOT been submitted to Taskmarket.
+- Reason: existing 42 submissions imply the first-five free submission allowance is exhausted; later submissions cost 0.001 OUSD, and no user-authorized/funded wallet or Taskmarket account is available. Do not pay or submit without explicit authorization.
+
+### Official documentation sources consulted
+- Taskmarket API reference: https://docs.taskmarket.dev/api/reference (task details, task terms, bounty submission fee schedule).
+- Taskmarket raw REST fallback: https://docs.taskmarket.dev/reference/raw-api (canonical detail and terms routes).
+- Taskmarket network reference: https://docs.taskmarket.dev/reference/network (chain IDs, tokens and explorers).
+- Taskmarket Base reference: https://docs.taskmarket.dev/reference/base (Base RPC, Taskmarket Diamond, USDC).
+- Taskmarket Tempo reference: https://docs.taskmarket.dev/reference/tempo (Tempo RPC, Taskmarket Diamond, OUSD).
+
+### Next actions
+1. Re-fetch the Taskmarket open list and the economics task detail immediately before considering any action; deadlines and submission counts change.
+2. Do not submit the article unless the user authorizes the 0.001 OUSD submission cost and the account/wallet authorization gate is resolved.
+3. Expand discovery beyond the three agent marketplaces toward legitimate no-cost AI contributor/task platforms with public task discovery and permitted automation. Screen for India eligibility, AI execution permission, no upfront purchases, verifiable payout, and positive net economics.
+4. Keep all writes, wallet operations, registrations and paid submissions disabled until each platform's owner-consent and financial authorization gates are met.
