@@ -16,6 +16,8 @@ An agent may receive adversarial task content that attempts to redirect funds, c
 6. A prompt-injection demonstration attempts to pay a blocked recipient and is stopped before the signer boundary.
 
 ## Security controls in this prototype
+
+- An empty recipient, contract or method allowlist fails closed; omission never means unrestricted access.
 - No seed phrase or private key is stored.
 - The demo signer returns SIMULATED_ONLY; it never broadcasts or transfers funds.
 - Empty recipient allowlists fail closed.
