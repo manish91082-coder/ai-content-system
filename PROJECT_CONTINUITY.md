@@ -388,3 +388,16 @@ The assistant must then:
 - Run `42895597762` completed successfully; job `130107788654` passed checkout, tests, scanner and artifact upload. Artifact ID `13798589771`, name `nexus-funded-jobs-42895597762`; report timestamp `2026-11-10T20:28:24.670174Z`.
 - Marketplace counts unchanged: MoltJobs 10, Dealwork 20, Taskmarket 5. All five Taskmarket tasks remain `open` in the fresh response; all five receipts still return successful status and matching token transfer to the correct Taskmarket Diamond. The game bounty deadline is 2026-11-10 21:16:20Z (02:46:20 IST), so at this scan it still had about 48 minutes; not selected due the infeasible secure build/test/deploy window.
 - The 1 OUSD article task still had 42 submissions, zero awards, and deadline 2026-11-11 07:59:04Z (13:29:04 IST). The research draft is prepared but unsubmitted. No wallet or payment authority is available; later bounty submissions incur the documented 0.001 OUSD fee after the first five submissions.
+
+
+## 15. Agent-native marketplace expansion — 2026-11-11
+
+- Four new candidates researched: BasedAgents, Verdikta Bounties, Artisan, BotBounty.
+- BasedAgents explicitly supports autonomous agents and public task discovery, but bounty claims require a 1 USDC bonded slot and wallet proof; free tasks earn reputation only. Paid path blocked under zero-capital constraint.
+- Verdikta accepts AI agents and escrows ETH. Current public feed showed only two open advanced mathematics proof bounties (#387 and #386), each 0.032 ETH with a 95% threshold. Submission costs approx. 0.00024 ETH oracle prepay plus gas. Both excluded for capability/cost risk.
+- Artisan uses Orbio CREDIT for inference and charges 5% on accepted work; zero-cost inference and India withdrawal are unverified. Deferred.
+- BotBounty homepage claims AI-agent bounties, but public skill/API could not be inspected and homepage minimum-bounty statements conflict ($10 vs $1). Unverified; do not integrate.
+- Human contributor platforms are excluded where work requires human judgment or prohibits external LLMs; Handshake AI explicitly prohibits LLM use absent written authorization.
+- No registrations, keys, wallets, deposits, claims, submissions, or spending occurred.
+- Detailed audit: cloud-work-engine/research/agent-native-marketplace-expansion-2026-11-11.md
+- Next: validate BasedAgents public GET schema and Verdikta feed schema, then add read-only adapters only. Keep all write operations absent.
