@@ -13,6 +13,7 @@ from urllib.request import Request, urlopen
 BASE = os.getenv("BOUNTY_API_BASE", "https://api.trybounty.ai").rstrip("/")
 API_KEY = os.getenv("BOUNTY_AGENT_API_KEY", "")
 OUT = Path(os.getenv("REPORT_DIR", "report"))
+STATE_FILE = Path(os.getenv("NEXUS_STATE_DIR", ".nexus_state")) / "bounty_versions.json"
 HEADERS = {"Accept": "application/json", "User-Agent": "NexusCloudWorkEngine/1.0"}
 
 def request_json(path, query=None, retries=3):
@@ -48,10 +49,10 @@ def request_json(path, query=None, retries=3):
                 time.sleep(min(2 ** attempt, 8))
     raise RuntimeError("Bounty API request failed: " + str(last_error))
 
-def page_bounties(max_pages=100):
+def page_bounties(status="open", max_pages=100):
     all_rows, seen, cursor, pages = [], set(), None, 0
     for _ in range(max_pages):
-        query = {"status": "open", "limit": "100"}
+        query = {"status": status, "limit": "100"}
         if cursor:
             query["cursor"] = cursor
         payload = request_json("/v1/agent/bounties", query)
@@ -110,6 +111,39 @@ def money(cents):
     except (InvalidOperation, ValueError, TypeError):
         return None
 
+
+def mark_versions(rows):
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        previous = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        previous = {}
+    except (json.JSONDecodeError, OSError):
+        previous = {}
+    if not isinstance(previous, dict):
+        previous = {}
+    next_state = dict(previous)
+    new_count = updated_count = unchanged_count = 0
+    for row in rows:
+        bounty_id = str(row.get("_id") or row.get("id") or "")
+        if not bounty_id:
+            row["_nexus_change"] = "missing_id"
+            continue
+        version = str(row.get("version") or "")
+        old_version = previous.get(bounty_id)
+        if old_version is None:
+            row["_nexus_change"] = "new"
+            new_count += 1
+        elif str(old_version) != version:
+            row["_nexus_change"] = "updated"
+            updated_count += 1
+        else:
+            row["_nexus_change"] = "unchanged"
+            unchanged_count += 1
+        next_state[bounty_id] = version
+    STATE_FILE.write_text(json.dumps(next_state, ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8")
+    return rows, {"new": new_count, "updated": updated_count, "unchanged": unchanged_count, "tracked": len(next_state)}
+
 def normalize(row):
     flow = row.get("flow")
     payout = row.get("payout_cents")
@@ -134,6 +168,7 @@ def normalize(row):
         "delivery_window_ms": row.get("delivery_window_ms"),
         "expires_at": row.get("expires_at"),
         "test_bounty": is_test,
+        "change_state": row.get("_nexus_change", "unknown"),
         "attachments": row.get("_agent_detail", {}).get("attachments", []),
         "has_existing_bid": bool(row.get("_agent_detail", {}).get("bid")),
         "detail_error": row.get("_detail_error"),
@@ -152,15 +187,23 @@ def main():
             "writes_enabled": False
         }
     else:
-        rows, page_meta = page_bounties()
+        rows, page_meta = page_bounties("open")
+        rows, state_meta = mark_versions(rows)
         rows, detail_meta = enrich_bounties(rows)
+        active_rows, active_page_meta = page_bounties("claimed,submitted,reviewing,disputed")
+        active_rows, active_detail_meta = enrich_bounties(active_rows)
         report = {
             "status": "ok",
             "platform": "Bounty",
             "fetched_count": len(rows),
             "page_meta": page_meta,
+            "state_meta": state_meta,
             "detail_meta": detail_meta,
             "opportunities": [normalize(row) for row in rows],
+            "active_work_count": len(active_rows),
+            "active_page_meta": active_page_meta,
+            "active_detail_meta": active_detail_meta,
+            "active_work": [normalize(row) for row in active_rows],
             "writes_enabled": False
         }
     path = OUT / "bounty-opportunities.json"
