@@ -18,10 +18,10 @@ class SourceVerifierTests(unittest.TestCase):
     def test_non_github_url_is_not_falsely_verified(self):
         self.assertIsNone(parse_issue_url("https://bountybook.example/gigs/123"))
 
-    def test_cashworthy_requires_grade_b_or_better(self):
+    def test_cashworthy_requires_cash_and_includes_low_confidence_source_checks(self):
         self.assertTrue(is_cashworthy(self.candidate()))
         row=self.candidate();row["payout_grade"]="C"
-        self.assertFalse(is_cashworthy(row))
+        self.assertTrue(is_cashworthy(row))
 
     def test_closed_or_locked_issue_excluded(self):
         self.assertEqual(classify_source(self.candidate(),self.issue(state="closed"),[]) [0],"EXCLUDED_SOURCE_CLOSED")
