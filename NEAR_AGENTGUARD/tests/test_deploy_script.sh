@@ -65,7 +65,7 @@ chmod +x "$TMP/bin/cargo" "$TMP/bin/near"
 run_deploy() {
   OWNER_ACCOUNT="owner.testnet" \
   RECIPIENT_ACCOUNT="recipient.testnet" \
-  "$DEPLOY_SCRIPT"
+  bash "$DEPLOY_SCRIPT"
 }
 
 # Case 1: valid single FunctionCall key scoped to AgentGuard/pay.
