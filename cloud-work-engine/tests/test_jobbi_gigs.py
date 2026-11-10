@@ -23,13 +23,15 @@ def feed_item(gig_id="algora:1", **overrides):
         "source": {"key": "algora"}
     }
     meta.update(overrides.pop("_jobbi", {}))
-    return {
+    item = {
         "id": gig_id, "url": "https://github.com/example/project/issues/1",
         "title": "Implement a Python API feature",
         "content_text": "Build an endpoint and include tests",
         "tags": ["python", "api", "github"],
         "_jobbi": meta
     }
+    item.update(overrides)
+    return item
 
 class JobbiTests(unittest.TestCase):
     def test_escrowed_agent_cash_task_promoted_to_source_review(self):
