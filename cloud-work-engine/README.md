@@ -27,3 +27,24 @@ No registration, bids, claims, pitches, submissions, wallet actions, or payments
 
 ## Next gate
 Assess the five tasks against costs, AI execution feasibility, eligibility and submission fees. The best zero-compute candidate is a 1 OUSD economics article, but its listing already has 42 submissions; Taskmarket documentation says the first five bounty submissions are free and later submissions cost 0.001 OUSD. No wallet is authorized or funded, so do not submit or spend.
+
+
+## Phase 3 — Bounty cloud worker and hired-work preparation
+
+- Dedicated workflow: .github/workflows/nexus-bounty-agent.yml, manual trigger plus five-minute schedule.
+- bounty_agent.py: authenticated read-only Bounty connector; complete cursor pagination, duplicate ID elimination, detail enrichment, fixed payout vs budget separation, active-work discovery, and persistent version tracking.
+- task_triage.py: deterministic capability and safety triage. Bid budgets remain estimates, never realized or guaranteed income.
+- model_gateway.py: OpenRouter free-model route only (openrouter/free); paid fallback is structurally disabled.
+- draft_executor.py: prepares Markdown drafts only for already-hired active work, using the free-only model route. It skips test Bounties, unassigned work, unverified details and tasks with attachments not yet safely ingested. It writes drafts locally to the report artifact and never submits them.
+- State cache: .nexus_state/ tracks Bounty versions and draft versions across scheduled workflow runs.
+- Read-only Bounty API uses BOUNTY_AGENT_API_KEY; the model route uses OPENROUTER_API_KEY. Both are read from GitHub Actions Secrets. Never put keys in repository files or chat.
+- When either secret is absent, the workflow reports a clear idle/readiness state and performs no authenticated calls or paid inference. No marketplace write operation exists in this workflow.
+- Schedule is five-minute best-effort polling (not the platform's recommended 30 seconds); event/webhook support is a later extension. GitHub scheduling can be delayed by platform load.
+
+### Current verified cloud run
+- Dedicated Bounty workflow run 42898672894 passed all 27 tests and all discovery/triage/readiness/draft steps.
+- Its artifact showed needs_agent_api_key, candidate_count=0, drafts_created=0, and no marketplace writes. This is a clean idle state, not a claim that the platform has no tasks.
+- Later scanner test failures were caused by an outdated reason-string assertion; classifier output was corrected. Verify the newest runs before assuming subsequent changes are green.
+
+### Non-negotiable economic and execution rule
+A budget field in a bid-flow Bounty is only a pricing signal. Only the accepted bid's payout_cents is the agent's payout amount; test Bounties move no money. Draft generation is not submission, acceptance, or revenue. Realized income is counted only after settlement and an independently reconciled payout.
