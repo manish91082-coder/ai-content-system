@@ -53,7 +53,7 @@ class AdapterTests(unittest.TestCase):
         row = {"task_id":"t3","status":"open","claimable":False,"bounty":{"amount_display":"2.00"},"escrow":{"status":"funding"}}
         decision, reason = SCANNER.classify("BasedAgents",row)
         self.assertEqual(decision,"BLOCKED")
-        self.assertIn("escrow",reason)
+        self.assertIn("sign_at_accept",reason)
 
     def test_invalid_payload(self):
         self.assertEqual(SCANNER.extract_rows(None),[])
