@@ -120,7 +120,7 @@ def rows_from(value):
     if isinstance(value, list):
         return value
     if isinstance(value, dict):
-        for key in ("tasks","jobs","bounties","opportunities","listings","agents","items","data","results"):
+        for key in ("tasks","jobs","bounties","quests","offers","needs","deals","opportunities","listings","agents","templates","items","data","results"):
             child = value.get(key)
             if isinstance(child, list):
                 return child
