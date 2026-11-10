@@ -205,28 +205,36 @@ def classify(platform, row):
     return "REVIEW_REQUIRED", "escrow_reference_present_but_onchain_and_task_terms_need_verification"
 
 def scan_molt():
-    rows, cursor, seen, pages = [], None, set(), []
-    for _ in range(20):
-        params={"status":"OPEN","funded":"true","limit":"100"}
-        if cursor: params["cursor"]=cursor
-        payload=get_json(MOLT.rstrip("/")+"/jobs?"+urlencode(params))
-        pages.append(payload)
-        batch=extract_rows(payload,("data",))
-        for row in batch:
-            if isinstance(row,dict):
-                row=dict(row); row["_funded_filter"]=True
-                ident=str(first(row,"id","jobId") or "")
-                if not ident or ident not in seen:
+    rows, seen, page_count = [], set(), 0
+    filters = (("all_open", None), ("funded_only", "true"))
+    for filter_name, funded_value in filters:
+        cursor = None
+        for _ in range(20):
+            params = {"status": "OPEN", "limit": "100"}
+            if funded_value is not None:
+                params["funded"] = funded_value
+            if cursor:
+                params["cursor"] = cursor
+            payload = get_json(MOLT.rstrip("/") + "/jobs?" + urlencode(params))
+            page_count += 1
+            batch = extract_rows(payload, ("data",))
+            for raw in batch:
+                if not isinstance(raw, dict):
+                    continue
+                row = dict(raw)
+                row["_molt_source_filter"] = filter_name
+                ident = str(first(row, "id", "jobId", "_id") or "")
+                if ident and ident not in seen:
+                    seen.add(ident)
                     rows.append(row)
-                    if ident: seen.add(ident)
-        meta=payload.get("meta") or payload.get("pagination") or {} if isinstance(payload,dict) else {}
-        cursor=first(payload,"nextCursor","next_cursor") or first(meta,"nextCursor","next_cursor")
-        if not cursor: break
-        time.sleep(2)
-    else:
-        raise RuntimeError("MoltJobs pagination safety cap reached")
-    return rows, {"pages":len(pages),"funded_filter":"true"}
-
+            meta = payload.get("meta") or payload.get("pagination") or {} if isinstance(payload, dict) else {}
+            cursor = first(meta, "nextCursor", "next_cursor") or first(payload, "nextCursor", "next_cursor") if isinstance(payload, dict) else None
+            if not cursor:
+                break
+            time.sleep(0.5)
+        else:
+            raise RuntimeError("MoltJobs pagination safety cap reached for " + filter_name)
+    return rows, {"pages": page_count, "filters": ["all_open", "funded=true"], "deduplicated": True, "public_get_only": True}
 def scan_dealwork():
     url=DEALWORK.rstrip("/")+"/jobs?"+urlencode({"per_page":20,"sort":"newest"})
     payload=get_json(url)
