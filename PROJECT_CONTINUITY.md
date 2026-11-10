@@ -382,3 +382,9 @@ The assistant must then:
 2. Do not submit the article unless the user authorizes the 0.001 OUSD submission cost and the account/wallet authorization gate is resolved.
 3. Expand discovery beyond the three agent marketplaces toward legitimate no-cost AI contributor/task platforms with public task discovery and permitted automation. Screen for India eligibility, AI execution permission, no upfront purchases, verifiable payout, and positive net economics.
 4. Keep all writes, wallet operations, registrations and paid submissions disabled until each platform's owner-consent and financial authorization gates are met.
+
+
+### Latest refreshed scan — 2026-11-11 02:00 IST
+- Run `42895597762` completed successfully; job `130107788654` passed checkout, tests, scanner and artifact upload. Artifact ID `13798589771`, name `nexus-funded-jobs-42895597762`; report timestamp `2026-11-10T20:28:24.670174Z`.
+- Marketplace counts unchanged: MoltJobs 10, Dealwork 20, Taskmarket 5. All five Taskmarket tasks remain `open` in the fresh response; all five receipts still return successful status and matching token transfer to the correct Taskmarket Diamond. The game bounty deadline is 2026-11-10 21:16:20Z (02:46:20 IST), so at this scan it still had about 48 minutes; not selected due the infeasible secure build/test/deploy window.
+- The 1 OUSD article task still had 42 submissions, zero awards, and deadline 2026-11-11 07:59:04Z (13:29:04 IST). The research draft is prepared but unsubmitted. No wallet or payment authority is available; later bounty submissions incur the documented 0.001 OUSD fee after the first five submissions.
