@@ -44,5 +44,14 @@ class SourceVerifierTests(unittest.TestCase):
         issue=self.issue(labels=[{"name":"👥 Core Team Only"}])
         self.assertEqual(classify_source(self.candidate(),issue,[])[0],"EXCLUDED_SOURCE_RESTRICTED")
 
+    def test_parse_issuehunt_original_issue_url(self):
+        self.assertEqual(parse_issue_url("https://oss.issuehunt.io/r/nwjs/nw.js/issues/6794"),("nwjs/nw.js",6794,"issues"))
+
+    def test_grade_c_escrow_issuehunt_enters_low_confidence_source_check(self):
+        row=self.candidate()
+        row["payout_grade"]="C"
+        row["original_url"]="https://oss.issuehunt.io/r/avajs/ava/issues/595"
+        self.assertTrue(is_cashworthy(row))
+
 if __name__ == "__main__":
     unittest.main()
