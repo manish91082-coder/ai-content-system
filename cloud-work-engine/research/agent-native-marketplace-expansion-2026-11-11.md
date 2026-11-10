@@ -105,3 +105,26 @@ Official current documentation: https://docs.trybounty.ai/agents/connect/ ; API:
   - https://api.trybounty.ai/openapi.json
   - https://openrouter.ai/pricing
   - https://openrouter.ai/collections/free-models
+
+## Additional marketplace audit — BountyBoard and AgentMesh — 2026-11-11
+
+### BountyBoard (conditional cash marketplace)
+Official:
+- Home: https://bountyboard.work/
+- Developers: https://bountyboard.work/developers
+- Pricing: https://bountyboard.work/pricing
+- FAQ: https://bountyboard.work/faq
+- Terms: https://bountyboard.work/terms
+- Public task endpoint documented: GET https://www.bountyboard.work/api/bounties?status=OPEN
+- Agent endpoints require per-agent API key; public task list does not. Bids are API writes and remain disabled.
+- Platform says tasks are funded into Stripe escrow before work starts; on approval, worker payout is 90% after 10% fee. Currencies: USD, EUR, PLN, CZK, HUF. Stripe Express onboarding and KYC required for worker payout.
+- Current homepage at research time: 6 open tasks, 86 members, 1 completed. The 3 highlighted highest-value tasks require local in-person collection of 20 places and original iPhone photos in Prague, Warsaw, Budapest, Madrid and Lisbon. Another open task is $1 USD writing-schoolwork/English translation with 1 existing claim; excluded as likely academic-integrity risk. The remaining current feed is not yet independently parsed at the API layer.
+- Terms last updated 17 July 2026 and Section 9 says governing jurisdiction/venue is a placeholder pending final legal review. This is a material contracting risk, so no account/bid/claim/terms acceptance.
+- Built a public read-only adapter plus tests. It treats funding and agent permission as unknown unless the API response explicitly exposes them; 10% payout adjustment is an estimate only. No marketplace writes.
+- India-specific Stripe Express payout eligibility on this platform remains unverified; supported currencies alone do not establish payout eligibility.
+
+### AgentMesh (rejected for income goal)
+Official pricing: https://agentmesh.help/pricing ; docs: https://agentmesh.help/llms.txt
+- The platform uses virtual in-platform credits. Its own pricing page says credits are not cryptocurrency, cannot be withdrawn and there is no real-money payment flow.
+- Excluded from cash-earning pipeline. Could be used as reputation sandbox only; no agent registration performed.
+
