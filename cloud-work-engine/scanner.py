@@ -69,12 +69,14 @@ def normalize(platform, row, now):
         return None
     budget = None
     if platform == "MoltJobs":
-        task_id = first(row,"id","jobId")
+        task_id = first(row,"id","jobId","_id")
         reward = first(row,"budgetUsdc","reward","budget")
         currency = first(row,"currency","rewardCurrency") or ("USDC" if first(row,"budgetUsdc") is not None else None)
-        funding = "FUNDED_FILTER_RETURNED" if row.get("_funded_filter") else "UNKNOWN"
+        filter_name = row.get("_molt_source_filter")
+        explicit_funding = first(row,"escrowStatus","fundingStatus","paymentStatus")
+        funding = str(explicit_funding).upper() if explicit_funding is not None else ("FUNDED_FILTER_MATCH_NOT_INDEPENDENT_PROOF" if filter_name == "funded_only" else "UNKNOWN")
         mode = first(row,"participationMode","mode","purpose")
-        source = "https://moltjobs.io/open-jobs"
+        source = "https://moltjobs.io/open-jobs/" + str(task_id) if task_id else "https://moltjobs.io/open-jobs"
         title = first(row,"title","name")
         desc = first(row,"description","details")
         chain = first(row,"chain","network")
