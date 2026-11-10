@@ -20,16 +20,38 @@ def get_json(url, attempts=4):
             time.sleep(min(2 ** n, 12))
     raise RuntimeError("GET failed after retries: " + str(last))
 def unpack(payload):
-    if isinstance(payload, list): return payload, None
-    if not isinstance(payload, dict): return [], None
+    """Accept documented {data:[...]} envelopes and common cursor metadata layouts."""
+    if isinstance(payload, list):
+        return payload, None
+    if not isinstance(payload, dict):
+        return [], None
+
+    data = payload.get("data")
     rows = None
-    for key in ("jobs","data","items","results"):
-        if isinstance(payload.get(key), list): rows = payload[key]; break
-    if rows is None and isinstance(payload.get("data"), dict):
-        for key in ("jobs","items","results"):
-            if isinstance(payload["data"].get(key), list): rows = payload["data"][key]; break
-    meta = payload.get("meta") or {}
-    return rows or [], meta.get("nextCursor") or meta.get("next_cursor")
+    if isinstance(data, list):
+        rows = data
+    elif isinstance(data, dict):
+        for key in ("jobs", "items", "results"):
+            if isinstance(data.get(key), list):
+                rows = data[key]
+                break
+
+    if rows is None:
+        for key in ("jobs", "items", "results"):
+            if isinstance(payload.get(key), list):
+                rows = payload[key]
+                break
+
+    meta = payload.get("meta") or payload.get("pagination") or {}
+    if not isinstance(meta, dict):
+        meta = {}
+    cursor = (
+        payload.get("nextCursor") or payload.get("next_cursor")
+        or meta.get("nextCursor") or meta.get("next_cursor")
+        or (data.get("nextCursor") if isinstance(data, dict) else None)
+        or (data.get("next_cursor") if isinstance(data, dict) else None)
+    )
+    return rows or [], cursor
 def main():
     all_rows, raw_pages, cursor, seen = [], [], None, set()
     for page in range(20):
