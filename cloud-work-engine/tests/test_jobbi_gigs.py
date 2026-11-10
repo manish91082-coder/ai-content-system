@@ -102,6 +102,7 @@ class JobbiTests(unittest.TestCase):
                 jobbi.STATE_FILE = original_state
         self.assertEqual(payload["title"], "cached feed")
         self.assertTrue(meta["cached_without_request"])
+        self.assertTrue(meta["not_modified"])
         self.assertEqual(meta["poll_window_seconds"], 3600)
 
 if __name__ == "__main__":
