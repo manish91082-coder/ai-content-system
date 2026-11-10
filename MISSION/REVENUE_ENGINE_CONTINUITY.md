@@ -639,3 +639,14 @@ Deployment script is hardened to validate the original worker key, capture the n
 A no-network mock test checks the valid path plus two stop conditions (FullAccess remains, wrong receiver scope). Latest Python Actions run #63, ID `42776847117`, job ID `129697239134`: **17/17 tests pass**, attack demo pass, shell syntax pass, mocked key-safety test pass. Rust source has not changed since the last successful run #17 (11/11 contract tests, rustfmt, WASM build).
 
 The deployment test uses fake `near` and `cargo` commands only. No local wallet, OS keychain, real testnet account, network transaction or funds were used. Testnet deployment and user-controlled wallet setup remain outstanding. ₹0 verified revenue remains the ledger.
+
+
+---
+
+## 2026-11-10 — FINAL CI STATUS FOR THIS RESUME CHECKPOINT
+
+Rust Actions run #26 (ID `42776772591`, job `129696995790`) completed successfully: formatting, 11 contract tests (0 failed), release WASM build. Rust contract source is unchanged since this successful run. Python Actions run #63 (ID `42776847117`) completed successfully: 17 tests, benign ALLOW / hostile BLOCK demo, shell syntax, mocked key-scope deployment safety test. Latest branch head: `2d1051bed899cfd2063a9574f7c835bf4415da06`.
+
+Clarification from the current official NEAR HACKATHON page: no wallet connection is needed to submit; a NEAR account address is entered for any eventual prize payment. The user-only gate is the true mainnet NEAR account address and approval of final form/public post. Never ask for seed phrases, private keys or signing access.
+
+Draft PR #7 remains open, unmerged and unsubmitted. Testnet deployment is still not done. Verified revenue remains ₹0.
