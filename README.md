@@ -49,4 +49,4 @@ This project is located in the dedicated branch `near-hackathon/agentguard-v0` a
 
 The project targets **AI Security & Defense** only. It does not claim a complete Agent Economy workflow.
 
-For the detailed project README, test commands, security limitations and fresh-work disclosure, see [NEAR_AGENTGUARD/README.md](NEAR_AGENTGUARD/README.md).
+License: [MIT, scoped to NEAR_AGENTGUARD/](NEAR_AGENTGUARD/LICENSE). For the detailed project README, test commands, security limitations and fresh-work disclosure, see [NEAR_AGENTGUARD/README.md](NEAR_AGENTGUARD/README.md).
