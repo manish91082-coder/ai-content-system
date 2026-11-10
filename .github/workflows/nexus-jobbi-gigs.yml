@@ -7,11 +7,15 @@ on:
   push:
     paths:
       - "cloud-work-engine/jobbi_gigs.py"
+      - "cloud-work-engine/jobbi_source_verifier.py"
       - "cloud-work-engine/tests/test_jobbi_gigs.py"
+      - "cloud-work-engine/tests/test_jobbi_source_verifier.py"
       - ".github/workflows/nexus-jobbi-gigs.yml"
 
 permissions:
   contents: read
+  issues: read
+  pull-requests: read
 
 concurrency:
   group: nexus-jobbi-gigs
@@ -20,14 +24,16 @@ concurrency:
 jobs:
   discover-and-rank:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       REPORT_DIR: report
       NEXUS_STATE_DIR: .nexus_state
+      GITHUB_TOKEN: ${{ github.token }}
+      JOBBI_SOURCE_CHECK_LIMIT: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Restore Jobbi feed cache
+      - name: Restore Jobbi feed and verification state
         uses: actions/cache@v4
         with:
           path: .nexus_state
@@ -40,12 +46,15 @@ jobs:
         run: python -m unittest discover -s cloud-work-engine/tests -v
       - name: Fetch Jobbi agent lane (hourly only)
         run: python cloud-work-engine/jobbi_gigs.py
-      - name: Upload normalized feed and ranked candidates
+      - name: Verify original GitHub issues and live competition
+        run: python cloud-work-engine/jobbi_source_verifier.py
+      - name: Upload normalized feed, ranked candidates and source evidence
         uses: actions/upload-artifact@v4
         with:
           name: nexus-jobbi-gigs-${{ github.run_id }}
           path: |
             report/jobbi-opportunities.json
-            .nexus_state/jobbi_feed_state.json
+            report/jobbi-source-verification.json
+            .nexus_state/
           if-no-files-found: error
           retention-days: 14
