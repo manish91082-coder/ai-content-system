@@ -401,3 +401,31 @@ The assistant must then:
 - No registrations, keys, wallets, deposits, claims, submissions, or spending occurred.
 - Detailed audit: cloud-work-engine/research/agent-native-marketplace-expansion-2026-11-11.md
 - Next: validate BasedAgents public GET schema and Verdikta feed schema, then add read-only adapters only. Keep all write operations absent.
+
+
+## 16. BasedAgents live adapter — first verified cloud scan (2026-11-11)
+
+### Implementation
+- Added public read-only adapter in `cloud-work-engine/scanner.py` for `GET https://api.basedagents.ai/v1/tasks?status=open&limit=100&offset=0`.
+- Normalizes task ID, title, description, bounty, token/network, creator type, expiry, escrow and claimability.
+- Added unit tests for funded bounty bond gate, free reputation-only task exclusion, and unready escrow.
+- The scanner has no BasedAgents registration, claim, deliver, wallet, signature, or payment code.
+- First implementation commit: `ae873e58a684177925ac17b23ac79ad7d0496791`; tests commit: `40ce23e042cc012ab78df8a1f2693a35fc738c3e`.
+- Follow-up classification commit distinguishes sign-at-accept bounty (not prefunded) from actual escrow: scanner `061385bf60862490e2774151fb4e28580e2a02c2`; tests `57c38bbe1683913ea2f9ea26b215d9f432e0b465`.
+
+### First live result
+- GitHub Actions run `42896368586`: https://github.com/manish91082-coder/ai-content-system/actions/runs/42896368586
+- Run completed successfully. Unit tests and scanner succeeded; artifact `nexus-funded-jobs-42896368586`, ID `13799399561`.
+- The live scanner queried all four sources: MoltJobs 10, Dealwork 20, Taskmarket 5, BasedAgents 16; total 51 listings.
+- BasedAgents 16 records: 6 free/no-cash tasks, excluded from revenue; 10 bounty tasks, all are sign-at-accept with no escrow object and payment_status=pending, therefore not prefunded/guaranteed. The initial classifier labeled them generic escrow-not-ready; follow-up patch now identifies the exact sign-at-accept risk.
+- The 10 paid-looking tasks are clustered around one poster, Industrial Platform / Sentinel. Five list 0.25 USDC but require genuine external installation plus at least 0.50 USDC of settled Industrial Platform revenue across two UTC days and a second-day paid cycle. Five list 2.00 USDC cashback but require at least 2.50 USDC of settled revenue across two UTC days and a second-day paid call. This requires an existing authorized external runtime, wallet/payer setup and generating paid usage; it is not a zero-cost, self-contained assignment. Exclude from pilot.
+- One free BasedAgents task asks for a multi-day full self-host stack kit and public delivery. It is not paid, takes several focused days and has a seven-day claim window; do not claim for revenue objective.
+- Artifact was downloaded and inspected locally. No account, agent key, wallet, bond, claim or delivery was created.
+
+### Current workflow verification
+- Run `42896513388` was triggered by the follow-up classifier/test commit. At the last status check it was in progress. Do not mark this follow-up run successful until its final conclusion is fetched.
+
+### Decision
+- BasedAgents adapter is implemented and its first live execution is verified. Current sample has zero suitable tasks for the user's zero-upfront-cost/no-external-installation constraints.
+- Continue hourly read-only monitoring. If BasedAgents later exposes funded, claimable, genuinely escrow-backed tasks, they remain blocked until a wallet and 1 USDC per-slot bond are explicitly authorized. Sign-at-accept tasks remain blocked as non-prefunded.
+- Next: inspect current run `42896513388` to verify the classifier patch, then validate Verdikta task detail/on-chain status and BotBounty canonical API before adding either adapter.
