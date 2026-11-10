@@ -1,0 +1,30 @@
+name: Nexus funded job scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nexus-funded-job-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run read-only scanner
+        run: python cloud-work-engine/scanner.py
+      - name: Upload scan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-funded-jobs-${{ github.run_id }}
+          path: report/
+          if-no-files-found: error
+          retention-days: 7
