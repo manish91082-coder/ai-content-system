@@ -14,7 +14,10 @@ MIN_USDC = Decimal(os.getenv("MOLTJOBS_MIN_WATCH_USDC", "50"))
 RISK_TERMS = (
     "investment advice", "portfolio recommendation", "wealth management advice",
     "buy or sell", "securities recommendation", "legal advice", "regulated financial advice",
-    "guaranteed return", "stock picks"
+    "guaranteed return", "stock picks", "sovereign wealth fund",
+    "investment strategies", "portfolio management market",
+    "asset management market", "digital stock exchange",
+    "asset tokenization", "central bank digital currency"
 )
 
 def latest_scan():
