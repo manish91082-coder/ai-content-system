@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Read-only multi-marketplace opportunity scanner. Python standard library only."""
 import json, os, sys, time
+sys.path.insert(0, os.path.dirname(__file__))
+import bounty_agent
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from urllib.parse import urlencode
