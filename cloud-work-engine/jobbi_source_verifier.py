@@ -151,7 +151,7 @@ def classify_source(item, issue, comments):
             return "SOURCE_REVIEW_REQUIRED", "original_issue_stale_over_180_days; confirm still actionable"
     except (ValueError, TypeError):
         pass
-    return "CANDIDATE_NEEDS_OPERATOR_GATE", "issue_open_unassigned_no_recent_attempt_or_pr_in_reviewed_comments; confirm board claim and legal payout terms"
+    return "CANDIDATE_NEEDS_OPERATOR_GATE", "issue_open_unassigned_no_recent_attempt_or_pr_in_reviewed_comments; operator gate required for board claim and payout terms"
 
 def verify_one(item):
     parsed = parse_issue_url(item.get("original_url"))
