@@ -587,3 +587,21 @@ The user explicitly granted full permission and delegated execution decisions. R
 
 ### Current revenue ledger
 Verified revenue, awarded prizes, claimable awards and settled payments remain ₹0. Code, passing CI, draft PRs and hackathon entry preparation are not income.
+
+
+---
+
+## 2026-11-10 RESUME UPDATE — SETTLEMENT WINDOW + LIVE HACKATHON
+
+The latest user instruction accepts genuinely confirmed payments or awards with a 30-, 35-, 60- or up-to-90-day payout window, ranked in increasing time-to-payment. Keep the ₹10 crore objective unchanged. Rank 0–30 days first, 31–35 second, 36–60 third and 61–90 last; exclude >90 days unless the user changes this. From Day 0 = 2026-11-09 the boundaries are Dec 9, Dec 14, Jan 8 and Feb 7, respectively.
+
+Track earned/awarded, accepted/approved, vested/claimable, withdrawable, requested, destination settled and net realized as distinct states. Earnings can first arrive in a platform balance, crypto wallet, PayPal or bank; do not conflate that with INR bank settlement.
+
+### NEAR HACKATHON timing update
+The live event website says submissions close 2026-11-14 23:59 UTC and results are announced by 2026-11-18 23:59 UTC: https://nearhackathon.com/. A participant-held copy of the organiser's HACKATHON.md (provenance states copied from the live file on 2026-11-04) says Q-016: one payment, no vesting, within 30 days of results, paid in NEAR. Re-read the live organiser Markdown before submission. If results are announced on Nov 18, the stated payment ceiling is approximately Dec 18, Day 39 from Day 0, i.e. the **36–60-day** band and within the current 90-day tolerance. This is not Day-30 cash and is not guaranteed; award and wallet receipt remain unearned until formally confirmed.
+
+AgentGuard remains the strongest immediate submission candidate: AI Security & Defense only; public repo and X demo post are required; local-only demo is allowed by the copied organiser rules when reproducible and shown by video; NEAR payout address and submission consent are human-only. No submission/public post or award is claimed.
+
+PayPal Sentinel: results expected around Dec 21, with payment up to 60 days after completed winner forms, so it falls outside Day 90 from Nov 9 in the conservative calendar. Keep as long-horizon upside, not a 90-day primary route.
+
+See the appended settlement-horizon reconciliation in `MISSION/REVENUE_OPPORTUNITY_AUDIT_2026-11-09.md` and the current execution handoff in `MISSION/MASTER_EXECUTION_LOG.md`.
