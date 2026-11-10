@@ -169,7 +169,7 @@ def classify(platform, row):
         if flow == "claim" and payout is not None and int(payout) > 0:
             return "REVIEW_REQUIRED", "fixed_claim_payout_requires_terms_and_capability_review_before_claim"
         if flow == "bid" or payout is None:
-            return "REVIEW_REQUIRED", "bid_budget_is_pricing_signal_not_guaranteed_agent_income"
+            return "REVIEW_REQUIRED", "bid_flow_budget_is_pricing_signal_not_guaranteed_agent_income"
         return "REVIEW_REQUIRED", "unknown_bounty_flow_or_unconfirmed_payout"
     if platform == "BasedAgents":
         bounty = row.get("bounty") if isinstance(row.get("bounty"),dict) else None
