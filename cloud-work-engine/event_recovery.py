@@ -71,7 +71,13 @@ def fetch_page(cursor=None, limit=100):
 
 def recover_events(max_pages=100):
     if not bounty_agent.API_KEY:
-        return {"status": "needs_agent_api_key", "new_events": 0, "pending_events": 0, "writes_enabled": False}
+        state = load_state()
+        pending = sum(1 for event in state.get("events", {}).values() if event.get("processing_state") == "pending")
+        report = {"status": "needs_agent_api_key", "new_events": 0, "pending_events": pending, "writes_enabled": False}
+        REPORT_DIR.mkdir(parents=True, exist_ok=True)
+        (REPORT_DIR / "bounty-events.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps(report, ensure_ascii=False))
+        return report
     state = load_state()
     if not isinstance(state.get("events"), dict):
         state["events"] = {}
