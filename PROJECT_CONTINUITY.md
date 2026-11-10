@@ -459,3 +459,30 @@ The assistant must then:
 - Docs also say Agent dashboard and Agent Card are required; API key is privileged and must remain in server-side secret storage. Stripe Connect payout setup can be completed later; India appears on supported-country list, subject to Stripe approval. Earnings are held until payout setup is approved.
 - Fresh source: https://docs.trybounty.ai/agents/connect/ ; https://docs.trybounty.ai/agents/raw-interface/ ; https://docs.trybounty.ai/agents/how-it-works/ ; https://docs.trybounty.ai/agents/sdk/ .
 - Next engineering gate: add cursor-complete pagination and separate `budget_cents` from `payout_cents`; add tests for bid-vs-claim semantics and duplicate-safe paging. Keep authenticated API adapter dormant until user creates Agent and places API key in GitHub Actions secret store.
+
+
+## 19. Phase 3 — Autonomous Bounty discovery and hired-work preparation — 2026-11-11
+
+### What is implemented
+- Added cloud-work-engine/bounty_agent.py: bearer-authenticated, read-only Bounty client with complete next_cursor pagination, repeated-cursor protection, ID deduplication, per-Bounty detail reads, payout/budget normalization, and active-work lookup (claimed,submitted,reviewing,disputed).
+- Added durable Bounty version tracking in .nexus_state/bounty_versions.json. New, changed and unchanged Bounty versions are classified; GitHub Actions cache restores/saves state across scheduled runs.
+- Added cloud-work-engine/task_triage.py: deterministic allowed-skill and risk triage. Test Bounties and unsupported/high-risk tasks are excluded; paid candidates require subsequent economics/verification review.
+- Added cloud-work-engine/model_gateway.py: OpenRouter openrouter/free only, with no paid model fallback. It refuses to send an inference request if the API key is missing and treats rate-limit/funding errors as unavailable free capacity.
+- Added cloud-work-engine/draft_executor.py: only processes work which is already hired (status=claimed, claim_status=active), excludes test Bounties, skips detail failures and attachments pending safe ingestion, and generates local Markdown drafts. Every draft is marked NOT SUBMITTED. Local QA checks substance and non-claims. Draft version deduplication is persisted.
+- Added dedicated .github/workflows/nexus-bounty-agent.yml with five-minute best-effort polling, tests, read-only discovery, triage, free-model readiness, hired-work draft preparation, state cache and 14-day report artifacts.
+- Updated primary scanner to use the same canonical Bounty pagination/details adapter and fixed the API's _id, payout_cents, budget_cents, flow, and test-Bounty semantics. Primary scanner workflow passes Bounty API key through GitHub Secrets.
+- Tests cover pagination/deduplication, detail enrichment, Bounty fixed payout vs bid budget, test Bounty exclusion, active claim gating, attachment dependency and no-key/no-paid-fallback behavior.
+
+### Cloud validation and current gate
+- Dedicated Bounty workflow 42898672894 succeeded: 27 tests passed; all steps completed. Artifact showed no Bounty API key configured, no authenticated tasks discovered, no draft created, and no marketplace writes.
+- Subsequent primary scanner test run exposed a stale expected reason string in one legacy regression test. The classifier was corrected to preserve the bid_flow prefix; the newest runs must be fetched before this checkpoint is marked fully green.
+- New workflow is a five-minute GitHub Actions schedule, not a 30-second event loop. It is best-effort and may be delayed by GitHub scheduling.
+- Required cloud Secrets (never paste into chat or source): BOUNTY_AGENT_API_KEY, OPENROUTER_API_KEY. Both are optional; missing keys produce a clean idle state.
+- OpenRouter free model route openrouter/free is the only selected route; no paid model fallback is allowed. The free tier is currently capped at 50 requests/day, subject to model/provider limits.
+- No accounts, API keys, Stripe payout setup, KYC, bids, claims, messages, submissions or payments were created. No income is claimed.
+
+### Execution policy
+- Keep discovery and draft preparation automatic.
+- Do not automatically bid/claim, message owners, or submit work until the account is configured and action authority is explicitly resolved. Accepted work is the only input to the draft executor.
+- Do not process customer-private attachments until safe file ingestion and content extraction are implemented.
+- Never label model-generated drafts as delivered, accepted or paid.
