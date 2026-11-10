@@ -667,3 +667,40 @@ Fluid program maximum caps are not expected earnings. The source repository's cu
 2. Finish PayPal Sentinel sandbox end-to-end demo before its earlier deadline (13 Nov 01:30 IST). Prize timing is outside the 30/90-day cash window, so it is upside only.
 3. Continue one carefully selected, in-scope security bounty review only after duplicate/audit/scope checks; no automated spam or speculative report.
 4. Keep all prize pools and program maximums out of the revenue ledger until an award is formally confirmed.
+
+
+---
+
+## USER SETTLEMENT-HORIZON CLARIFICATION — 2026-11-10
+
+The latest Project 10 Cr conversation clarifies that a genuinely confirmed payment/award is still acceptable when payout takes 30, 35, 60 or up to 90 days. Rank candidates in ascending time-to-payment rather than excluding everything after Day 30.
+
+Use the following ordered settlement bands from Day 0 (2026-11-09):
+1. 0–30 days: primary / fastest.
+2. 31–35 days: next priority.
+3. 36–60 days: acceptable, ranked after the first two bands.
+4. 61–90 days: outer accepted window, ranked last among currently acceptable routes.
+5. More than 90 days: outside current acceptance unless the user changes the rule.
+
+Date boundaries: Day 30 = 2026-12-09; Day 35 = 2026-12-14; Day 60 = 2027-01-08; Day 90 = 2027-02-07. Preserve the ₹10 crore North Star. This settlement tolerance does not make an unjudged entry, advertised pool, unsigned promise, pending balance or speculative estimate into revenue.
+
+Maintain separate evidence states: earned/awarded, accepted/approved, vested/claimable, withdrawable, withdrawal requested, destination settled, and net realized after fees, FX, refunds and reversals. The user has also clarified that the earning route is the priority and the payout instrument may be a platform balance, crypto wallet, PayPal or bank; withdrawal/conversion is a separate stage. Never imply that token or wallet receipt equals bank-settled INR.
+
+## NEAR HACKATHON — PAYOUT WINDOW RECONCILIATION (2026-11-10)
+
+The live organiser website currently states:
+- Submission closes 2026-11-14 23:59 UTC.
+- Results are announced by 2026-11-18 23:59 UTC.
+- Submission needs a public repository and a public X demo post; the post must identify the build as made at NEAR HACKATHON and tag @NEARProtocol and #NEARHackathon.
+Official event page: https://nearhackathon.com/
+
+A participant-held copy of the organiser's HACKATHON.md was retrieved from 0xileri/SpactVault. Its provenance comment states that it is a copy of https://nearhackathon.com/HACKATHON.md, pasted by that project owner on 2026-11-04, and explicitly says to re-read the live version before submitting. In that copy:
+- Q-016 says prize distribution is a single payment, no vesting, within 30 days of results.
+- Prizes are denominated in USD but paid in NEAR to the mainnet account supplied in the submission.
+- The track awards listed are $10,000 / $3,000 / $2,000, plus a $55,000 overall grand prize.
+- Q-010 says testnet-only projects are eligible; Q-012 says a local-only demo is acceptable with a public repo, reproducible README and demo video in the public X post.
+This is a strong rules mirror, not an independent live fetch of the Markdown endpoint. The live HTML site verifies deadline and result date; re-read the live organiser Markdown before any final submission because it controls.
+
+If results are announced on 2026-11-18, Q-016's 30-day ceiling implies payment by approximately 2026-12-18, Day 39 from Day 0. Therefore NEAR falls in the **36–60-day** band and inside the user's 90-day tolerance, but does not meet the original Day-30 bank-credit target. Payment is in NEAR, so volatility, wallet receipt, any conversion and final INR bank credit must be tracked separately. This is a competitive prize, not assured income; the award amount remains ₹0 until formally awarded/received.
+
+AgentGuard's correct fit is AI Security & Defense. Its README and current implementation must not claim a full Agent Economy workflow. Its contract is not yet deployed and no wallet, X post, demo video or submission is verified.
