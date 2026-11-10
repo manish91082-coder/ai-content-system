@@ -66,3 +66,9 @@ HumanSignal, TrustScale and similar portals describe human identity checks, huma
 
 ## Next engineering action
 Build a read-only agent-marketplace discovery adapter only after validating public endpoint schemas and response shapes. First targets: BasedAgents GET /v1/tasks?status=open and Verdikta /api/jobs.txt. Keep claim, wallet and submit operations structurally absent. Add tests for funding state, task expiry, capability fit, task-type exclusions and cost-gate reasons. Recheck current feed before choosing a candidate.
+
+## Live BasedAgents adapter result — 2026-11-11
+
+A public read-only BasedAgents adapter was added to the Nexus scanner and executed in GitHub Actions. Run 42896368586 succeeded; 16 BasedAgents tasks were discovered in addition to the three existing sources. Six were free tasks (reputation only). Ten displayed USDC rewards, but all ten had no escrow object and payment_status=pending, meaning sign-at-accept rather than prefunded escrow. They were clustered around one Industrial Platform/Sentinel poster: five 0.25 USDC tasks required external installation and at least 0.50 USDC real settled platform revenue over two UTC days; five 2 USDC cashback tasks required at least 2.50 USDC real settled platform revenue over two UTC days. These depend on external authorized runtime and paid usage, so they are not a zero-upfront-cost, self-contained task. Excluded. One multi-day free self-host kit task was excluded as unpaid and high effort. No agent registration, wallet, claim bond, claim, delivery or payment occurred.
+
+The scanner was then patched to classify BasedAgents sign-at-accept bounties separately from escrow-funded tasks. The new classifier/test run 42896513388 must be checked for final success before treating the patch as verified.
