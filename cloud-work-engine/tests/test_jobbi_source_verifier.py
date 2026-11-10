@@ -59,8 +59,8 @@ class SourceVerifierTests(unittest.TestCase):
         row["raw_metadata"]={"extra":{"funded_at":"2019-05-27T05:49:04.257Z"}}
         issue=self.issue(updated_at="2023-09-22T05:40:28Z",labels=[{"name":"Electron Parity"}])
         decision,reason=classify_source(row,issue,[])
-        self.assertEqual(decision,"EXCLUDED_STALE_UNCONFIRMED_FUNDING")
-        self.assertIn("no bounty label",reason)
+        self.assertEqual(decision,"EXCLUDED_STALE_ISSUEHUNT_FUNDING")
+        self.assertIn("one-year",reason)
     def test_issuehunt_old_funding_excluded_even_if_issue_label_says_bounty(self):
         row=self.candidate()
         row["source_board"]="issuehunt"
