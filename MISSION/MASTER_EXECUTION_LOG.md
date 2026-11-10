@@ -182,3 +182,17 @@ A mock-based no-network test is part of CI. It covers (a) the correctly scoped s
 - Python Actions run #63, run ID `42776847117`, job ID `129697239134`: **17 passed**; attack demo pass; `bash -n` pass; mocked deploy-script safety test pass. The log explicitly reports: “PASS: valid scoped key proceeds; FullAccess and wrong-scope keys stop before contract calls.”
 - Rust source/contract remains unchanged; last Rust Actions run #17 passed rustfmt, 11 unit tests and release WASM build. A newer PR run #26 is being checked separately.
 - No real testnet deployment, wallet or funds. No hackathon submission or revenue. Verified revenue remains **₹0**.
+
+
+---
+
+## 2026-11-10 — LATEST RUST CI + SUBMISSION ADDRESS CLARIFICATION
+
+- Rust Actions run #26, ID `42776772591`, job ID `129696995790`: `cargo fmt -- --check` passed; `cargo test` reports **11 passed, 0 failed**; `wasm32-unknown-unknown` release build passed. Rust contract source has not changed since this run; subsequent branch commits are deployment-helper/test/docs-only.
+- Latest Python Actions run #63 at head `2d1051bed899cfd2063a9574f7c835bf4415da06`: 17 Python tests, attack demo, deploy script syntax and mocked deployment guard test all pass.
+- PR #7 remains open, draft, unmerged, mergeable. It is not submitted to the hackathon.
+
+### NEAR payout account wording
+The current official NEAR HACKATHON submission page explicitly says no wallet connection is required to submit; a NEAR account address is entered and any prize is sent there if the project wins. Therefore the remaining user-only payout gate is to provide the actual mainnet NEAR account address for the submission form, not to connect a wallet or share a key/seed phrase. Never request or store wallet credentials. Official page: https://nearhackathon.com/
+
+No testnet deployment, X post, video, submission, award or settled revenue is claimed. ₹0 verified revenue remains.
