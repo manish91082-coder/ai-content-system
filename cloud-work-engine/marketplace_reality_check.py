@@ -9,6 +9,40 @@ from pathlib import Path
 OUT = Path(os.getenv("REPORT_DIR", "report"))
 TIMEOUT = 20
 SOURCES = {
+    "AgentHansa": {
+        "model": "agent_quest_and_collective_bounty_marketplace",
+        "policy": "Public read-only feeds only. Work submission, collective join, claims, social engagement and payout destination require agent identity or authenticated actions. Competitive quest rewards are not guaranteed income.",
+        "urls": [
+            "https://www.agenthansa.com/health",
+            "https://www.agenthansa.com/openapi.json",
+            "https://www.agenthansa.com/api/collective/bounties/public",
+            "https://www.agenthansa.com/api/offers/public",
+            "https://www.agenthansa.com/api/alliance-war/quests",
+            "https://www.agenthansa.com/api/activity",
+            "https://www.agenthansa.com/api/agents/skills"
+        ]
+    },
+    "AgentPactLegacy": {
+        "model": "agent_to_agent_usdc_escrow_base_legacy_api",
+        "policy": "Previous marketplace API. Current docs also surfaced a new api.agentpact.dev control-plane; do not assume old routes and new API represent the same operating version.",
+        "urls": [
+            "https://api.agentpact.xyz/api/public/overview",
+            "https://api.agentpact.xyz/api/needs",
+            "https://api.agentpact.xyz/api/offers",
+            "https://api.agentpact.xyz/api/deals",
+            "https://api.agentpact.xyz/health"
+        ]
+    },
+    "AgentPactNewDocs": {
+        "model": "agent_policy_and_pact_control_plane",
+        "policy": "New docs host uses api.agentpact.dev/api/v1; most operational routes require owner or agent-session auth. Probe only anonymous health and templates.",
+        "urls": [
+            "https://api.agentpact.dev/health",
+            "https://api.agentpact.dev/api/v1/health",
+            "https://api.agentpact.dev/api/v1/templates"
+        ]
+    },
+
     "AgentSouk": {
         "model": "agent_to_agent_wallet_to_wallet",
         "policy": "No custody; buyer pays seller directly in USDC on Base. No escrow protection.",
@@ -100,14 +134,16 @@ def safe_item(row):
     if not isinstance(row, dict):
         return {"type": type(row).__name__}
     return {
-        "id": row.get("id") or row.get("_id") or row.get("task_id") or row.get("slug"),
-        "title": row.get("title") or row.get("name"),
+        "id": row.get("id") or row.get("_id") or row.get("task_id") or row.get("slug") or row.get("bounty_id") or row.get("quest_id"),
+        "title": row.get("title") or row.get("name") or row.get("headline"),
         "status": row.get("status"),
         "flow": row.get("flow"),
         "reward": row.get("reward") or row.get("payout") or row.get("amount") or row.get("budget") or row.get("payout_cents"),
         "currency": row.get("currency") or row.get("token") or row.get("rewardCurrency"),
-        "escrow": row.get("escrow") or row.get("payment_state") or row.get("funding_status"),
-        "url": row.get("url") or row.get("task_url")
+        "escrow": row.get("escrow") or row.get("payment_state") or row.get("funding_status") or row.get("escrow_status"),
+        "reward_pool": row.get("reward_pool") or row.get("rewardPool") or row.get("pool"),
+        "deadline": row.get("deadline") or row.get("expires_at") or row.get("end_at"),
+        "url": row.get("url") or row.get("task_url") or row.get("public_url")
     }
 
 def summarize(response):
