@@ -231,3 +231,34 @@ The assistant must then:
 
 ---
 **Non-negotiable status rule:** distinguish *planned*, *committed*, *configured*, *executed*, *verified*, *accepted*, and *paid*. Never collapse these into one status.
+
+
+## 11. Continuation update — 2026-11-11 (Phase 1A/1B)
+
+### Official MoltJobs API schema verified
+- Retrieved the official MoltJobs documentation repository's machine-readable OpenAPI spec from: https://raw.githubusercontent.com/Moltjobs/docs/main/openapi.json
+- Confirmed `GET /v1/jobs` is the public open-jobs endpoint.
+- Confirmed query parameters include `cursor`, `limit` (1–100), `status`, `vertical`, `templateId`, `funded` (boolean), `agentId`, and `posterId`.
+- Confirmed `funded=true` is explicitly described as filtering jobs whose escrow has been deposited. This supports the scanner's funded filter, but does not independently verify the live service's returned records.
+- Official docs describe a response envelope with a `data` property; list endpoints return arrays under `data`. Source: https://github.com/Moltjobs/docs
+- The direct API endpoint was not successfully queried in this execution environment; do not claim a live result.
+
+### Parser hardening and tests added
+- Updated `cloud-work-engine/scanner.py` to accept documented `{data:[...]}` envelopes and several common cursor metadata layouts.
+- Added `cloud-work-engine/tests/test_scanner.py` with 5 unit tests for documented envelope, root cursor, nested data cursor, legacy jobs array, and invalid payload handling.
+- Updated GitHub Actions workflow to run unit tests before the scanner.
+- Added a path-filtered `push` trigger to run validation after relevant project changes, while retaining manual dispatch and hourly schedule.
+- Commits: scanner `7ba05d03b6629887f1426063ad1aa9d86115fb30`; tests `039c5c96f6122241d96c1d925ea931977a5866d7`; test import fix `35843e71bed0a151723f069f4fd7bb96847c4e51`; workflow test step `99234a36db72c32574c3d00ababce18dd39ea833`; push trigger `0dd8d707b1d1616f3accff0870c3138190a8fdf8`.
+
+### Current verified execution state
+- Files/commits exist in GitHub and can be fetched back.
+- Latest Actions history query returned 197 total runs but zero runs whose workflow path matches `.github/workflows/nexus-funded-job-scan.yml`.
+- Therefore workflow execution is still **NOT VERIFIED**. The GitHub connector available in this session exposes Actions read operations but no workflow-dispatch write operation. A dispatch requires Actions:write permission according to GitHub's official REST docs: https://docs.github.com/en/rest/actions/workflows# create-a-workflow-dispatch-event (remove the space before fragment when using URL).
+- Possible causes to investigate: workflow not yet indexed/recognized, Actions disabled/restricted in repo settings, schedule not yet fired, or the connector's run listing cache/coverage. Do not assume a cause without evidence.
+
+### Next action, in order
+1. Re-query GitHub Actions runs after the latest commit and look specifically for the workflow path.
+2. If still absent, inspect repository Actions settings/workflow visibility using available read APIs; do not ask user to run terminal commands.
+3. If Actions are disabled or the connector lacks write permission, choose another genuinely zero-cost cloud executor with an assistant-accessible deployment/control path. Do not claim deployment is live merely because YAML exists.
+4. Once cloud execution is proven, inspect logs/artifact and correct any API/parser errors.
+5. Keep MoltJobs write operations disabled until agent account authorization, task-specific automation permission, funding, settlement rail, and payment route are verified.
