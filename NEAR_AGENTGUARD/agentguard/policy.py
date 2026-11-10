@@ -108,16 +108,19 @@ def evaluate(
     if intent.recipient not in policy.allowed_recipients:
         reasons.append("recipient_not_allowlisted")
 
-    if policy.allowed_contracts:
-        if not intent.contract_id:
-            return block("contract_id_required")
-        if intent.contract_id not in policy.allowed_contracts:
-            return block("contract_not_allowlisted")
-    if policy.allowed_methods:
-        if not intent.method_name:
-            return block("method_name_required")
-        if intent.method_name not in policy.allowed_methods:
-            return block("method_not_allowlisted")
+    if not policy.allowed_contracts:
+        return block("contract_allowlist_not_configured")
+    if not intent.contract_id:
+        return block("contract_id_required")
+    if intent.contract_id not in policy.allowed_contracts:
+        return block("contract_not_allowlisted")
+
+    if not policy.allowed_methods:
+        return block("method_allowlist_not_configured")
+    if not intent.method_name:
+        return block("method_name_required")
+    if intent.method_name not in policy.allowed_methods:
+        return block("method_not_allowlisted")
 
     if signals.account_age_days is None:
         reasons.append("counterparty_age_unknown")
