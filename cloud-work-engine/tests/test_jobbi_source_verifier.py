@@ -61,5 +61,22 @@ class SourceVerifierTests(unittest.TestCase):
         decision,reason=classify_source(row,issue,[])
         self.assertEqual(decision,"EXCLUDED_STALE_UNCONFIRMED_FUNDING")
         self.assertIn("no bounty label",reason)
+    def test_issuehunt_old_funding_excluded_even_if_issue_label_says_bounty(self):
+        row=self.candidate()
+        row["source_board"]="issuehunt"
+        row["raw_metadata"]={"extra":{"funded_at":"2019-03-14T10:44:34.369Z"}}
+        issue=self.issue(labels=[{"name":"Bounty $45"}])
+        decision,reason=classify_source(row,issue,[])
+        self.assertEqual(decision,"EXCLUDED_STALE_ISSUEHUNT_FUNDING")
+        self.assertIn("one-year",reason)
+
+    def test_issuehunt_existing_pr_count_excludes_task(self):
+        row=self.candidate()
+        row["source_board"]="issuehunt"
+        row["raw_metadata"]={"extra":{"funded_at":"2026-11-01T10:44:34.369Z","pull_requests":2}}
+        issue=self.issue(labels=[{"name":"Bounty $62"}])
+        decision,reason=classify_source(row,issue,[])
+        self.assertEqual(decision,"EXCLUDED_COMPETITION")
+        self.assertIn("existing pull request",reason)
 if __name__ == "__main__":
     unittest.main()
