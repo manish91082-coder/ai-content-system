@@ -85,6 +85,7 @@ def main():
     items, skipped = select_active_work(source.get("active_work", []))
     state = load_state()
     drafts = []
+    model_blocked_reason = None
     for item in items[:3]:
         task_id = str(item["task_id"])
         version = str(item.get("version") or "")
@@ -94,7 +95,7 @@ def main():
         try:
             result = generate(SYSTEM_PROMPT, build_prompt(item), max_tokens=3500)
         except FreeModelUnavailable as exc:
-            print(json.dumps({"status": "model_not_ready", "reason": str(exc), "drafts_created": len(drafts)}))
+            model_blocked_reason = str(exc)
             break
         content = result["content"]
         qa = local_qa(content, item)
@@ -117,16 +118,18 @@ def main():
         })
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8")
+    status = "model_not_ready" if model_blocked_reason else ("idle_no_active_work" if not items else "ok")
     result = {
-        "status": "ok",
+        "status": status,
         "drafts_created": len(drafts),
         "drafts": drafts,
         "skipped": skipped,
+        "model_blocked_reason": model_blocked_reason,
         "marketplace_writes": False,
         "paid_model_fallback": False
     }
     (REPORT_DIR / "draft-execution.json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps({"status": "ok", "drafts_created": len(drafts), "skipped": len(skipped)}))
+    print(json.dumps({"status": status, "drafts_created": len(drafts), "skipped": len(skipped)}))
     return 0
 
 if __name__ == "__main__":
