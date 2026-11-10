@@ -437,3 +437,14 @@ The assistant must then:
 - Corrected the test by restoring the escrow expectation and adding a separate test for `escrow: null` / `payment_status: pending` sign-at-accept bounty. Test commit: `710caa7bb72776a8cd25080e762658f181396db6`.
 - New validation run `42896620155` was queued at the latest check; fetch its final conclusion before calling the test correction verified.
 - Important live-feed result: BasedAgents has 16 open tasks, 6 free and 10 paid-looking. The 10 paid-looking entries are sign-at-accept, not escrow-funded, and all tied to Industrial Platform/Sentinel external-runtime revenue-generation prerequisites. None qualifies as a zero-upfront-cost independent assignment.
+
+
+## 17. Bounty (trybounty.ai) adapter and candidate audit — 2026-11-11
+- New candidate audit identifies Bounty as the strongest zero-capital paid-work lead so far: no agent deposit, subscription, API access fee or separate payout fee; India is on its Stripe Connect payout country list subject to Stripe approval. Payout onboarding/KYC remains an operator-controlled requirement; funds can be held until payout account is ready.
+- API discovery is authenticated: `GET https://api.trybounty.ai/v1/agent/bounties?status=open` with `Authorization: Bearer <Agent API key>`. Creating the key requires dashboard access and an Agent Card. No account/key exists in the project environment.
+- Added dormant read-only Bounty adapter in `cloud-work-engine/scanner.py`. If `BOUNTY_AGENT_API_KEY` is absent, it returns a `needs_agent_api_key` status without calling the API. If present, it only reads open bounty list. No bid/claim/message/submit routes exist in the adapter. Payout cents are normalized to currency units.
+- Added unit tests for Bounty bid-flow unknown payout and closed-task exclusion. Commits: scanner `2168ea235a4cf743f989c4c5d91a6c61b3d1b71c`; tests `5fa71103bf60e6f9a91657ba9f3e14874cb094c4`; cents normalization commit follows.
+- TryBounty supports claim (fixed funded payout) and bid (owner accepts one offer). In bid flow, payout_cents is null until acceptance; never count budget as earned revenue. India Stripe Connect is supported subject to approval; non-US payouts may still be unavailable. Buyer review is 72 hours after verification. Operator remains responsible for agent output and IP transfers on settlement.
+- BotBounty remains unverified: homepage API URL and skill.md API base differ; API feed inaccessible in research pass. Excluded pending canonical endpoint and escrow evidence.
+- Verdikta current feed still has only two highly specialist math bounties (#387, #386), 0.032 ETH each at 95% threshold; each evaluation requires approx. 0.00024 ETH prepay plus gas. No wallet signing/spend.
+- Last known validation run `42896620155` was queued; verify final status. New Bounty adapter commits will trigger a fresh Actions run. No marketplace credentials, KYC, bids, claims, submissions or payouts were created.
