@@ -6,43 +6,40 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("scanner", ROOT / "scanner.py")
 SCANNER = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SCANNER)
-unpack = SCANNER.unpack
-classify_job = SCANNER.classify_job
 
-class UnpackTests(unittest.TestCase):
-    def test_documented_data_array_envelope(self):
-        rows, cursor = unpack({"data":[{"id":"a"},{"id":"b"}]})
-        self.assertEqual([r["id"] for r in rows], ["a","b"])
-        self.assertIsNone(cursor)
+class AdapterTests(unittest.TestCase):
+    def test_taskmarket_envelope(self):
+        rows = SCANNER.extract_rows({"tasks":[{"id":"t1"}]},("tasks",))
+        self.assertEqual(rows[0]["id"],"t1")
 
-    def test_root_meta_cursor(self):
-        rows, cursor = unpack({"data":[{"id":"a"}],"meta":{"nextCursor":"p2"}})
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(cursor, "p2")
+    def test_dealwork_data_envelope(self):
+        rows = SCANNER.extract_rows({"data":{"jobs":[{"id":"d1"}]}},("data",))
+        self.assertEqual(rows[0]["id"],"d1")
 
-    def test_data_object_envelope(self):
-        rows, cursor = unpack({"data":{"jobs":[{"id":"x"}],"nextCursor":"p3"}})
-        self.assertEqual(rows[0]["id"], "x")
-        self.assertEqual(cursor, "p3")
+    def test_taskmarket_six_decimal_conversion(self):
+        self.assertEqual(SCANNER.decimal_base_units("15000000"),"15")
 
-    def test_legacy_jobs_array(self):
-        rows, cursor = unpack({"jobs":[{"id":"legacy"}]})
-        self.assertEqual(rows[0]["id"], "legacy")
-        self.assertIsNone(cursor)
+    def test_taskmarket_missing_escrow_is_blocked(self):
+        decision, reason = SCANNER.classify("Taskmarket",{"id":"x","status":"open"})
+        self.assertEqual(decision,"BLOCKED")
+        self.assertIn("escrow",reason)
 
-    def test_referral_reward_excluded(self):
-        ok, reason = classify_job({"purpose":"PLATFORM_REFERRAL","participationMode":"AUTOMATIC_FORUM_REWARD"})
-        self.assertFalse(ok)
-        self.assertIn("referral", reason)
+    def test_taskmarket_escrow_reference_requires_review(self):
+        decision, reason = SCANNER.classify("Taskmarket",{"id":"x","status":"open","escrowTxHash":"0xabc"})
+        self.assertEqual(decision,"REVIEW_REQUIRED")
+        self.assertIn("onchain",reason)
 
-    def test_normal_task_passes_to_review_only(self):
-        ok, reason = classify_job({"purpose":"TASK","participationMode":"STANDARD"})
-        self.assertTrue(ok)
-        self.assertEqual(reason, "eligible_for_next_stage_review")
+    def test_moltjobs_referral_excluded(self):
+        decision, _ = SCANNER.classify("MoltJobs",{"purpose":"PLATFORM_REFERRAL","participationMode":"AUTOMATIC_FORUM_REWARD"})
+        self.assertEqual(decision,"EXCLUDED")
 
-    def test_invalid_payload_is_safe(self):
-        self.assertEqual(unpack(None), ([], None))
-        self.assertEqual(unpack({"data":"unexpected"}), ([], None))
+    def test_dealwork_open_job_not_assumed_funded(self):
+        decision, reason = SCANNER.classify("Dealwork",{"status":"open","reward":"25"})
+        self.assertEqual(decision,"REVIEW_REQUIRED")
+        self.assertIn("funding",reason)
+
+    def test_invalid_payload(self):
+        self.assertEqual(SCANNER.extract_rows(None),[])
 
 if __name__ == "__main__":
     unittest.main()
