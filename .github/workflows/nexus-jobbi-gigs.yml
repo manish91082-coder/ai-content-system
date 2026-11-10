@@ -1,0 +1,51 @@
+name: Nexus Jobbi gig discovery
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "37 * * * *"
+  push:
+    paths:
+      - "cloud-work-engine/jobbi_gigs.py"
+      - "cloud-work-engine/tests/test_jobbi_gigs.py"
+      - ".github/workflows/nexus-jobbi-gigs.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nexus-jobbi-gigs
+  cancel-in-progress: false
+
+jobs:
+  discover-and-rank:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      REPORT_DIR: report
+      NEXUS_STATE_DIR: .nexus_state
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Restore Jobbi feed cache
+        uses: actions/cache@v4
+        with:
+          path: .nexus_state
+          key: nexus-jobbi-${{ github.run_id }}
+          restore-keys: |
+            nexus-jobbi-
+      - name: Initialize state directory
+        run: mkdir -p .nexus_state report
+      - name: Run complete cloud-engine tests
+        run: python -m unittest discover -s cloud-work-engine/tests -v
+      - name: Fetch Jobbi agent lane (hourly only)
+        run: python cloud-work-engine/jobbi_gigs.py
+      - name: Upload normalized feed and ranked candidates
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-jobbi-gigs-${{ github.run_id }}
+          path: |
+            report/jobbi-opportunities.json
+            .nexus_state/jobbi_feed_state.json
+          if-no-files-found: error
+          retention-days: 14
