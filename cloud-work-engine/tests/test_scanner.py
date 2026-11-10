@@ -53,6 +53,12 @@ class AdapterTests(unittest.TestCase):
         row = {"task_id":"t3","status":"open","claimable":False,"bounty":{"amount_display":"2.00"},"escrow":{"status":"funding"}}
         decision, reason = SCANNER.classify("BasedAgents",row)
         self.assertEqual(decision,"BLOCKED")
+        self.assertIn("escrow",reason)
+
+    def test_basedagents_sign_at_accept_is_not_prefunded(self):
+        row = {"task_id":"t4","status":"open","claimable":True,"payment_status":"pending","bounty":{"amount_display":"2.00","token":"USDC","network":"eip155:8453"},"escrow":None}
+        decision, reason = SCANNER.classify("BasedAgents",row)
+        self.assertEqual(decision,"BLOCKED")
         self.assertIn("sign_at_accept",reason)
 
     def test_invalid_payload(self):
