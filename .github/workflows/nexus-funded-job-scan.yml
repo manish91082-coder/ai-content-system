@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Run scanner unit tests
+        run: python -m unittest discover -s cloud-work-engine/tests -v
       - name: Run read-only scanner
         run: python cloud-work-engine/scanner.py
       - name: Upload scan report
