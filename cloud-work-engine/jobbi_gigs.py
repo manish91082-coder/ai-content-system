@@ -69,7 +69,7 @@ def fetch_feed():
     last_request = parse_datetime(state.get("last_request_utc"))
     if isinstance(cached_body, str) and cached_body and last_request and (now - last_request).total_seconds() < 3600:
         payload = json.loads(cached_body)
-        return payload, {"http_status": 0, "cached_without_request": True, "etag_present": bool(state.get("etag")), "poll_window_seconds": 3600}
+        return payload, {"http_status": 0, "not_modified": True, "cached_without_request": True, "etag_present": bool(state.get("etag")), "poll_window_seconds": 3600}
     query = urlencode({"lane": "agent", "limit": "1000"})
     url = BASE + ("&" if "?" in BASE else "?") + query
     headers = dict(HEADERS)
