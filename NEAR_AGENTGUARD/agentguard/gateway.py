@@ -83,7 +83,7 @@ class ApprovalAuthority:
                 return False
             if payload["intent_hash"] != intent_fingerprint(intent):
                 return False
-            if not isinstance(payload["expires_at"], int) or payload["expires_at"] < int(self._clock()):
+            if not isinstance(payload["expires_at"], int) or payload["expires_at"] <= int(self._clock()):
                 return False
             nonce = payload["nonce"]
             if not isinstance(nonce, str) or not nonce:
