@@ -5,7 +5,7 @@ import os
 import re
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
@@ -14,6 +14,8 @@ from urllib.request import Request, urlopen
 REPORT_DIR = Path(os.getenv("REPORT_DIR", "report"))
 INPUT = REPORT_DIR / "jobbi-opportunities.json"
 OUTPUT = REPORT_DIR / "jobbi-source-verification.json"
+STATE_FILE = Path(os.getenv("NEXUS_STATE_DIR", ".nexus_state")) / "jobbi_source_verified.json"
+CACHE_HOURS = int(os.getenv("JOBBI_SOURCE_CACHE_HOURS", "24"))
 TOKEN = os.getenv("GITHUB_TOKEN", "")
 MAX_CHECKS = int(os.getenv("JOBBI_SOURCE_CHECK_LIMIT", "30"))
 HEADERS = {
@@ -125,7 +127,7 @@ def classify_source(item, issue, comments):
     if issue.get("pull_request"):
         return "EXCLUDED_SOURCE_IS_PR", "original_url_points_to_pull_request"
     all_comments = comments if isinstance(comments, list) else []
-    recent = all_comments[-40:] if len(all_comments) > 40 else all_comments
+    recent = all_comments[:40] if len(all_comments) > 40 else all_comments
     texts = [str(c.get("body") or "") for c in recent if isinstance(c, dict)]
     for body in texts:
         for pattern in NO_PAY_PATTERNS:
@@ -194,14 +196,63 @@ def verify_one(item):
             "checked_at_utc": datetime.now(timezone.utc).isoformat()
         }
 
+def parse_cache_time(value):
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00")).astimezone(timezone.utc)
+    except (ValueError, TypeError):
+        return None
+
+def load_cache():
+    try:
+        data = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {}
+
+def save_cache(cache):
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    STATE_FILE.write_text(json.dumps(cache, ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8")
+
+def item_signature(item):
+    payload = {key: item.get(key) for key in ("title", "summary", "original_url", "reward_amount", "reward_currency", "payment_state", "payout_grade", "claims_open")}
+    return json.dumps(payload, sort_keys=True, ensure_ascii=False)
+
 def main():
     if not INPUT.exists():
         raise RuntimeError("Jobbi feed report missing")
     source = json.loads(INPUT.read_text(encoding="utf-8"))
     rows = [x for x in source.get("opportunities", []) if is_cashworthy(x)]
     rows.sort(key=candidate_order, reverse=True)
-    selected = rows[:MAX_CHECKS]
-    results = [verify_one(item) for item in selected]
+    cache = load_cache()
+    now = datetime.now(timezone.utc)
+    selected = []
+    cached_skipped = 0
+    for item in rows:
+        key = str(item.get("id") or "")
+        signature = item_signature(item)
+        cached = cache.get(key) if key else None
+        checked = parse_cache_time(cached.get("checked_at_utc")) if isinstance(cached, dict) else None
+        reusable = (
+            isinstance(cached, dict)
+            and cached.get("signature") == signature
+            and checked is not None
+            and (now - checked) < timedelta(hours=CACHE_HOURS)
+            and cached.get("result", {}).get("source_decision") != "SOURCE_VERIFICATION_INCOMPLETE"
+        )
+        if reusable:
+            cached_skipped += 1
+            continue
+        selected.append(item)
+        if len(selected) >= MAX_CHECKS:
+            break
+    results = []
+    for item in selected:
+        result = verify_one(item)
+        results.append(result)
+        key = str(item.get("id") or "")
+        if key:
+            cache[key] = {"signature": item_signature(item), "checked_at_utc": now.isoformat(), "result": result}
+        save_cache(cache)
     counts = {}
     for row in results:
         key = row["source_decision"]
@@ -211,6 +262,8 @@ def main():
         "status": "ok",
         "jobbi_feed_candidates": len(rows),
         "source_checks_attempted": len(results),
+        "cached_results_skipped": cached_skipped,
+        "verification_cache_size": len(cache),
         "source_decision_counts": counts,
         "operator_gate_candidates": eligible,
         "results": results,
@@ -224,6 +277,7 @@ def main():
         "status": report["status"],
         "jobbi_candidates": len(rows),
         "source_checks": len(results),
+        "cached_skipped": cached_skipped,
         "source_decisions": counts,
         "operator_gate_candidates": len(eligible),
         "report": str(OUTPUT)
