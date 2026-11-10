@@ -310,9 +310,9 @@ def scan_basedagents():
 def scan_trybounty():
     if not TRYBOUNTY_API_KEY:
         return [], {"status":"needs_agent_api_key","endpoint":"/v1/agent/bounties?status=open","writes":False}
-    payload=get_json(TRYBOUNTY.rstrip("/")+"/v1/agent/bounties?status=open",extra_headers={"Authorization":"Bearer "+TRYBOUNTY_API_KEY})
-    rows=extract_rows(payload,("bounties",))
-    return rows,{"status":"authenticated_read_only","count":len(rows),"has_more":payload.get("has_more") if isinstance(payload,dict) else None,"next_cursor_present":bool(payload.get("next_cursor")) if isinstance(payload,dict) else False}
+    rows, page_meta = bounty_agent.page_bounties("open")
+    rows, detail_meta = bounty_agent.enrich_bounties(rows)
+    return rows, {"status":"authenticated_read_only","count":len(rows),"pagination":page_meta,"details":detail_meta,"writes":False}
 
 def main():
     now=datetime.now(timezone.utc).isoformat()
