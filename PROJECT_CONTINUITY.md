@@ -497,3 +497,46 @@ The assistant must then:
 - AgentMesh was rejected as revenue source: official pricing page states its credits are in-platform units, non-crypto, non-withdrawable and the platform has no real-money payment flow. Not eligible for realized-cash goal.
 - Main Bounty lifecycle ledger and event recovery now added. Run 42900051461 succeeded with 37 unit tests; no API keys present, so authenticated Bounty reads, event recovery and model drafting were clean idle modes. A unit test prints mocked two-event page coverage; do not misreport this as actual live event retrieval.
 - Next: validate live public BountyBoard API in Actions, review task detail/escrow state and AI permission, then rank only tasks with cash payout, funded escrow, explicit agent permission, no physical presence and acceptable unit economics.
+
+
+## 21. Phase 4 — MoltJobs all-open scan, cash-task watchlist and funding transition detection — 2026-11-11
+
+### Engineering changes
+- cloud-work-engine/scanner.py MoltJobs adapter now scans both:
+  1. GET /jobs?status=OPEN&limit=100
+  2. GET /jobs?status=OPEN&funded=true&limit=100
+  It paginates both feeds, deduplicates by task ID and tags source filter. A funded=true search result is explicitly not treated as escrow proof. It normalizes deadlineAt and source URL.
+- cloud-work-engine/moltjobs_watchlist.py ranks genuine independent marketplace tasks, excludes referral/forum rewards, low-value items and finance/asset-management/sovereign-wealth/CBDC exposure, and keeps high-value unpaid bid-flow listings in a watch-only state.
+- Durable state file .nexus_state/moltjobs_funding_state.json tracks each job's funded, escrowTxHash, payment status and decision. A transition to funded plus tx hash creates ESCROW_BECAME_FUNDED event requiring chain and assignment verification.
+- .github/workflows/nexus-funded-job-scan.yml now restores state, runs scanner, generates MoltJobs watchlist and uploads reports plus state.
+
+### Verified result
+- Run 42906246301: SUCCESS. Tests, read-only scanner, watchlist builder and artifact upload all passed.
+- Artifact ID 13803779486, name nexus-funded-jobs-42906246301.
+- Total 58 normalized listings:
+  - MoltJobs 18 (10 platform referral/forum rewards excluded; 8 real marketplace listings found).
+  - Dealwork 20 (all poster-unfunded in this sample).
+  - Taskmarket 4.
+  - BasedAgents 16 (10 sign-at-accept/no prefunding and 6 free reputation-only).
+- Exactly 2 high-priority MoltJobs watch items remain:
+  - WharfUp.com Landing Page: 150 USDC listed budget, 6 acceptance checks, deadline 2026-11-12 08:11:12Z / 13:41:12 IST, open BID mode, funded=false, escrowTxHash=null, paymentStatus=null.
+  - Landing page for pedex.org: 150 USDC listed budget, 6 acceptance checks, deadline 2026-11-12 08:10:40Z / 13:40:40 IST, open BID mode, funded=false, escrowTxHash=null, paymentStatus=null.
+- Their budgetType is fixed but participation mode is BID: amount is a listed bid target, not a claimable escrow reward. No agent accepted/assigned.
+- Other six independent MoltJobs items filtered as low-value, no acceptance criteria, or regulated finance/asset-management research.
+- No registration, email verification, API key generation, wallet binding, bid, claim, external message, work submission, or payment occurred.
+
+### Wider public GET probes
+- Jobbi agent lane: 216 cash/escrow candidates in current cached snapshot; original GitHub issue verification previously returned no clear operator-gate tasks among checked records. Jobbi is an index, not payer.
+- WorkPNP: one public open job of 2 USDC currently returned; not an attractive target after effort/fees.
+- BountyBoard.xyz: current public task and stats endpoints return 404 from the cloud runner; docs identify Devnet. Devnet tokens are not cash.
+- Atelier: public API returned 402; not connected.
+- TaskForce: agent task feed returned 401; no account/agent key.
+- Agent Souk: public API routes did not respond from the cloud runner; its model is direct wallet-to-wallet and does not escrow customer funds.
+- BountyBoard.work: low-value physical presence/photo and schoolwork-style jobs excluded.
+- AgentMesh: in-platform credits cannot be withdrawn, no real-cash route.
+- No credentials or wallet setup performed.
+
+### Next decision
+- Keep MoltJobs watch active until the two task deadlines, but do not spend inference/engineering time or submit work before a funded escrow and valid agent assignment appear.
+- Continue expanding source discovery only where the payout path is actually cash-settled, agents are permitted, and the work can be performed remotely at positive expected net value.
+- Count revenue only after actual payout transfer independently reconciled.
