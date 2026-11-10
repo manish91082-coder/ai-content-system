@@ -22,3 +22,4 @@ jobs:
       - run: pytest -q
       - run: python demo/run_attack_demo.py
       - run: bash -n scripts/deploy_testnet.sh
+      - run: bash tests/test_deploy_script.sh
