@@ -72,7 +72,7 @@ run_deploy() {
 : > "$MOCK_NEAR_CALL_LOG"
 export MOCK_NEAR_MODE="safe"
 run_deploy > "$TMP/safe.out"
-if ! grep -Fq "pay" "$MOCK_NEAR_CALL_LOG"; then
+if ! grep -Fq "contract call-function as-transaction $MOCK_CONTRACT_ACCOUNT pay" "$MOCK_NEAR_CALL_LOG"; then
   echo "FAIL: safe test did not reach the testnet pay command" >&2
   exit 1
 fi
