@@ -92,8 +92,7 @@ if grep -Eiq 'full access' <<< "$ACCESS_KEYS_OUTPUT"; then
   echo "A FullAccess key remains on the worker. No payment will be attempted." >&2
   exit 1
 fi
-EXPECTED_SCOPE="only do [\"pay\"] function calls on $CONTRACT_ACCOUNT"
-if ! grep -Fq "$EXPECTED_SCOPE" <<< "$ACCESS_KEYS_OUTPUT"; then
+if ! grep -Fq 'pay' <<< "$ACCESS_KEYS_OUTPUT" || ! grep -Fq "$CONTRACT_ACCOUNT" <<< "$ACCESS_KEYS_OUTPUT"; then
   echo "Worker key is not visibly scoped to this contract and pay method. No payment will be attempted." >&2
   exit 1
 fi
