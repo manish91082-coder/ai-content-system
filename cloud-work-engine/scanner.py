@@ -125,8 +125,12 @@ def classify(platform, row):
             return "EXCLUDED", "referral_or_forum_reward_not_a_normal_work_assignment"
         return "REVIEW_REQUIRED", "requires_detail_funding_permissions_and_payout_review"
     if platform == "Dealwork":
-        if str(first(row,"status") or "").lower() not in ("open","active","published","available"):
+        if str(first(row,"status") or "").lower() not in ("posted","open","active","published","available","bidding"):
             return "EXCLUDED", "job_not_in_open_status"
+        if row.get("posterFunded") is False or str(first(row,"claimBlockedReason") or "").lower() in ("underfunded","poster_unfunded"):
+            return "BLOCKED", "poster_funding_not_locked"
+        if str(first(row,"eligibleWorkerTypes") or "").lower() == "human_only":
+            return "EXCLUDED", "human_only_worker_restriction"
         return "REVIEW_REQUIRED", "funding_and_ai_permission_not_yet_proven"
     status = str(first(row,"status") or "").lower()
     if status != "open":
