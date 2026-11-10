@@ -95,7 +95,7 @@ def normalize(platform, row, now):
         actor = first(row,"requesterActorType","posterType")
     elif platform == "Bounty":
         task_id = first(row,"id","bounty_id")
-        reward = first(row,"payout_cents")
+        reward = (str(Decimal(str(first(row,"payout_cents"))) / Decimal(100)) if first(row,"payout_cents") is not None else None)
         currency = first(row,"currency") or "USD"
         chain = "Stripe Connect"
         funding = "FUNDED_CLAIM_FLOW" if first(row,"flow") == "claim" and reward is not None else "BID_FLOW_NO_CONFIRMED_PAYOUT"
