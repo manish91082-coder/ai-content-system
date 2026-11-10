@@ -14,7 +14,7 @@ Zero-cost-first cloud marketplace discovery using GitHub Actions and Python stan
 - Latest scan: 35 listings discovered (10 MoltJobs, 20 Dealwork, 5 Taskmarket).
 - MoltJobs: 10 referral/forum reward listings excluded.
 - Dealwork: 20 listings blocked because posterFunded=false; no funded work in this sample.
-- Taskmarket: 5 open listings with escrow transaction references, all sent to evidence review, not cleared for execution.
+- Taskmarket: 5 open listings with escrow transaction references. A subsequent cloud run fetched canonical details and settlement terms, then verified all 5 transaction receipts on the correct public RPCs. Each successful receipt included a payment-token Transfer to the correct Taskmarket Diamond equal to the listed reward. This proves the listed reward was deposited to the contract address, not that a worker will win or be paid.
 
 ## Safety and economics
 No registration, bids, claims, pitches, submissions, wallet actions, or payments are performed. Unknown funding, platform permissions, model/compute costs, settlement fees, acceptance risk, and India withdrawal route remain unknown. Economic gate is not evaluated. A listed reward is not income.
@@ -26,4 +26,4 @@ No registration, bids, claims, pitches, submissions, wallet actions, or payments
 - This is a discovery monitor, not a promise of task availability or earnings.
 
 ## Next gate
-Fetch Taskmarket canonical task details and terms for the five open tasks; verify chain-specific escrow transaction receipts and exact deliverable/acceptance requirements; assess task fit and net payout. Do not claim, pitch, submit, or spend any funds.
+Assess the five tasks against costs, AI execution feasibility, eligibility and submission fees. The best zero-compute candidate is a 1 OUSD economics article, but its listing already has 42 submissions; Taskmarket documentation says the first five bounty submissions are free and later submissions cost 0.001 OUSD. No wallet is authorized or funded, so do not submit or spend.
