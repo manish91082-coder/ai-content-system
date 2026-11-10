@@ -9,9 +9,9 @@ on:
       - "cloud-work-engine/bounty_agent.py"
       - "cloud-work-engine/task_triage.py"
       - "cloud-work-engine/model_gateway.py"
+      - "cloud-work-engine/draft_executor.py"
       - "cloud-work-engine/tests/test_bounty_agent.py"
       - "cloud-work-engine/tests/test_task_triage.py"
-      - "cloud-work-engine/draft_executor.py"
       - "cloud-work-engine/tests/test_draft_executor.py"
       - ".github/workflows/nexus-bounty-agent.yml"
 
@@ -49,9 +49,9 @@ jobs:
       - name: Triage opportunities (no writes)
         run: python cloud-work-engine/task_triage.py
       - name: Check free model gateway readiness
+        run: python cloud-work-engine/model_gateway.py
       - name: Prepare drafts for hired work (free model only)
         run: python cloud-work-engine/draft_executor.py
-        run: python cloud-work-engine/model_gateway.py
       - name: Upload reports and state
         uses: actions/upload-artifact@v4
         with:
