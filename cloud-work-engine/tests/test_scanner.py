@@ -61,6 +61,16 @@ class AdapterTests(unittest.TestCase):
         self.assertEqual(decision,"BLOCKED")
         self.assertIn("sign_at_accept",reason)
 
+    def test_trybounty_bid_flow_without_payout_requires_review(self):
+        decision, reason = SCANNER.classify("Bounty",{"id":"b1","status":"open","flow":"bid","payout_cents":None})
+        self.assertEqual(decision,"REVIEW_REQUIRED")
+        self.assertIn("bid_flow",reason)
+
+    def test_trybounty_closed_task_excluded(self):
+        decision, reason = SCANNER.classify("Bounty",{"id":"b2","status":"closed","flow":"claim","payout_cents":5000})
+        self.assertEqual(decision,"EXCLUDED")
+        self.assertIn("not_open",reason)
+
     def test_invalid_payload(self):
         self.assertEqual(SCANNER.extract_rows(None),[])
 
