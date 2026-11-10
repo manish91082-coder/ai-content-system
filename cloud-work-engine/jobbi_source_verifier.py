@@ -154,6 +154,11 @@ def classify_source(item, issue, comments):
     meta = item.get("raw_metadata") if isinstance(item.get("raw_metadata"), dict) else {}
     extra = meta.get("extra") if isinstance(meta.get("extra"), dict) else {}
     funded_at = parse_cache_time(extra.get("funded_at"))
+    issuehunt_prs = extra.get("pull_requests")
+    if board == "issuehunt" and funded_at and (datetime.now(timezone.utc) - funded_at).days > 365:
+        return "EXCLUDED_STALE_ISSUEHUNT_FUNDING", "IssueHunt reward funding predates one-year freshness window"
+    if board == "issuehunt" and isinstance(issuehunt_prs, int) and issuehunt_prs > 0:
+        return "EXCLUDED_COMPETITION", "IssueHunt feed reports existing pull request activity"
     if board == "issuehunt" and not bounty_labels:
         funded_age = (datetime.now(timezone.utc) - funded_at).days if funded_at else None
         try:
@@ -258,6 +263,10 @@ def main():
             and checked is not None
             and (now - checked) < timedelta(hours=CACHE_HOURS)
             and cached.get("result", {}).get("source_decision") != "SOURCE_VERIFICATION_INCOMPLETE"
+            and not (
+                str(item.get("source_board") or "").lower() == "issuehunt"
+                and cached.get("result", {}).get("source_decision") == "SOURCE_REVIEW_REQUIRED"
+            )
         )
         if reusable:
             cached_skipped += 1
