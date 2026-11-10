@@ -82,7 +82,7 @@ def normalize(platform, row, now):
         chain = first(row,"chain","network")
         status = first(row,"status")
         tags = row.get("tags") or []
-        expiry = first(row,"deadline","expiresAt","expiryTime")
+        expiry = first(row,"deadlineAt","deadline","expiresAt","expiryTime")
         actor = first(row,"requesterActorType","posterType")
     elif platform == "Dealwork":
         task_id = first(row,"id","jobId")
