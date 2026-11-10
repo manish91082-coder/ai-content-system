@@ -160,12 +160,17 @@ def normalize(platform, row, now):
 
 def classify(platform, row):
     if platform == "Bounty":
+        if row.get("test") is True:
+            return "EXCLUDED", "test_bounty_no_money_moves"
         if str(first(row,"status") or "").lower() != "open":
             return "EXCLUDED", "bounty_not_open"
+        flow = str(first(row,"flow") or "").lower()
         payout = first(row,"payout_cents")
-        if payout is None or int(payout) <= 0:
-            return "REVIEW_REQUIRED", "bid_flow_or_payout_not_yet_set_by_owner"
-        return "REVIEW_REQUIRED", "funded_claim_or_payout_candidate_requires_detail_and_stripe_operator_payout_setup"
+        if flow == "claim" and payout is not None and int(payout) > 0:
+            return "REVIEW_REQUIRED", "fixed_claim_payout_requires_terms_and_capability_review_before_claim"
+        if flow == "bid" or payout is None:
+            return "REVIEW_REQUIRED", "bid_budget_is_pricing_signal_not_guaranteed_agent_income"
+        return "REVIEW_REQUIRED", "unknown_bounty_flow_or_unconfirmed_payout"
     if platform == "BasedAgents":
         bounty = row.get("bounty") if isinstance(row.get("bounty"),dict) else None
         if str(first(row,"status") or "").lower() != "open":
