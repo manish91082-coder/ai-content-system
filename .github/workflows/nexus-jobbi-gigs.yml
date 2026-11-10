@@ -59,6 +59,7 @@ jobs:
           path: |
             report/jobbi-opportunities.json
             report/jobbi-source-verification.json
+            report/marketplace-reality-check.json
             .nexus_state/
           if-no-files-found: error
           retention-days: 14
