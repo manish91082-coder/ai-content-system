@@ -120,3 +120,35 @@ Repository: https://github.com/manish91082-coder/ai-content-system
 ### Resume invariant
 
 Continue from this live checkpoint and the two canonical MISSION files. Do not restart Phase 0, conduct Admission Desk interviews, build an arbitrary product, merge old draft PRs, or claim income without proof.
+
+
+---
+
+## 2026-11-10 — AGENTGUARD SECURITY REVIEW + CI CHECKPOINT
+
+### Security fixes added after initial passing prototype
+- Exact-expiry approval boundary: a WARN approval token is rejected when current time is equal to or later than `expires_at` (previously equality was accepted). Regression test `test_approval_is_rejected_at_exact_expiry_boundary`.
+- Mandatory allowlist enforcement: empty `allowed_contracts` and `allowed_methods` now return BLOCK with explicit configuration reasons. Previously, empty sets disabled checks and could permit any contract/method. Added tests `test_empty_contract_allowlist_fails_closed` and `test_empty_method_allowlist_fails_closed`.
+- The new Python regression test import was corrected after CI exposed a NameError; the corrected run is the passing evidence below.
+
+### Exact commit trail
+- Approval expiry fix: `84da253256f9a45e0d2c0009b2d29c477e80db2d`
+- Exact-expiry regression test: `f79b2621fa10aeafd4591c6c0022c87f0b19f137`
+- Fail-closed policy fix: `9da7b36fc3ccb7ec6f31754096bca8628630b743`
+- Allowlist regression tests: `87fbe2457c90ba1ee4714d88f649648d6dc7c06f`
+- Correct test import: `ac066986dd8a90e9a0fd51b2c975f8a7b54237d2`
+- Current AgentGuard branch head at this checkpoint: `ac066986dd8a90e9a0fd51b2c975f8a7b54237d2`.
+
+### CI evidence
+- Python Actions run #44, run ID `42775909529`, job ID `129694239690`: **17 passed**; demo benign intent ALLOW, malicious prompt-injection attempt BLOCK with signer not called; `bash -n scripts/deploy_testnet.sh` passed.
+- Rust Actions run #17, run ID `42775497815`: `cargo fmt -- --check` passed, **11 Rust contract tests passed**, WASM target build passed. Rust contract files were not modified after this run.
+- Earlier Python CI failure run #43 (run ID `42775497720`) had 2 test NameErrors from a missing top-level import. It was fixed and superseded by the successful run #44. Keep the failed run in audit history; do not hide it.
+
+### Submission / PR state
+- Draft PR #7: https://github.com/manish91082-coder/ai-content-system/pull/7
+- PR remains open, draft, unmerged and mergeable. Current scope: 18 project files; AgentGuard MIT license is scoped only to `NEAR_AGENTGUARD/`.
+- No testnet deployment, NEAR wallet, X post, YouTube demo, submission, award, claimable balance or real transaction is verified.
+- Verified mission revenue remains **₹0**.
+
+### Next engineering decision
+Review the testnet script and contract accounting edge cases before any deployment. Preserve the scoped FunctionCall key; no FullAccess key for agent; testnet faucet tokens only. Prepare actual local demo/video and owner-confirmed form values only after reproducibility audit. Keep PR draft; do not merge or submit automatically.
