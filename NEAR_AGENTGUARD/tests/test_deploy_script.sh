@@ -84,7 +84,7 @@ if run_deploy > "$TMP/full-access.out" 2>&1; then
   echo "FAIL: deployment continued despite a remaining FullAccess key" >&2
   exit 1
 fi
-if grep -Fq "pay" "$MOCK_NEAR_CALL_LOG" || grep -Fq "register_agent" "$MOCK_NEAR_CALL_LOG"; then
+if grep -Fq "contract call-function as-transaction $MOCK_CONTRACT_ACCOUNT pay" "$MOCK_NEAR_CALL_LOG" || grep -Fq "register_agent" "$MOCK_NEAR_CALL_LOG"; then
   echo "FAIL: unsafe key state reached a contract call" >&2
   exit 1
 fi
@@ -96,7 +96,7 @@ if run_deploy > "$TMP/wrong-scope.out" 2>&1; then
   echo "FAIL: deployment continued with the wrong FunctionCall receiver" >&2
   exit 1
 fi
-if grep -Fq "pay" "$MOCK_NEAR_CALL_LOG" || grep -Fq "register_agent" "$MOCK_NEAR_CALL_LOG"; then
+if grep -Fq "contract call-function as-transaction $MOCK_CONTRACT_ACCOUNT pay" "$MOCK_NEAR_CALL_LOG" || grep -Fq "register_agent" "$MOCK_NEAR_CALL_LOG"; then
   echo "FAIL: wrong receiver scope reached a contract call" >&2
   exit 1
 fi
