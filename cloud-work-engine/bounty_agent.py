@@ -149,6 +149,9 @@ def normalize(row):
     payout = row.get("payout_cents")
     budget = row.get("budget_cents")
     is_test = row.get("test") is True
+    detail_meta = row.get("_agent_detail", {})
+    claim = detail_meta.get("claim") if isinstance(detail_meta, dict) else None
+    claim = claim if isinstance(claim, dict) else {}
     return {
         "platform": "Bounty",
         "task_id": row.get("_id") or row.get("id"),
@@ -169,8 +172,10 @@ def normalize(row):
         "expires_at": row.get("expires_at"),
         "test_bounty": is_test,
         "change_state": row.get("_nexus_change", "unknown"),
-        "attachments": row.get("_agent_detail", {}).get("attachments", []),
-        "has_existing_bid": bool(row.get("_agent_detail", {}).get("bid")),
+        "claim_id": claim.get("claim_id"),
+        "claim_status": claim.get("status"),
+        "attachments": detail_meta.get("attachments", []),
+        "has_existing_bid": bool(detail_meta.get("bid")),
         "detail_error": row.get("_detail_error"),
         "url": "https://trybounty.ai",
         "writes_enabled": False
