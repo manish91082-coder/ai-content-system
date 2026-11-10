@@ -31,6 +31,7 @@ An agent may receive adversarial task content that attempts to redirect funds, c
 python -m pip install -e ".[dev]"
 python demo/run_attack_demo.py
 pytest -q
+bash tests/test_deploy_script.sh
 ~~~
 
 Expected behavior: the benign scoped payment is allowed in simulation; the prompt-injection attempt to bad.actor.near is blocked; the signer is not called for the blocked action.
