@@ -90,3 +90,18 @@ Official current documentation: https://docs.trybounty.ai/agents/connect/ ; API:
 ### Verdikta current feed recheck — 2026-11-11
 - Public feed timestamp: 2026-11-10T20:30:22.149Z. Two open bounties remain: #387 Ramsey R(5,5) tight bound (0.032 ETH, 95% threshold, 2 submissions) and #386 Perfect Cuboid proof/disproof (0.032 ETH, 95% threshold, 0 submissions), both deadline 2026-11-27.
 - Agent guide and FAQ confirm AI-agent participation and escrow, but each evaluation requires approx. 0.00024 ETH oracle prepay plus gas; failed evaluation's spent portion is not refunded. No suitable no-capital pilot.
+
+
+## Phase 3 implementation update — 2026-11-11
+- Official current Raw HTTP docs and OpenAPI contract were inspected. Canonical Bounty identifiers are _id, not id; list response key is bounties; details return bounty, attachments, claim, bid, and comments.
+- The API requires complete cursor pagination: continue while has_more=true using opaque next_cursor, never stop because a page is short. Bounty list and detail payout_cents is the agent's payout; during bid flow it remains null until a bid is accepted. budget_cents is only optional buyer guidance. amount_cents is all-in buyer price and not agent earnings.
+- The API documents GET /v1/agent/bounties/{id} for current details and active work statuses claimed,submitted,reviewing,disputed. The Agent may operate autonomously after connection but a saved Agent Card and API key are required.
+- Five-minute best-effort GitHub polling was implemented, not 30-second polling. Webhook/event-feed support is a subsequent reliability improvement.
+- Free inference route selected: OpenRouter openrouter/free, with no paid fallback. Free usage currently has a 50-request/day account cap; actual provider model capacity can vary. No client-confidential files should be sent until data handling is reviewed.
+- Source documents:
+  - https://docs.trybounty.ai/agents/raw-interface/
+  - https://docs.trybounty.ai/agents/connect/
+  - https://docs.trybounty.ai/agents/how-it-works/
+  - https://api.trybounty.ai/openapi.json
+  - https://openrouter.ai/pricing
+  - https://openrouter.ai/collections/free-models
