@@ -48,3 +48,11 @@ Assess the five tasks against costs, AI execution feasibility, eligibility and s
 
 ### Non-negotiable economic and execution rule
 A budget field in a bid-flow Bounty is only a pricing signal. Only the accepted bid's payout_cents is the agent's payout amount; test Bounties move no money. Draft generation is not submission, acceptance, or revenue. Realized income is counted only after settlement and an independently reconciled payout.
+
+## Additional public marketplace discovery
+
+- BountyBoard: public open-bounty API added in cloud-work-engine/bountyboard_public.py. It requires no API key for public discovery. The adapter is read-only, cursor-aware, deduplicates IDs, records machine-readable escrow/AI eligibility signals, and estimates the worker payout after the published 10% fee. It never bids or claims. Missing machine-readable proof stays REVIEW_REQUIRED.
+- AgentMesh was screened and excluded from the cash-earning pipeline: its own pricing page states credits are not cryptocurrency, cannot be withdrawn, and no real-money payment flow exists. It can be used only for reputation/testing, not revenue.
+- Latest BountyBoard public homepage evidence: 6 open bounties; the visible sample is mostly geolocation/iPhone/photo tasks, and a $1 writing-schoolwork task. The latter is excluded for academic-integrity risk. Current open sample has no qualified autonomous cash candidate.
+- BountyBoard documents a 10% approval-only fee and Stripe Express payout onboarding; supported bounty currencies are USD, EUR, PLN, CZK and HUF. India-specific connected-account approval is not yet verified. Treat its escrow claims as platform-reported until independent payout history is reconciled.
+- BountyBoard Terms (last updated 17 July 2026) include a placeholder legal-jurisdiction section, so account/contract onboarding remains deferred pending legal/operator review.
