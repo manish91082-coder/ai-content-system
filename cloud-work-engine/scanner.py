@@ -173,8 +173,37 @@ def scan_taskmarket():
     url=TASKMARKET.rstrip("/")+"/api/tasks?"+urlencode({"status":"open","limit":50,"sort":"newest"})
     payload=get_json(url)
     rows=extract_rows(payload,("tasks",))
-    return rows, {"has_more":payload.get("hasMore") if isinstance(payload,dict) else None,
-                  "next_cursor_present":bool(payload.get("nextCursor")) if isinstance(payload,dict) else False}
+    enriched=[]
+    # Bounded public detail/terms reads only. Never call a write endpoint.
+    for row in rows[:10]:
+        if not isinstance(row,dict):
+            continue
+        task_id=first(row,"id","taskId")
+        if not task_id:
+            enriched.append(row); continue
+        detail=None; terms=None; errors=[]
+        for label, path in (("detail",f"/api/tasks/{task_id}"),("terms",f"/api/tasks/{task_id}/terms")):
+            try:
+                result=get_json(TASKMARKET.rstrip("/") + path)
+                if label=="detail": detail=result
+                else: terms=result
+            except Exception as exc:
+                errors.append(label + ": " + str(exc))
+        merged=dict(row)
+        if isinstance(detail,dict):
+            merged["_detail_response"]=detail
+            if isinstance(detail.get("terms"),dict):
+                merged["terms"]=detail["terms"]
+            merged["pendingActions"]=detail.get("pendingActions")
+            merged["awards"]=detail.get("awards")
+        if isinstance(terms,dict):
+            merged["_terms_response"]=terms
+        merged["_detail_read_errors"]=errors
+        enriched.append(merged)
+        time.sleep(0.25)
+    return enriched, {"has_more":payload.get("hasMore") if isinstance(payload,dict) else None,
+                  "next_cursor_present":bool(payload.get("nextCursor")) if isinstance(payload,dict) else False,
+                  "details_attempted":len(enriched),"details_with_errors":sum(bool(x.get("_detail_read_errors")) for x in enriched)}
 
 def main():
     now=datetime.now(timezone.utc).isoformat()
