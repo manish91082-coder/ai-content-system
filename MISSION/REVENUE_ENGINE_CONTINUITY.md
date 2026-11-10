@@ -626,3 +626,16 @@ Draft PR #7 is open, unmerged and mergeable: https://github.com/manish91082-code
 No testnet deployment, connected wallet, testnet transaction, public X post, public YouTube demo, hackathon submission, award or revenue. ₹0 verified remains the ledger.
 
 Review the deployment-script/accounting edge cases and reproduce the local demo before marking PR ready. Any testnet owner account/keychain setup remains the account holder's secure action. Mainnet and real funds are out of scope.
+
+
+---
+
+## 2026-11-10 — DEPLOYMENT GUARD + MOCKED SAFETY TEST
+
+Current AgentGuard branch: `near-hackathon/agentguard-v0`; latest head at checkpoint `2d1051bed899cfd2063a9574f7c835bf4415da06`. Draft PR #7: https://github.com/manish91082-coder/ai-content-system/pull/7
+
+Deployment script is hardened to validate the original worker key, capture the newly created FunctionCall key exactly, delete only the identified original FullAccess key, and verify exactly one matching FunctionCall key remains with the target contract and `pay` method before any contract payment call. Any failed check halts the script before registration/payment.
+
+A no-network mock test checks the valid path plus two stop conditions (FullAccess remains, wrong receiver scope). Latest Python Actions run #63, ID `42776847117`, job ID `129697239134`: **17/17 tests pass**, attack demo pass, shell syntax pass, mocked key-safety test pass. Rust source has not changed since the last successful run #17 (11/11 contract tests, rustfmt, WASM build).
+
+The deployment test uses fake `near` and `cargo` commands only. No local wallet, OS keychain, real testnet account, network transaction or funds were used. Testnet deployment and user-controlled wallet setup remain outstanding. ₹0 verified revenue remains the ledger.
