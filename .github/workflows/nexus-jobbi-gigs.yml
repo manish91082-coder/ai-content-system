@@ -29,7 +29,7 @@ jobs:
       REPORT_DIR: report
       NEXUS_STATE_DIR: .nexus_state
       GITHUB_TOKEN: ${{ github.token }}
-      JOBBI_SOURCE_CHECK_LIMIT: 30
+      JOBBI_SOURCE_CHECK_LIMIT: 100
     steps:
       - name: Checkout
         uses: actions/checkout@v4
