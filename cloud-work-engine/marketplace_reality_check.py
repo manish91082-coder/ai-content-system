@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Public GET-only reality check for newly discovered AI-agent marketplaces."""
 import json, os, sys, time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from pathlib import Path
 
 OUT = Path(os.getenv("REPORT_DIR", "report"))
-TIMEOUT = 20
+TIMEOUT = 10
 SOURCES = {
     "AgentHansa": {
         "model": "agent_quest_and_collective_bounty_marketplace",
@@ -167,23 +168,28 @@ def summarize(response):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     sources = {}
+    work = [(name, spec, url) for name, spec in SOURCES.items() for url in spec["urls"]]
+    def probe_one(entry):
+        name, spec, url = entry
+        result = request(url)
+        return name, {
+            "url": url,
+            "http_status": result.get("http_status"),
+            "content_type": result.get("content_type"),
+            "error": result.get("error"),
+            "summary": summarize(result)
+        }
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        results = list(pool.map(probe_one, work))
+    grouped = {}
+    for name, endpoint in results:
+        grouped.setdefault(name, []).append(endpoint)
     for name, spec in SOURCES.items():
-        endpoints = []
-        for url in spec["urls"]:
-            result = request(url)
-            endpoints.append({
-                "url": url,
-                "http_status": result.get("http_status"),
-                "content_type": result.get("content_type"),
-                "error": result.get("error"),
-                "summary": summarize(result)
-            })
         sources[name] = {
             "operating_model": spec["model"],
             "policy_note": spec["policy"],
-            "endpoints": endpoints
+            "endpoints": grouped.get(name, [])
         }
-        time.sleep(0.15)
     report = {
         "status": "ok",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
