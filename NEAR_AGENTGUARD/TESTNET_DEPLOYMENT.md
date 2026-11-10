@@ -42,6 +42,10 @@ It deploys and initializes the contract, allowlists the recipient, registers the
 
 The script uses your local NEAR CLI keychain. It does not read or transmit private keys.
 
+## Automated least-privilege gate
+
+Before it registers the worker or attempts the test payment, the script checks that the worker has exactly one on-chain access key, that its public key matches the newly-created FunctionCall key, that no FullAccess permission remains, and that the visible permission is restricted to the AgentGuard contract's `pay` method. If any check fails, the script stops before the 0.001 NEAR testnet transfer.
+
 ## Manual verification after the script
 
 1. Inspect the contract account and transaction on https://explorer.testnet.near.org/
