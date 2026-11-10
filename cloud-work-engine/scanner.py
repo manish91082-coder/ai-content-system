@@ -67,6 +67,7 @@ def decimal_base_units(value, decimals=6):
 def normalize(platform, row, now):
     if not isinstance(row, dict):
         return None
+    budget = None
     if platform == "MoltJobs":
         task_id = first(row,"id","jobId")
         reward = first(row,"budgetUsdc","reward","budget")
@@ -96,18 +97,22 @@ def normalize(platform, row, now):
         expiry = first(row,"deadline","expiresAt","dueDate")
         actor = first(row,"requesterActorType","posterType")
     elif platform == "Bounty":
-        task_id = first(row,"id","bounty_id")
-        reward = (str(Decimal(str(first(row,"payout_cents"))) / Decimal(100)) if first(row,"payout_cents") is not None else None)
+        task_id = first(row,"_id","id","bounty_id")
+        payout_cents = first(row,"payout_cents")
+        budget_cents = first(row,"budget_cents")
+        reward = str(Decimal(str(payout_cents)) / Decimal(100)) if payout_cents is not None else None
+        budget = str(Decimal(str(budget_cents)) / Decimal(100)) if budget_cents is not None else None
         currency = first(row,"currency") or "USD"
         chain = "Stripe Connect"
-        funding = "FUNDED_CLAIM_FLOW" if first(row,"flow") == "claim" and reward is not None else "BID_FLOW_NO_CONFIRMED_PAYOUT"
-        mode = first(row,"flow")
+        flow = first(row,"flow")
+        funding = "FIXED_CLAIM_PAYOUT" if flow == "claim" and payout_cents is not None else "BID_PAYOUT_PENDING_OWNER_ACCEPTANCE"
+        mode = flow
         source = "https://trybounty.ai"
         title = first(row,"title")
         desc = first(row,"description")
         status = first(row,"status")
-        tags = row.get("categories") or row.get("required_capabilities") or []
-        expiry = first(row,"expires_at","deadline")
+        tags = row.get("tags") or ([first(row,"category")] if first(row,"category") else [])
+        expiry = first(row,"expires_at")
         actor = "agent_operator"
     elif platform == "BasedAgents":
         task_id = first(row,"task_id","id")
@@ -144,10 +149,11 @@ def normalize(platform, row, now):
     return {
         "platform":platform, "task_id":str(task_id) if task_id is not None else None,
         "title":title, "description":desc, "reward_amount":reward,
+        "budget_amount":budget,
         "reward_raw_base_units":str(first(row,"reward")) if platform == "Taskmarket" and first(row,"reward") is not None else None,
         "reward_currency":currency, "chain":chain, "funded_or_escrow_status":funding,
         "actor_type":actor, "task_mode":mode, "status":status, "deadline":expiry,
-        "tags":tags if isinstance(tags,list) else [], "acceptance_criteria":first(row,"acceptanceCriteria","criteria"),
+        "tags":tags if isinstance(tags,list) else [], "acceptance_criteria":first(row,"acceptanceCriteria","criteria") or first(row,"verification"),
         "source_url":source, "fetched_at":now, "settlement_terms":row.get("terms"), "computed_settlement_terms":row.get("_terms_response"), "detail_read_errors":row.get("_detail_read_errors",[]), "receipt_verification":row.get("_receipt_verification"), "pending_actions":row.get("pendingActions"), "awards":row.get("awards"), "raw":row,
         "write_actions_enabled":False
     }
