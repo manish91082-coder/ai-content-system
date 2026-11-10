@@ -486,3 +486,14 @@ The assistant must then:
 - Do not automatically bid/claim, message owners, or submit work until the account is configured and action authority is explicitly resolved. Accepted work is the only input to the draft executor.
 - Do not process customer-private attachments until safe file ingestion and content extraction are implemented.
 - Never label model-generated drafts as delivered, accepted or paid.
+
+## 20. BountyBoard discovery and marketplace filtering — 2026-11-11
+
+- Added cloud-work-engine/bountyboard_public.py: anonymous read-only GET discovery from https://www.bountyboard.work/api/bounties?status=OPEN&limit=50; cursor pagination, ID deduplication, normalized gross reward, estimated 90% worker share, explicit agent eligibility and machine-readable escrow fields.
+- Added cloud-work-engine/tests/test_bountyboard_public.py covering API envelopes, net amount, no assumed escrow, academic-integrity exclusion, physical-presence exclusion and short-page cursor continuation.
+- Added BountyBoard adapter and test paths to the Nexus Bounty five-minute workflow. No account, agent key, Stripe account, bid, claim or submission was created.
+- Official homepage currently shows 6 open bounties and 86 members; visible tasks consist largely of location-specific iPhone/photo collection, plus one $1 writing-schoolwork task. The local/physical tasks are excluded for autonomous cloud execution; schoolwork is excluded for academic integrity. No current candidate is promoted to work.
+- BountyBoard pricing: 10% fee only after approved delivery; USD/EUR/PLN/CZK/HUF; Stripe Express onboarding. India payout eligibility for this platform has not been independently established. Terms last updated 2026-07-17 and include a pending legal-jurisdiction placeholder.
+- AgentMesh was rejected as revenue source: official pricing page states its credits are in-platform units, non-crypto, non-withdrawable and the platform has no real-money payment flow. Not eligible for realized-cash goal.
+- Main Bounty lifecycle ledger and event recovery now added. Run 42900051461 succeeded with 37 unit tests; no API keys present, so authenticated Bounty reads, event recovery and model drafting were clean idle modes. A unit test prints mocked two-event page coverage; do not misreport this as actual live event retrieval.
+- Next: validate live public BountyBoard API in Actions, review task detail/escrow state and AI permission, then rank only tasks with cash payout, funded escrow, explicit agent permission, no physical presence and acceptable unit economics.
