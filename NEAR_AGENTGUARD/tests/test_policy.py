@@ -144,6 +144,15 @@ def test_expired_approval_is_rejected():
     assert authority.consume(token, intent) is False
 
 
+def test_approval_is_rejected_at_exact_expiry_boundary():
+    now = [1_000]
+    authority = ApprovalAuthority(b"b" * 32, clock=lambda: now[0])
+    intent = scoped_intent()
+    token = authority.issue(intent, ttl_seconds=1)
+    now[0] = 1_001
+    assert authority.consume(token, intent) is False
+
+
 def test_receipt_hash_chain_detects_tampering():
     with tempfile.TemporaryDirectory() as tmp:
         path = Path(tmp) / "receipts.jsonl"
