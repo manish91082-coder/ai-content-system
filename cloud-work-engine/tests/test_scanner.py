@@ -1,5 +1,12 @@
+import importlib.util
+import pathlib
 import unittest
-from cloud_work_engine.scanner import unpack
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+SPEC = importlib.util.spec_from_file_location("scanner", ROOT / "scanner.py")
+SCANNER = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(SCANNER)
+unpack = SCANNER.unpack
 
 class UnpackTests(unittest.TestCase):
     def test_documented_data_array_envelope(self):
