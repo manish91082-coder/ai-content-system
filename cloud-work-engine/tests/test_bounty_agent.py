@@ -1,6 +1,8 @@
 import pathlib
 import sys
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -43,6 +45,23 @@ class BountyAgentTests(unittest.TestCase):
         result = agent.normalize({"_id": "t", "flow": "bid", "status": "open", "test": True})
         self.assertTrue(result["test_bounty"])
         self.assertFalse(result["writes_enabled"])
+
+    def test_version_state_marks_new_then_unchanged_then_updated(self):
+        original = agent.STATE_FILE
+        with tempfile.TemporaryDirectory() as tmp:
+            agent.STATE_FILE = Path(tmp) / "versions.json"
+            try:
+                first, meta1 = agent.mark_versions([{"_id": "x", "version": 1}])
+                second, meta2 = agent.mark_versions([{"_id": "x", "version": 1}])
+                third, meta3 = agent.mark_versions([{"_id": "x", "version": 2}])
+            finally:
+                agent.STATE_FILE = original
+        self.assertEqual(first[0]["_nexus_change"], "new")
+        self.assertEqual(second[0]["_nexus_change"], "unchanged")
+        self.assertEqual(third[0]["_nexus_change"], "updated")
+        self.assertEqual(meta1["new"], 1)
+        self.assertEqual(meta2["unchanged"], 1)
+        self.assertEqual(meta3["updated"], 1)
 
 if __name__ == "__main__":
     unittest.main()
