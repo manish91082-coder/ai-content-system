@@ -235,7 +235,11 @@ def scan_taskmarket():
             merged["awards"]=detail.get("awards")
         if isinstance(terms,dict):
             merged["_terms_response"]=terms
-        merged["_detail_read_errors"]=errors\n        try:\n            merged["_receipt_verification"]=verify_taskmarket_receipt(row)\n        except Exception as exc:\n            merged["_receipt_verification"]={"status":"ERROR","error":str(exc)}
+        merged["_detail_read_errors"]=errors
+        try:
+            merged["_receipt_verification"]=verify_taskmarket_receipt(row)
+        except Exception as exc:
+            merged["_receipt_verification"]={"status":"ERROR","error":str(exc)}
         enriched.append(merged)
         time.sleep(0.25)
     return enriched, {"has_more":payload.get("hasMore") if isinstance(payload,dict) else None,
