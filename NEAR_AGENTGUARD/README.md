@@ -63,6 +63,10 @@ This implementation targets **AI Security & Defense**: deterministic spending co
 
 It does not currently claim a complete Agent Economy workflow. Agent-to-agent hiring, paid service discovery and settlement would require a separate working feature set.
 
+## Hackathon branch and baseline
+
+This project is isolated in the `NEAR_AGENTGUARD/` directory on branch `near-hackathon/agentguard-v0`. The parent repository contains unrelated pre-existing work. Review the [branch diff against master](https://github.com/manish91082-coder/ai-content-system/compare/master...near-hackathon/agentguard-v0) to identify the hackathon project changes. This submission targets AI Security & Defense only; it does not claim a complete Agent Economy workflow.
+
 ## Fresh-work disclosure
 The AgentGuard implementation in this directory is newly authored for the NEAR HACKATHON build window. The parent repository contains unrelated pre-existing work. No pre-existing product, users, customers or revenue are claimed.
 
