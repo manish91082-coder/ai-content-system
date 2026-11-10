@@ -53,5 +53,13 @@ class SourceVerifierTests(unittest.TestCase):
         row["original_url"]="https://oss.issuehunt.io/r/avajs/ava/issues/595"
         self.assertTrue(is_cashworthy(row))
 
+    def test_stale_issuehunt_listing_without_original_bounty_label_excluded(self):
+        row=self.candidate()
+        row["source_board"]="issuehunt"
+        row["raw_metadata"]={"extra":{"funded_at":"2019-05-27T05:49:04.257Z"}}
+        issue=self.issue(updated_at="2023-09-22T05:40:28Z",labels=[{"name":"Electron Parity"}])
+        decision,reason=classify_source(row,issue,[])
+        self.assertEqual(decision,"EXCLUDED_STALE_UNCONFIRMED_FUNDING")
+        self.assertIn("no bounty label",reason)
 if __name__ == "__main__":
     unittest.main()
