@@ -38,4 +38,5 @@ class LocalCoderTests(unittest.TestCase):
    self.assertTrue(ok,result)
    self.assertEqual(result["changed_files"],["README.md"])
    self.assertEqual((root/"README.md").read_text(encoding="utf-8"),"# API Rate Limiter\nLocal development guide\n")
-\nif __name__=="__main__": unittest.main()
+
+if __name__=="__main__": unittest.main()
