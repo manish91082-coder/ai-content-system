@@ -82,7 +82,7 @@ def utc_from_epoch(value):
 def title_from_challenge(challenge):
     if not isinstance(challenge, str):
         return None
-    match = re.search(r"(?m)^#\s+(.+?)\s*$", challenge)
+    match = re.search(r"(?m)^#\s+([^\r\n]+)", challenge)
     return match.group(1).strip() if match else None
 
 
