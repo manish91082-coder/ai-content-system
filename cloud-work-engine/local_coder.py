@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Local-only coding worker for already-hired tasks; no hosted inference key."""
-import json, os, re, subprocess, sys, tempfile
+import json, os, re, subprocess, sys, tempfile, zipfile
 from pathlib import Path
 from urllib.request import Request, urlopen
 
