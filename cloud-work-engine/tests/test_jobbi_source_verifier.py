@@ -79,5 +79,30 @@ class SourceVerifierTests(unittest.TestCase):
         decision,reason=classify_source(row,issue,[])
         self.assertEqual(decision,"EXCLUDED_COMPETITION")
         self.assertIn("existing pull request",reason)
+
+    def test_cached_source_verdicts_remain_in_current_report(self):
+        row=self.candidate()
+        row.update({"id":"jobbi:1","title":"T","summary":"Build API","original_url":"https://github.com/o/r/issues/1"})
+        now=datetime.now(timezone.utc)
+        cached_result={"id":"jobbi:1","source_decision":"EXCLUDED_COMPETITION","source_reason":"existing PR"}
+        cache={"jobbi:1":{"signature":item_signature(row),"checked_at_utc":now.isoformat(),"result":cached_result}}
+        results,meta=gather_source_results([row],cache,now,30,lambda item: self.fail("cached result should be reused"))
+        self.assertEqual(meta["cached_reused"],1)
+        self.assertEqual(meta["live_checks"],0)
+        self.assertEqual(results[0]["source_decision"],"EXCLUDED_COMPETITION")
+        self.assertEqual(results[0]["verification_source"],"CACHE")
+
+    def test_expired_cache_is_rechecked(self):
+        row=self.candidate()
+        row.update({"id":"jobbi:2","title":"T","summary":"Build API","original_url":"https://github.com/o/r/issues/2"})
+        now=datetime.now(timezone.utc)
+        cache={"jobbi:2":{"signature":item_signature(row),"checked_at_utc":(now-timedelta(hours=25)).isoformat(),"result":{"id":"jobbi:2","source_decision":"CANDIDATE_NEEDS_OPERATOR_GATE"}}}
+        live=lambda item: {"id":item["id"],"source_decision":"EXCLUDED_SOURCE_CLOSED","source_reason":"closed"}
+        results,meta=gather_source_results([row],cache,now,30,live)
+        self.assertEqual(meta["live_checks"],1)
+        self.assertEqual(meta["cached_reused"],0)
+        self.assertEqual(results[0]["source_decision"],"EXCLUDED_SOURCE_CLOSED")
+        self.assertEqual(results[0]["verification_source"],"LIVE")
+
 if __name__ == "__main__":
     unittest.main()
