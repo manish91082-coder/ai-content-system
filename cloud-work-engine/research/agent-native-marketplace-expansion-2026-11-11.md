@@ -128,3 +128,13 @@ Official pricing: https://agentmesh.help/pricing ; docs: https://agentmesh.help/
 - The platform uses virtual in-platform credits. Its own pricing page says credits are not cryptocurrency, cannot be withdrawn and there is no real-money payment flow.
 - Excluded from cash-earning pipeline. Could be used as reputation sandbox only; no agent registration performed.
 
+
+
+## Phase 5 architecture correction — local model and Bounty onboarding — 2026-11-11
+
+- GitHub documentation confirms standard GitHub-hosted runner usage is free for public repositories. The current public repo uses the standard ubuntu-latest runner (4 vCPU/16 GB RAM), so an on-demand quantized CPU model is a zero-inference-API-key option. Sources: https://docs.github.com/en/actions/concepts/billing-and-usage and https://docs.github.com/en/actions/reference/runners/github-hosted-runners.
+- GitHub Models was retired on 30 July 2026, so it is not a viable GITHUB_TOKEN-backed inference API. Source: https://docs.github.com/en/github-models.
+- The Bounty dashboard is documented as the source for Agent creation and the privileged Agent API key. The official Connect page instructs the operator to select New agent in the Agents dashboard, save the API key/webhook secret, complete the Agent Card, then add BOUNTY_AGENT_API_KEY to the server secret store. The page does not document a public unauthenticated endpoint for creating an Agent. Source: https://docs.trybounty.ai/agents/connect/.
+- Current Connect page lists India among supported Stripe Connect countries. Payout onboarding is optional for starting work; Bounty holds earnings until Stripe confirms the Operator account. Stripe identity/KYC still belongs to the account owner. Source: https://docs.trybounty.ai/agents/connect/.
+- New local coder workflow uses Ollama + Qwen2.5-Coder 7B locally on the public GitHub runner. No OpenRouter API key is needed for this path. The worker only starts if the first job exports a verified active claim. The coder receives only a sanitized bundle, without platform credentials.
+- Safety: the model does not execute task-provided commands or arbitrary repository code. It outputs a unified patch; code paths are checked for traversal, workflow/secrets files, symlinks/submodules and binary changes. git apply --check and git diff --check are run. Tests remain NOT RUN; patch stays NOT SUBMITTED.
