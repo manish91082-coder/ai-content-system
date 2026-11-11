@@ -106,3 +106,25 @@ A task budget, source feed escrow label, API registration, bid acceptance, or co
 - Current official Bounty documentation says the Agent is created in the Bounty Agents dashboard (New agent), where the privileged Agent API key is generated. Complete the Agent Card, then store the key server-side as BOUNTY_AGENT_API_KEY. The documented connection flow requires account-owner dashboard access; no public self-service registration endpoint is documented in the connection guide.
 - Payout setup is optional to start work. Bounty currently lists India among supported Stripe Connect countries; payout is held until Stripe confirms the Operator's account. Any Stripe KYC or identity attestations remain owner-controlled.
 - A secure browser connector has been suggested to finish the dashboard step and transfer the key directly into GitHub Actions Secrets without displaying it in chat. It is not yet connected. Do not ask the user to paste the raw API key into chat.
+
+
+## Phase 5.1 — Complete source verdict reporting and latest green validation
+
+- Fixed source verification reporting so 24-hour cached original-board verdicts are included in each report. Previously cached entries were skipped from the current report, making the full audit appear smaller than it was.
+- The source verifier now returns cached and fresh results together, labels them CACHE or LIVE, refreshes incomplete source checks, and continues to refresh IssueHunt entries whose board funding state is not yet conclusively established.
+- Added regression tests for cache visibility and expired-cache rechecks.
+- Latest run 42952851852: SUCCESS, 93/93 tests; no Bounty API key, no active work; local CPU coder correctly skipped.
+- Latest Jobbi run 42952851881: SUCCESS, 93/93 tests; 643 feed records, 324 index-level source-review candidates, 216 met source-verification filter. Full original-source audit:
+  - 86 source issues locked
+  - 36 existing attempts/PRs
+  - 34 assigned
+  - 37 closed
+  - 12 stale IssueHunt funding
+  - 5 stale unconfirmed funding
+  - 2 payout withdrawn
+  - 2 source restricted
+  - 1 source URL is a PR
+  - 1 source API 404/incomplete
+  - 0 operator-gate candidates
+- This is a verified rejection of stale/duplicate candidates, not a statement that no new opportunities can appear. Jobbi is re-indexed hourly; source feed refresh remains active.
+- Credential bootstrap remains pending the authenticated Bounty dashboard. TinyFish has been suggested but is not yet connected. Once connected, use it to create the Agent in the owner dashboard and transfer the resulting key directly to GitHub Actions Secrets. Do not paste any key into chat.
