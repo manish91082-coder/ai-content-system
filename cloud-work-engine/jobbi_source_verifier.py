@@ -242,6 +242,49 @@ def item_signature(item):
     payload = {key: item.get(key) for key in ("title", "summary", "original_url", "reward_amount", "reward_currency", "payment_state", "payout_grade", "claims_open")}
     return json.dumps(payload, sort_keys=True, ensure_ascii=False)
 
+def gather_source_results(rows, cache, now, max_checks, verify_fn):
+    results = []
+    live_items = []
+    cached_reused = 0
+    for item in rows:
+        key = str(item.get("id") or "")
+        signature = item_signature(item)
+        cached = cache.get(key) if key else None
+        checked = parse_cache_time(cached.get("checked_at_utc")) if isinstance(cached, dict) else None
+        cached_decision = cached.get("result", {}).get("source_decision") if isinstance(cached, dict) else None
+        reusable = (
+            isinstance(cached, dict)
+            and cached.get("signature") == signature
+            and checked is not None
+            and (now - checked) < timedelta(hours=CACHE_HOURS)
+            and cached_decision != "SOURCE_VERIFICATION_INCOMPLETE"
+            and not (
+                str(item.get("source_board") or "").lower() == "issuehunt"
+                and cached_decision == "SOURCE_REVIEW_REQUIRED"
+            )
+        )
+        if reusable:
+            cached_result = dict(cached["result"])
+            cached_result["verification_source"] = "CACHE"
+            results.append(cached_result)
+            cached_reused += 1
+            continue
+        live_items.append(item)
+        if len(live_items) >= max_checks:
+            break
+    for item in live_items:
+        result = verify_fn(item)
+        result["verification_source"] = "LIVE"
+        results.append(result)
+        key = str(item.get("id") or "")
+        if key:
+            cache[key] = {
+                "signature": item_signature(item),
+                "checked_at_utc": now.isoformat(),
+                "result": result
+            }
+    return results, {"live_checks": len(live_items), "cached_reused": cached_reused}
+
 def main():
     if not INPUT.exists():
         raise RuntimeError("Jobbi feed report missing")
@@ -250,38 +293,17 @@ def main():
     rows.sort(key=candidate_order, reverse=True)
     cache = load_cache()
     now = datetime.now(timezone.utc)
-    selected = []
-    cached_skipped = 0
-    for item in rows:
-        key = str(item.get("id") or "")
-        signature = item_signature(item)
-        cached = cache.get(key) if key else None
-        checked = parse_cache_time(cached.get("checked_at_utc")) if isinstance(cached, dict) else None
-        reusable = (
-            isinstance(cached, dict)
-            and cached.get("signature") == signature
-            and checked is not None
-            and (now - checked) < timedelta(hours=CACHE_HOURS)
-            and cached.get("result", {}).get("source_decision") != "SOURCE_VERIFICATION_INCOMPLETE"
-            and not (
-                str(item.get("source_board") or "").lower() == "issuehunt"
-                and cached.get("result", {}).get("source_decision") == "SOURCE_REVIEW_REQUIRED"
-            )
-        )
-        if reusable:
-            cached_skipped += 1
-            continue
-        selected.append(item)
-        if len(selected) >= MAX_CHECKS:
-            break
-    results = []
-    for item in selected:
-        result = verify_one(item)
-        results.append(result)
-        key = str(item.get("id") or "")
-        if key:
-            cache[key] = {"signature": item_signature(item), "checked_at_utc": now.isoformat(), "result": result}
-        save_cache(cache)
+    results, verification_meta = gather_source_results(rows, cache, now, MAX_CHECKS, verify_one)
+    for result in results:
+        if result.get("verification_source") == "LIVE":
+            key = str(result.get("id") or "")
+            if key:
+                cache[key] = {
+                    "signature": item_signature(next((x for x in rows if str(x.get("id") or "") == key), {})),
+                    "checked_at_utc": now.isoformat(),
+                    "result": result
+                }
+                save_cache(cache)
     counts = {}
     for row in results:
         key = row["source_decision"]
@@ -290,8 +312,8 @@ def main():
     report = {
         "status": "ok",
         "jobbi_feed_candidates": len(rows),
-        "source_checks_attempted": len(results),
-        "cached_results_skipped": cached_skipped,
+        "source_checks_attempted": verification_meta["live_checks"],
+        "cached_results_reused": verification_meta["cached_reused"],
         "verification_cache_size": len(cache),
         "source_decision_counts": counts,
         "operator_gate_candidates": eligible,
@@ -305,8 +327,9 @@ def main():
     print(json.dumps({
         "status": report["status"],
         "jobbi_candidates": len(rows),
-        "source_checks": len(results),
-        "cached_skipped": cached_skipped,
+        "source_checks": verification_meta["live_checks"],
+        "cached_reused": verification_meta["cached_reused"],
+        "results_returned": len(results),
         "source_decisions": counts,
         "operator_gate_candidates": len(eligible),
         "report": str(OUTPUT)
