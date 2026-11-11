@@ -11,6 +11,8 @@ on:
       - "cloud-work-engine/work_ledger.py"
       - "cloud-work-engine/bountyboard_public.py"
       - "cloud-work-engine/pact_market.py"
+      - "cloud-work-engine/pact_agent.py"
+      - "cloud-work-engine/tests/test_pact_agent.py"
       - "cloud-work-engine/tests/test_pact_market.py"
       - "cloud-work-engine/task_triage.py"
       - "cloud-work-engine/bundle_active.py"
@@ -33,6 +35,7 @@ jobs:
       active_work: ${{ steps.bundle.outputs.active_work }}
     env:
       BOUNTY_AGENT_API_KEY: ${{ secrets.BOUNTY_AGENT_API_KEY }}
+      PACT_AGENT_API_KEY: ${{ secrets.PACT_AGENT_API_KEY }}
       REPORT_DIR: report
       NEXUS_STATE_DIR: .nexus_state
     steps:
@@ -59,6 +62,8 @@ jobs:
         run: python cloud-work-engine/bountyboard_public.py
       - name: Discover PACT AI Market public tasks
         run: python cloud-work-engine/pact_market.py
+      - name: Read PACT agent orders and wallet (read-only)
+        run: python cloud-work-engine/pact_agent.py
       - name: Triage opportunities (no writes)
         run: python cloud-work-engine/task_triage.py
       - name: Export already-hired tasks to isolated worker bundle
