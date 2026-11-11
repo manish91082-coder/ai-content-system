@@ -64,6 +64,21 @@ def validate_patch(patch):
             if path.split("/")[0] in (".github",".git"): return False,"workflow_or_git_metadata_changes_blocked"
             if path.lower().endswith((".env",".pem",".key")) or "secret" in path.lower(): return False,"secret_file_change_blocked"
     return (True,"ok") if patch.startswith("diff --git ") else (False,"unified_git_diff_required")
+def apply_patch_to_workspace(patch_file,dest):
+    rc,check=run(["git","apply","--index","--check",str(patch_file)],cwd=dest)
+    if rc:
+        return False,{"reason":"git_apply_check_failed","details":check[-1600:],"changed_files":[]}
+    rc,out=run(["git","apply","--index",str(patch_file)],cwd=dest)
+    if rc:
+        return False,{"reason":"git_apply_failed","details":out[-1600:],"changed_files":[]}
+    rc,out=run(["git","diff","--cached","--check"],cwd=dest)
+    if rc:
+        return False,{"reason":"git_diff_check_failed","details":out[-1600:],"changed_files":[]}
+    changed=run(["git","diff","--cached","--name-only"],cwd=dest)[1].splitlines()
+    if not changed:
+        return False,{"reason":"patch_has_no_changed_files","details":"","changed_files":[]}
+    return True,{"reason":"ok","details":"","changed_files":changed}
+
 def work(task,tmp):
     text="\n".join(str(task.get(k) or "") for k in ("title","description","verification","category"))
     ref=issue_ref(text)
@@ -111,18 +126,10 @@ def work(task,tmp):
     folder.mkdir(parents=True,exist_ok=True)
     patch_file=folder/(str(task.get("task_id"))+".patch")
     patch_file.write_text(patch,encoding="utf-8")
-    rc,check=run(["git","apply","--index","--check",str(patch_file)],cwd=dest)
-    if rc:
-        return {"task_id":task.get("task_id"),"status":"blocked","reason":"git_apply_check_failed","details":check[-1600:]}
-    rc,out=run(["git","apply","--index",str(patch_file)],cwd=dest)
-    if rc:
-        return {"task_id":task.get("task_id"),"status":"blocked","reason":"git_apply_failed","details":out[-1600:]}
-    rc,out=run(["git","diff","--cached","--check"],cwd=dest)
-    if rc:
-        return {"task_id":task.get("task_id"),"status":"blocked","reason":"git_diff_check_failed","details":out[-1600:]}
-    changed=run(["git","diff","--cached","--name-only"],cwd=dest)[1].splitlines()
-    if not changed:
-        return {"task_id":task.get("task_id"),"status":"blocked","reason":"patch_has_no_changed_files"}
+    valid,qa=apply_patch_to_workspace(patch_file,dest)
+    if not valid:
+        return {"task_id":task.get("task_id"),"status":"blocked",**qa}
+    changed=qa["changed_files"]
     python_files=[x for x in changed if x.endswith(".py")]
     syntax_checks=[]
     for rel in python_files:
