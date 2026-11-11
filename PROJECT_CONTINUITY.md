@@ -620,3 +620,10 @@ The assistant must then:
 
 ### Resume instruction
 Continue from this Phase 6 checkpoint and current `master` HEAD. Do not restart marketplace discovery, Phase 5.1 source screening, or earlier adapter implementation. First resolve the secure owner-dashboard credential route where available; otherwise continue useful read-only opportunity validation and worker QA without fabricating credentials or paid work.
+
+
+## 24. Dashboard credential access audit — 2026-11-11
+- TinyFish connector/tool access is available, but its only/default Browser Context Profile is `Default`, with `domain_count=0` and `signed_in_sites=[]`. No saved PACT or Bounty dashboard session is available.
+- TinyFish account wallet inspection returned an available balance of USD 8 and auto-reload unconfigured. Its browser/agent actions are metered (listed rates: USD 0.002 per browser minute and USD 0.016 per agent step). This is an existing tool credit balance, not project revenue.
+- Because the project is zero-cost-first and no separate instruction authorized consuming metered automation credits, no browser automation or dashboard sign-in was started. No account credentials, password, OTP, or API key were accessed.
+- To resume authenticated onboarding, the owner must either authorize a bounded use of the existing metered browser credit and complete sign-in through the secure setup flow, or provide access to a suitable already-authenticated profile. Never request credentials in chat. Do not enable auto-reload or add funds.
