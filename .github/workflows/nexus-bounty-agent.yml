@@ -1,4 +1,4 @@
-name: Nexus Bounty agent discovery
+name: Nexus Bounty agent discovery and local coding worker
 
 on:
   workflow_dispatch:
@@ -8,17 +8,12 @@ on:
     paths:
       - "cloud-work-engine/bounty_agent.py"
       - "cloud-work-engine/event_recovery.py"
-      - "cloud-work-engine/bountyboard_public.py"
-      - "cloud-work-engine/tests/test_bountyboard_public.py"
       - "cloud-work-engine/work_ledger.py"
-      - "cloud-work-engine/tests/test_work_ledger.py"
+      - "cloud-work-engine/bountyboard_public.py"
       - "cloud-work-engine/task_triage.py"
-      - "cloud-work-engine/model_gateway.py"
-      - "cloud-work-engine/draft_executor.py"
-      - "cloud-work-engine/tests/test_bounty_agent.py"
-      - "cloud-work-engine/tests/test_task_triage.py"
-      - "cloud-work-engine/tests/test_draft_executor.py"
-      - "cloud-work-engine/tests/test_event_recovery.py"
+      - "cloud-work-engine/bundle_active.py"
+      - "cloud-work-engine/local_coder.py"
+      - "cloud-work-engine/tests/**"
       - ".github/workflows/nexus-bounty-agent.yml"
 
 permissions:
@@ -32,45 +27,93 @@ jobs:
   discover-and-triage:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      active_work: ${{ steps.bundle.outputs.active_work }}
     env:
       BOUNTY_AGENT_API_KEY: ${{ secrets.BOUNTY_AGENT_API_KEY }}
-      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       REPORT_DIR: report
       NEXUS_STATE_DIR: .nexus_state
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Restore deduplication state
+      - name: Restore durable Bounty state
         uses: actions/cache@v4
         with:
           path: .nexus_state
           key: nexus-bounty-state-${{ github.run_id }}
           restore-keys: |
             nexus-bounty-state-
-      - name: Initialize state directory
+      - name: Initialize report and state directories
         run: mkdir -p .nexus_state report
-      - name: Run unit tests
+      - name: Run full test suite
         run: python -m unittest discover -s cloud-work-engine/tests -v
       - name: Discover Bounty tasks (read-only)
         run: python cloud-work-engine/bounty_agent.py
-      - name: Discover BountyBoard public tasks
-        run: python cloud-work-engine/bountyboard_public.py
-      - name: Recover lifecycle events (read-only)
+      - name: Recover Bounty lifecycle events (read-only)
         run: python cloud-work-engine/event_recovery.py
       - name: Reconcile work and settlement state
         run: python cloud-work-engine/work_ledger.py
+      - name: Discover BountyBoard public tasks
+        run: python cloud-work-engine/bountyboard_public.py
       - name: Triage opportunities (no writes)
         run: python cloud-work-engine/task_triage.py
-      - name: Check free model gateway readiness
-        run: python cloud-work-engine/model_gateway.py
-      - name: Prepare drafts for hired work (free model only)
-        run: python cloud-work-engine/draft_executor.py
-      - name: Upload reports and state
+      - name: Export already-hired tasks to isolated worker bundle
+        id: bundle
+        run: python cloud-work-engine/bundle_active.py
+      - name: Upload reports and secret-free task bundle
         uses: actions/upload-artifact@v4
         with:
-          name: nexus-bounty-scan-${{ github.run_id }}
+          name: nexus-bounty-task-bundle-${{ github.run_id }}
           path: |
             report/
             .nexus_state/
           if-no-files-found: warn
           retention-days: 14
+
+  local-cpu-coder:
+    needs: discover-and-triage
+    if: needs.discover-and-triage.outputs.active_work == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    env:
+      REPORT_DIR: report
+      LOCAL_CODER_MODEL: qwen2.5-coder:7b
+    steps:
+      - name: Checkout code worker
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download sanitized task bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: nexus-bounty-task-bundle-${{ github.run_id }}
+          path: .worker-input
+      - name: Isolate sanitized bundle
+        run: |
+          mkdir -p report
+          cp .worker-input/report/active-work-bundle.json report/active-work-bundle.json
+          python -c "import json; d=json.load(open('report/active-work-bundle.json')); assert d.get('secrets_included') is False; assert d.get('tasks')"
+      - name: Install Ollama local runtime
+        run: curl -fsSL https://ollama.com/install.sh | sh
+      - name: Start local model server
+        run: |
+          ollama serve >/tmp/ollama.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:11434/api/tags >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/ollama.log
+          exit 1
+      - name: Download open-weight coder model
+        run: ollama pull qwen2.5-coder:7b
+      - name: Generate reviewable local code patches
+        run: python cloud-work-engine/local_coder.py
+      - name: Upload local code patch package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-local-code-patches-${{ github.run_id }}
+          path: report/
+          if-no-files-found: warn
+          retention-days: 30
