@@ -22,13 +22,13 @@ class LocalCoderTests(unittest.TestCase):
 
  def test_standalone_new_project_patch_applies_to_empty_git_workspace(self):
   patch_text=(
-   "diff --git a/README.md b/README.md\\n"
-   "new file mode 100644\\n"
-   "--- /dev/null\\n"
-   "+++ b/README.md\\n"
-   "@@ -0,0 +1,2 @@\\n"
-   "+# API Rate Limiter\\n"
-   "+Local development guide\\n"
+   "diff --git a/README.md b/README.md\n"
+   "new file mode 100644\n"
+   "--- /dev/null\n"
+   "+++ b/README.md\n"
+   "@@ -0,0 +1,2 @@\n"
+   "+# API Rate Limiter\n"
+   "+Local development guide\n"
   )
   with tempfile.TemporaryDirectory() as td:
    root=pathlib.Path(td)
@@ -37,5 +37,5 @@ class LocalCoderTests(unittest.TestCase):
    ok,result=apply_patch_to_workspace(p,root)
    self.assertTrue(ok,result)
    self.assertEqual(result["changed_files"],["README.md"])
-   self.assertEqual((root/"README.md").read_text(encoding="utf-8"),"# API Rate Limiter\\nLocal development guide\\n")
+   self.assertEqual((root/"README.md").read_text(encoding="utf-8"),"# API Rate Limiter\nLocal development guide\n")
 \nif __name__=="__main__": unittest.main()
