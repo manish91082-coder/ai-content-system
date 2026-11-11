@@ -142,3 +142,15 @@ A task budget, source feed escrow label, API registration, bid acceptance, or co
 - Latest scanner: run [42969039600](https://github.com/manish91082-coder/ai-content-system/actions/runs/42969039600), **SUCCESS**.
 - No PACT/Bounty agent API key, active hired order, claim, bid, submission, wallet transfer or recognized income was present. Local CPU coder correctly skipped.
 - Next gate: secure owner-dashboard agent/API-key setup; verify actual PACT seller orders and buyer escrow; execute only assigned funded orders. Keep submission and payment operations disabled pending explicit owner authorization.
+
+
+## Phase 6.1 — Supabase Vault credential bridge — 2026-11-11
+
+- Supabase project `ansezjzboysezdcfoupt` already had Vault 0.3.1. The HTTP extension 1.6 was enabled and outbound public PACT API GET connectivity was verified (HTTP 200).
+- Added `public.get_nexus_pact_agent_key()` as a `SECURITY DEFINER` read function. Execute is revoked from PUBLIC, `anon`, and `authenticated`; granted only to `service_role`. The function reads only the named `pact_agent_api_key` entry from `vault.decrypted_secrets`.
+- A temporary Vault canary was created and deleted; verification showed no remaining canary and no PACT credential stored.
+- Updated `.github/workflows/nexus-bounty-agent.yml` to resolve the named key from the restricted Supabase RPC, mask it with GitHub Actions, and place it only into that job's `GITHUB_ENV`. Supabase service credentials are scoped to the one resolution step; the separate local CPU coder job receives none of them.
+- The first bridge run caught a leading UTF-8 BOM in the existing Supabase service-key secret. The bridge normalizes a leading BOM/whitespace without printing the value.
+- Latest run [43003076008](https://github.com/manish91082-coder/ai-content-system/actions/runs/43003076008): SUCCESS; 112/112 tests passed; all discovery, Vault lookup, PACT read-only adapter, triage and artifact-upload steps succeeded. Artifact ID: 13847256749.
+- The successful run explicitly reported no PACT credential in Vault and `needs_pact_agent_api_key`; authenticated PACT reconciliation remained idle, with 0 orders seen and recognized external income 0. This is expected, not evidence of registration.
+- An attempt to carry out one-time PACT registration and write the returned credential directly into Vault was blocked by the execution safety layer. No PACT Agent was created and no key was generated. Do not use an unsafe workaround or expose the one-time key. Resume only through a supported secure provisioning path.
