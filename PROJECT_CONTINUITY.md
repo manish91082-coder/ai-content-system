@@ -627,3 +627,57 @@ Continue from this Phase 6 checkpoint and current `master` HEAD. Do not restart 
 - TinyFish account wallet inspection returned an available balance of USD 8 and auto-reload unconfigured. Its browser/agent actions are metered (listed rates: USD 0.002 per browser minute and USD 0.016 per agent step). This is an existing tool credit balance, not project revenue.
 - Because the project is zero-cost-first and no separate instruction authorized consuming metered automation credits, no browser automation or dashboard sign-in was started. No account credentials, password, OTP, or API key were accessed.
 - To resume authenticated onboarding, the owner must either authorize a bounded use of the existing metered browser credit and complete sign-in through the secure setup flow, or provide access to a suitable already-authenticated profile. Never request credentials in chat. Do not enable auto-reload or add funds.
+
+
+## 25. Phase 6.1 — Supabase Vault credential bridge and current resume state — 2026-11-11
+
+### User authorization / operating instruction
+- User explicitly authorized assistant-led work and asked to keep trying alternatives to minimize manual effort. The user also confirmed the secure GitHub browser setup was saved.
+- Normal engineering, browser inspection, GitHub and Supabase configuration work may proceed. Continue to keep one-time credentials out of chat, logs, source code, artifacts and screenshots. Do not bypass platform safety checks, owner KYC, legal attestations or actual financial authorization.
+- TinyFish profile `prof_1f3fe64f5d12427c` now records `github.com` (and `google.com`) sign-in. A live browser verification confirmed the owner account `manish91082-coder`, repository settings access, and the Actions Secrets form. Existing repository secret names were visible, but no secret values were read or changed.
+- PACT browser session showed Guest Mode. This is not a blocker for PACT Agent registration: its official Agent docs/OpenAPI say `POST /api/agents/register` is public and does not require a human login.
+- TinyFish wallet inspection at 2026-11-11T10:24:48Z: USD 10.584 available; auto-reload unconfigured. This is tool credit, not project revenue. Do not top up or enable auto-reload.
+
+### Secure credential-store alternative implemented
+- Canonical Supabase project: `ansezjzboysezdcfoupt` (existing active project; no new project created).
+- Confirmed Supabase Vault extension 0.3.1 and HTTP extension 1.6. Enabled HTTP extension and verified an outbound GET to PACT public API returned HTTP 200.
+- Verified Supabase Vault can create a temporary test entry; deleted the canary and verified the canary count is zero.
+- Added database function `public.get_nexus_pact_agent_key()`:
+  - SECURITY DEFINER, fixed search_path.
+  - Reads only `pact_agent_api_key` from `vault.decrypted_secrets`.
+  - EXECUTE denied to PUBLIC, `anon`, and `authenticated`; allowed only to `service_role`.
+  - Verified grants: service_role=true; anon=false; authenticated=false.
+- Updated `.github/workflows/nexus-bounty-agent.yml` to call this RPC in one bounded credential-resolution step using the already-configured `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` repository secrets. A valid `sk_pact_*` value is masked and added to the discovery job's environment; service credentials and PACT credential are not passed to the separate local CPU coder job.
+- First workflow attempts surfaced a leading UTF-8 BOM in the configured Supabase service-key secret; normalization now strips leading whitespace/BOM without printing the value.
+
+### Latest verified run
+- Repository workflow commit with bridge: `d76020c72d681d4061263492506133a71075b767`; newline correction: `f73b63dd077725571e336815d6ddbd290b124e46`; BOM normalization: `f87eb5c354ea281f4081663e074ec7b81584eecc`.
+- Bounty/PACT workflow run `43003076008`: SUCCESS; job `130463717708`; **112/112 unit tests passed**. Public marketplace discovery, Vault credential lookup, PACT read-only adapter, triage and artifact upload all succeeded. Artifact `nexus-bounty-task-bundle-43003076008`, ID `13847256749`.
+- Run confirmed: “No PACT credential found in Vault”; PACT adapter `needs_pact_agent_api_key`; 0 orders; 0 seller orders; recognized external income 0; local CPU coder SKIPPED because active hired work = 0.
+- Initial bridge attempts 43002887629 and 43002945625 failed while wiring the bridge (wrong extension overload then BOM header issue); both defects were fixed, and run 43003076008 is the successful verification. Do not use earlier failed runs as the current state.
+- README Phase 6.1 and MASTER_EXECUTION_LOG have been updated. The documentation-only updates do not change workflow code.
+
+### Critical unresolved credential gate
+- PACT OpenAPI 1.1.0 confirms registration:
+  - `POST https://app.pactcore.ai/api/agents/register`
+  - Required: `handle`, `displayName`
+  - Requested minimum capabilities: `market.read`, `orders.read`, `messages.read`
+  - No webhook URL; no write/order/payment/wallet capabilities.
+  - Plaintext key is returned exactly once.
+- The attempt to perform PACT registration and write the one-time returned key directly into Vault in one cloud-side SQL transaction was blocked by the execution safety layer. No successful registration request was made; no Agent was created; no plaintext key exists in Vault. Do not misreport success and do not attempt to evade the safety block.
+- A secure local PowerShell setup script was generated earlier as a fallback, but the user has not reported running it. The user wants near-zero manual work; do not keep asking them to run local commands unless no supported secure provisioning route is available.
+- Current best state: GitHub Actions can automatically retrieve a future PACT key from Supabase Vault without a manual GitHub Secret step. The missing operation is the one-time PACT registration + storing its response directly in Vault through a supported credential-provisioning path.
+- Continue useful public PACT discovery and all other zero-cost marketplace discovery/QA while this credential gate remains unresolved. Do not start a paid bid, negotiation, escrow funding, withdrawal, or financial action.
+
+### Current repository and mission state
+- Latest code/workflow commit: `f87eb5c354ea281f4081663e074ec7b81584eecc`; later README and mission log commits are documentation-only.
+- The authenticated PACT Agent adapter remains dormant until the Vault entry exists.
+- No accepted assignment, completed paid task, external bank receipt, or realized project income has been verified. Revenue remains ₹0.
+- Economic north star remains ₹10 crore actual cleared/bank-settled net receipts; 0–90 day accepted payment window remains 2026-11-09 through 2027-02-07. This is an ambitious target, not a guarantee.
+
+### Resume instructions for the next thread
+1. Start from this Phase 6.1 checkpoint and current master, not Phase 5.1 or Phase 6.0. Do not repeat completed tests or the PACT/Bounty source audit.
+2. Keep the Supabase Vault RPC and GitHub workflow bridge intact. Do not expose service key or PACT key.
+3. Do not retry blocked PACT key provisioning via a disguised/indirect route. Use only supported, safety-approved secure provisioning; if unavailable, keep public discovery and other revenue channels active.
+4. Recheck the newest Actions run and artifact before claiming current health.
+5. Keep the read-only PACT scope; any write-capable negotiation/order/payment operation remains disabled pending separate explicit authorization and verified funded assignment.
