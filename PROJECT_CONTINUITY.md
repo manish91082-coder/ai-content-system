@@ -540,3 +540,28 @@ The assistant must then:
 - Keep MoltJobs watch active until the two task deadlines, but do not spend inference/engineering time or submit work before a funded escrow and valid agent assignment appear.
 - Continue expanding source discovery only where the payout path is actually cash-settled, agents are permitted, and the work can be performed remotely at positive expected net value.
 - Count revenue only after actual payout transfer independently reconciled.
+
+
+## 22. Phase 5 — Local open-weight coder and credential automation — 2026-11-11
+
+### Implementation
+- Added cloud-work-engine/bundle_active.py. Only records already assigned to this Agent with status=claimed and claim_status=active pass. Test tasks, missing data, detail errors and file attachments are excluded. Bundle contains no API keys or secrets.
+- Added cloud-work-engine/local_coder.py and tests. Local Ollama CPU inference uses qwen2.5-coder:7b. It does not call OpenRouter or any hosted model endpoint.
+- Local worker finds a public GitHub issue in the accepted task brief, clones the public repository, uses bounded code context, and requests a minimal unified diff. It rejects dangerous path traversal, workflow/git metadata edits, .env/credential files, symlinks, submodules and binary patches; verifies git apply --check and git diff --check; writes a NOT SUBMITTED patch artifact and review note.
+- Active .github/workflows/nexus-bounty-agent.yml now separates secrets:
+  - Discovery job alone receives optional BOUNTY_AGENT_API_KEY, runs read-only discovery, event recovery, work ledger, BountyBoard public reads, triage and active-hire bundle.
+  - Local CPU worker is conditional on an active hired task and receives no marketplace key, model-provider key or repository write credential.
+  - It downloads qwen2.5-coder:7b and invokes Ollama on the public Ubuntu runner only when an active task exists.
+- The worker does not execute task-supplied shell commands, repository tests, deployment scripts or other untrusted code in this release. Static patch validation is enabled; tests are recorded as NOT RUN. No claims, bids, external messages, PR creation or submissions.
+- Added tests for active-hire selection and patch safety. Total suite has 91 tests.
+
+### Latest verification
+- Bounty run 42952254773 completed SUCCESS. All 91 tests passed; read-only discovery, event-recovery idle reporting, work ledger, BountyBoard scan, triage and active-work bundle all succeeded. No BOUNTY_AGENT_API_KEY was present. Active work count = 0; local-cpu-coder job was correctly skipped.
+- Jobbi run 42952254948 completed SUCCESS. 91 tests passed; JSON feed 643 items, 324 index candidates; 216 met high-confidence cash filters. Source verification attempted one new uncached record which returned GitHub HTTP 404, safely held as SOURCE_VERIFICATION_INCOMPLETE. No source candidate was promoted.
+- The most recent prior test failure in Jobbi cache test was fixed to use current UTC time; the follow-up Jobbi and main scanner workflows passed.
+
+### API key creation and account onboarding
+- Official Bounty Connect docs require dashboard access: create the Agent from New agent, save the privileged key, complete the Agent Card, and store the key in the server secret store. No public agent-creation endpoint is described in the Connect flow.
+- Bounty Connect docs currently list India as a Stripe Connect supported country. Payout setup is optional to begin, but earnings are held until Stripe confirms the account. KYC/identity attestations remain the account owner's responsibility.
+- A secure browser integration has been suggested so the Agent can be created in the signed-in Bounty dashboard and the key transferred directly to GitHub Actions Secrets without being pasted into chat. Connection has not yet been completed. Do not invent a Bounty API key.
+- OpenRouter API-key dependency has been removed from the active Bounty workflow. Local CPU inference is the chosen zero-model-API-key path.
