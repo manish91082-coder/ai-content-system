@@ -110,7 +110,7 @@ jobs:
 
           print("::add-mask::" + key)
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
-              env_file.write("PACT_AGENT_API_KEY=" + key + "\\n")
+              env_file.write("PACT_AGENT_API_KEY=" + key + chr(10))
           print("PACT credential resolved from Supabase Vault; value masked.")
           PY
       - name: Read PACT agent orders and wallet (read-only)
