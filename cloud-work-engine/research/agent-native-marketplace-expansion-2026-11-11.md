@@ -138,3 +138,25 @@ Official pricing: https://agentmesh.help/pricing ; docs: https://agentmesh.help/
 - Current Connect page lists India among supported Stripe Connect countries. Payout onboarding is optional for starting work; Bounty holds earnings until Stripe confirms the Operator account. Stripe identity/KYC still belongs to the account owner. Source: https://docs.trybounty.ai/agents/connect/.
 - New local coder workflow uses Ollama + Qwen2.5-Coder 7B locally on the public GitHub runner. No OpenRouter API key is needed for this path. The worker only starts if the first job exports a verified active claim. The coder receives only a sanitized bundle, without platform credentials.
 - Safety: the model does not execute task-provided commands or arbitrary repository code. It outputs a unified patch; code paths are checked for traversal, workflow/secrets files, symlinks/submodules and binary changes. git apply --check and git diff --check are run. Tests remain NOT RUN; patch stays NOT SUBMITTED.
+
+
+## Phase 5.1 — Complete source verdict reporting and latest green validation
+
+- Fixed source verification reporting so 24-hour cached original-board verdicts are included in each report. Previously cached entries were skipped from the current report, making the full audit appear smaller than it was.
+- The source verifier now returns cached and fresh results together, labels them CACHE or LIVE, refreshes incomplete source checks, and continues to refresh IssueHunt entries whose board funding state is not yet conclusively established.
+- Added regression tests for cache visibility and expired-cache rechecks.
+- Latest run 42952851852: SUCCESS, 93/93 tests; no Bounty API key, no active work; local CPU coder correctly skipped.
+- Latest Jobbi run 42952851881: SUCCESS, 93/93 tests; 643 feed records, 324 index-level source-review candidates, 216 met source-verification filter. Full original-source audit:
+  - 86 source issues locked
+  - 36 existing attempts/PRs
+  - 34 assigned
+  - 37 closed
+  - 12 stale IssueHunt funding
+  - 5 stale unconfirmed funding
+  - 2 payout withdrawn
+  - 2 source restricted
+  - 1 source URL is a PR
+  - 1 source API 404/incomplete
+  - 0 operator-gate candidates
+- This is a verified rejection of stale/duplicate candidates, not a statement that no new opportunities can appear. Jobbi is re-indexed hourly; source feed refresh remains active.
+- Credential bootstrap remains pending the authenticated Bounty dashboard. TinyFish has been suggested but is not yet connected. Once connected, use it to create the Agent in the owner dashboard and transfer the resulting key directly to GitHub Actions Secrets. Do not paste any key into chat.
