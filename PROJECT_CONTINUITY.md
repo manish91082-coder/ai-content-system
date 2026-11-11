@@ -2,7 +2,7 @@
 **Canonical project:** `manish91082-coder/ai-content-system`  
 **Primary branch:** `master`  
 **Continuity version:** 1.0  
-**Last updated:** 2026-11-11  
+**Last updated:** 2026-11-11 (Phase 6 verified at commit 0f1f75a)  
 **Purpose:** Preserve the complete operating context so a new ChatGPT thread can resume without losing decisions, constraints, implementation status, or next actions.
 
 ---
@@ -587,3 +587,36 @@ The assistant must then:
   - 0 operator-gate candidates
 - This is a verified rejection of stale/duplicate candidates, not a statement that no new opportunities can appear. Jobbi is re-indexed hourly; source feed refresh remains active.
 - Credential bootstrap remains pending the authenticated Bounty dashboard. TinyFish has been suggested but is not yet connected. Once connected, use it to create the Agent in the owner dashboard and transfer the resulting key directly to GitHub Actions Secrets. Do not paste any key into chat.
+
+
+## 23. Phase 6 — PACT funded seller-order bridge and standalone project package QA — 2026-11-11
+
+### Implemented after the Phase 5.1 checkpoint
+- Added `cloud-work-engine/pact_market.py`: public read-only PACT AI Market discovery for bounties and service listings. It reads canonical bounty details before triage, normalizes six-decimal USDT amounts, separates buyer-demand bounties from seller-side service listings, and keeps missing/ambiguous escrow evidence out of executable work.
+- Latest verified public PACT sample: 8 bounties and 100 service listings. Decisions: 1 LOW_VALUE_EXCLUDE, 2 EXCLUDED, 2 ESCROW_GATE_REQUIRED, 3 REVIEW_REQUIRED, and 100 SERVICE_SIDE_NOT_REVENUE. The two escrow-gate entries are not proof of funded orders, assignment, or payment.
+- Added `cloud-work-engine/pact_agent.py`: dormant authenticated read-only adapter for agent profile, seller orders, order details, and platform wallet ledger. It matches seller identity, order ID and escrow-release ledger entries. A PACT platform-wallet credit is not external bank receipt; recognized external income remains zero until a separate withdrawal/settlement is evidenced.
+- Extended `cloud-work-engine/bundle_active.py`: Bounty work passes only when already claimed and active; PACT seller work passes only when the order belongs to this agent, stage is ESCROWED or DELIVERING, and the brief contains title and description. The bundle is secret-free.
+- Extended `cloud-work-engine/local_coder.py`: a funded PACT order without a source repository can be scaffolded as a standalone project in an isolated Git workspace. The worker creates a reviewable patch, validates paths and Git patch application, performs Python syntax checks where relevant, packages changed deliverable files into ZIP, and emits a review note. It does not run untrusted task commands or tests, submit work, create a PR, or claim acceptance/payment.
+- PACT public discovery and authenticated read-only reconciliation were added to `.github/workflows/nexus-bounty-agent.yml`. The local CPU worker remains a separate conditional job; it receives only the sanitized task bundle and no marketplace or model-provider credentials.
+
+### Defect found and fixed during this resume
+- A source audit found that the standalone PACT package path called `zipfile.ZipFile` without importing `zipfile`. The normal workflow had not exposed this because no active hired task existed and the local CPU worker was skipped.
+- Fixed the import in commit `4d270d486b55331e03335639e326c859e2c37054`.
+- Added `test_pact_standalone_work_generates_zip_and_not_submitted_review` in commit `0f1f75a35437c7671a76a9d03617dc9a08c1e895`. It mocks local inference, initializes an empty Git workspace, applies a three-file standalone project patch, checks the ZIP contents, and verifies the review remains `NOT SUBMITTED` and `NOT RUN`. No live model or marketplace call is used by this regression test.
+
+### Latest verified cloud execution
+- Current `master` HEAD at this checkpoint: `0f1f75a35437c7671a76a9d03617dc9a08c1e895`.
+- Bounty discovery / PACT read-only / reconciliation workflow run `42969039577`: SUCCESS. Full suite: **112 tests passed**. New standalone-package regression passed. PACT public scan: 8 bounties, 100 services; 2 escrow-gate candidates, with no order/escrow/assignment inference. PACT Agent API key missing; authenticated seller-order read correctly returned `needs_pact_agent_api_key`. Active work 0; recognized external income 0; local-cpu-coder job correctly SKIPPED. Artifact `nexus-bounty-task-bundle-42969039577`, ID `13833230063`.
+- Funded-job scanner workflow run `42969039600`: SUCCESS; scan job `130352944514`; artifact `nexus-funded-jobs-42969039600`, ID `13832198362`.
+- Both latest runs were triggered by the regression-test commit; no active hired task was present, so the actual Ollama model download/inference branch was not executed in cloud. The standalone packaging path itself is verified through the mocked end-to-end unit test.
+- No Bounty or PACT agent keys were present in Actions for this run. No registration, claims, bids, messages, submissions, wallet actions, withdrawals or payments occurred. Verified revenue remains **0**.
+
+### Current blockers and next action
+1. **Credential/account gate:** PACT and Bounty authenticated account reads remain idle until the owner creates the relevant Agent account/key in the authenticated dashboard and authorizes secure storage as GitHub Actions Secrets. Never paste raw keys into chat or commit them.
+2. **Revenue gate:** The two PACT public bounty matches require a verified buyer-funded ESCROWED order assigned to this Agent before any work begins. Public listing or a price is not escrow proof.
+3. **Execution hardening gate:** Before the first real active task, keep the worker in isolated, secret-free execution. Its generated tests and task-supplied commands remain NOT RUN until a separately designed sandboxed test policy exists. Human approval remains required for any contractual acceptance or external submission.
+4. **Payout gate:** Reconcile PACT order completion, platform wallet credit, withdrawal state and external destination settlement separately. Only independently confirmed external net receipt counts as income.
+5. Re-run current public scans and re-check task details/funding just before any order or assignment decision. Continue with the highest-value fully verified no-upfront-cost opportunity; do not repeat the Phase 5.1 Jobbi stale-candidate audit unless source changes justify it.
+
+### Resume instruction
+Continue from this Phase 6 checkpoint and current `master` HEAD. Do not restart marketplace discovery, Phase 5.1 source screening, or earlier adapter implementation. First resolve the secure owner-dashboard credential route where available; otherwise continue useful read-only opportunity validation and worker QA without fabricating credentials or paid work.
