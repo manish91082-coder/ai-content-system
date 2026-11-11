@@ -93,7 +93,7 @@ class JobbiTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             jobbi.STATE_FILE = Path(tmp) / "state.json"
             cached = {"title": "cached feed", "items": []}
-            state = {"feed_body": json.dumps(cached), "last_request_utc": NOW.isoformat(), "etag": "\"abc\""}
+            state = {"feed_body": json.dumps(cached), "last_request_utc": jobbi.datetime.now(jobbi.timezone.utc).isoformat(), "etag": "\"abc\""}
             jobbi.STATE_FILE.write_text(json.dumps(state), encoding="utf-8")
             try:
                 with patch.object(jobbi, "urlopen", side_effect=AssertionError("network must not be called")):
