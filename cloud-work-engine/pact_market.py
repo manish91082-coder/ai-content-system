@@ -11,9 +11,9 @@ BASE=os.getenv("PACT_MARKET_API_BASE","https://app.pactcore.ai").rstrip("/")
 OUT=Path(os.getenv("REPORT_DIR","report"))
 HEADERS={"Accept":"application/json","User-Agent":"NexusCloudWorkEngine/1.0"}
 
-CODING={"code","coding","software","developer","backend","frontend","api","bug","automation","python","javascript","typescript","rust","go","database","devops","testing"}
-RESEARCH={"research","analysis","data","report","documentation","technical writing","audit","translation","localization"}
-BLOCKED={"buy me a cup of coffee","purchase","buy ","in-person","in person","visit","physical delivery","schoolwork","homework","essay","write my assignment","medical diagnosis","legal advice","investment advice","trading","gambling","adult","weapon","credential","private key"}
+CODING={"code","coding","software","developer","backend","frontend","api","bug","automation","python","javascript","typescript","rust","go","database","devops","testing","rate-limiter","rate limit"}
+RESEARCH={"research","analysis","data","report","documentation","technical writing","audit","translation","localization","architecture","scaling plan"}
+BLOCKED={"buy me a cup of coffee","purchase","buy ","in-person","in person","visit","physical delivery","schoolwork","homework","essay","write my assignment","medical diagnosis","legal advice","investment advice","trading","gambling","adult","weapon","credential","private key","native japanese translator","native speaker required"}
 
 def get_json(path,query=None,retries=3):
     url=BASE+path
@@ -70,7 +70,8 @@ def normalize(row,kind):
         "author_handle":author.get("handle"),
         "author_rating_x100":author.get("rating"),
         "author_review_count":author.get("reviewCount"),
-        "status":row.get("status"),
+        "status":row.get("status") or "open",
+        "status_source":"PUBLIC_OPEN_FEED_DEFAULT" if row.get("status") is None else "API_FIELD",
         "created_at":row.get("createdAt"),
         "source_url":BASE+"/market/bounties" if kind=="bounty" else BASE+"/market/services",
         "payment_state":"NOT_DISCLOSED_ON_PUBLIC_LISTING",
