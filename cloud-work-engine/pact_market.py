@@ -49,6 +49,23 @@ def get_rows(payload):
     if not isinstance(rows,list): raise RuntimeError("PACT response schema mismatch: items array required")
     return rows
 
+def fetch_bounty_detail(row):
+    ident=str(row.get("id") or "")
+    if not ident: return row,{"status":"missing_id"}
+    try:
+        payload,meta=get_json("/api/market/bounties/"+ident)
+        detail=payload.get("bounty") if isinstance(payload.get("bounty"),dict) else payload.get("item") if isinstance(payload.get("item"),dict) else payload
+        merged=dict(row)
+        if isinstance(detail,dict): merged.update(detail)
+        merged["_detail_read_status"]="ok"
+        merged["_detail_read_url"]=meta.get("url")
+        return merged,{"status":"ok","url":meta.get("url")}
+    except Exception as exc:
+        result=dict(row)
+        result["_detail_read_status"]="error"
+        result["_detail_read_error"]=type(exc).__name__+":"+str(exc)[:200]
+        return result,{"status":"error","reason":result["_detail_read_error"]}
+
 def normalize(row,kind):
     if not isinstance(row,dict): return None
     author=row.get("author") if isinstance(row.get("author"),dict) else {}
@@ -61,6 +78,8 @@ def normalize(row,kind):
         "title":str(row.get("title") or ""),
         "description":str(row.get("description") or ""),
         "acceptance_criteria":row.get("acceptanceCriteria"),
+        "detail_read_status":row.get("_detail_read_status","not_attempted"),
+        "detail_read_error":row.get("_detail_read_error"),
         "tags":[str(x) for x in tags],
         "price_amount_minor":str(row.get("priceAmount")) if row.get("priceAmount") is not None else None,
         "price_amount_usdt":amount,
@@ -84,6 +103,8 @@ def classify(item):
         return "EXCLUDED","missing_id_or_not_open"
     if item.get("listing_type")!="bounty":
         return "SERVICE_SIDE_NOT_REVENUE","service_is_supply_listing_not_buyer_demand"
+    if item.get("detail_read_status")=="error":
+        return "REVIEW_REQUIRED","original_bounty_detail_unavailable"
     text=" ".join([item.get("title") or "",item.get("description") or "",item.get("acceptance_criteria") or ""," ".join(item.get("tags") or [])]).lower()
     for term in sorted(BLOCKED,key=len,reverse=True):
         if term in text:
@@ -105,6 +126,10 @@ def classify(item):
         return "REVIEW_REQUIRED","capability_match_not_established"
     if amount<Decimal("5"):
         return "LOW_VALUE_EXCLUDE","payout_below_minimum_work_value"
+    if "ticket history" in text or "existing ticket history" in text:
+        return "REVIEW_REQUIRED","requires_private_customer_ticket_data_not_yet_ingested"
+    if "500 ui screenshots" in text or "screenshots for taxonomy" in text:
+        return "REVIEW_REQUIRED","requires_buyer_image_dataset_not_yet_available"
     return "ESCROW_GATE_REQUIRED",category+": buyer funding must be verified before work starts"
 
 def run_scan():
@@ -112,8 +137,12 @@ def run_scan():
     services,smeta=get_json("/api/public/services",{"limit":100,"sort":"newest"})
     items=[]
     seen=set()
+    detail_reads=[]
     for kind,payload in (("bounty",bounties),("service",services)):
         for row in get_rows(payload):
+            if kind=="bounty":
+                row,detail_meta=fetch_bounty_detail(row)
+                detail_reads.append({"id":str(row.get("id") or ""),"status":detail_meta.get("status"),"reason":detail_meta.get("reason")})
             item=normalize(row,kind)
             if not item or not item["id"]: continue
             key=(kind,item["id"])
@@ -131,6 +160,9 @@ def run_scan():
         "bounty_count":sum(x["listing_type"]=="bounty" for x in items),
         "service_count":sum(x["listing_type"]=="service" for x in items),
         "decision_counts":counts,
+        "bounty_detail_reads":detail_reads,
+        "bounty_details_ok":sum(x.get("status")=="ok" for x in detail_reads),
+        "bounty_details_failed":sum(x.get("status")=="error" for x in detail_reads),
         "escrow_gate_candidates":len(candidates),
         "candidates":candidates,
         "listings":items,
