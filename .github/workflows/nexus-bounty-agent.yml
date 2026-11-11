@@ -74,8 +74,8 @@ jobs:
           from urllib.error import HTTPError, URLError
           from urllib.request import Request, urlopen
 
-          base = os.environ.get("SUPABASE_URL", "").rstrip("/")
-          service_key = os.environ.get("SUPABASE_SERVICE_KEY", "")
+          base = os.environ.get("SUPABASE_URL", "").strip().lstrip("\ufeff").rstrip("/")
+          service_key = os.environ.get("SUPABASE_SERVICE_KEY", "").strip().lstrip("\ufeff")
           if not base or not service_key:
               print("PACT Vault bridge skipped: Supabase project credentials are not configured.")
               raise SystemExit(0)
