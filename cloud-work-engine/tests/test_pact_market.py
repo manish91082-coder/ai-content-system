@@ -37,7 +37,7 @@ class PactMarketTests(unittest.TestCase):
             self.assertEqual(classify(item)[0],"EXCLUDED")
 
     def test_unsupported_work_requires_review(self):
-        item=normalize(row(title="Host a party at a venue",description="Need people to attend"),"bounty")
+        item=normalize(row(title="Host a party at a venue",description="Need people to attend",tags=[],acceptanceCriteria=None),"bounty")
         self.assertEqual(classify(item)[0],"REVIEW_REQUIRED")
 
     def test_live_scan_public_get_only(self):
