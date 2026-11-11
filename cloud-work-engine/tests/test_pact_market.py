@@ -43,13 +43,14 @@ class PactMarketTests(unittest.TestCase):
     def test_live_scan_public_get_only(self):
         with patch("pact_market.get_json",side_effect=[
             ({"items":[row()]},{"url":"b"}),
-            ({"items":[row(id="s1",title="JSON quality service")]},{"url":"s"})
+            ({"items":[row(id="s1",title="JSON quality service")]},{"url":"s"}),
+            (row(),"detail")
         ]) as mock:
             result=run_scan()
         self.assertEqual(result["bounty_count"],1)
         self.assertEqual(result["service_count"],1)
         self.assertEqual(result["escrow_gate_candidates"],1)
-        self.assertEqual(mock.call_count,2)
+        self.assertEqual(mock.call_count,3)
         self.assertFalse(result["marketplace_writes"])
 
 
@@ -70,4 +71,11 @@ class PactMarketTests(unittest.TestCase):
                            priceAmount="12500000000"),"bounty")
         self.assertEqual(classify(item)[0],"ESCROW_GATE_REQUIRED")
 
+
+    def test_detail_failure_does_not_promote_public_bounty(self):
+        with patch("pact_market.get_json",side_effect=RuntimeError("HTTP 404")):
+            item,meta=__import__("pact_market").fetch_bounty_detail(row())
+        normalized=normalize(item,"bounty")
+        self.assertEqual(meta["status"],"error")
+        self.assertEqual(classify(normalized)[0],"REVIEW_REQUIRED")
 if __name__=="__main__": unittest.main()
