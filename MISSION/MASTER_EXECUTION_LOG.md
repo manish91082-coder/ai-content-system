@@ -217,3 +217,22 @@ No testnet deployment, X post, video, submission, award or settled revenue is cl
 - TinyFish is accessible, but the only/default browser profile has no signed-in sites (`domain_count=0`, `signed_in_sites=[]`); there is no saved PACT/Bounty dashboard session.
 - The TinyFish wallet showed USD 8 available with auto-reload unconfigured; browser and agent actions are metered. No browser automation was launched and no credit consumed because this project remains zero-cost-first and no separate spend authorization exists.
 - No account password, OTP, API key or private credential was requested or accessed. The remaining authenticated connector setup requires owner-controlled secure sign-in or explicit approval for bounded use of existing metered credits. Do not turn on auto-reload.
+
+
+## 2026-11-11 — PHASE 6.1 SUPABASE VAULT BRIDGE + CLOUD VALIDATION
+
+- User renewed explicit authorization for assistant-led automation and asked to minimize owner-side manual steps.
+- Secure GitHub browser session was saved and verified as `manish91082-coder`; repository Actions Secrets page is accessible. No existing secret was changed, read, or deleted.
+- A better secret-store path was built using the connected Supabase project rather than asking the owner to paste a key into chat:
+  - Confirmed Vault 0.3.1 and HTTP extension 1.6.
+  - Enabled the HTTP extension.
+  - Verified outbound GET connectivity to PACT public API (HTTP 200).
+  - Added `public.get_nexus_pact_agent_key()` SECURITY DEFINER RPC, executable only by `service_role`; PUBLIC, anon and authenticated roles are denied.
+  - Verified a temporary Vault canary could be created and then deleted; PACT secret count remains zero.
+- Added a GitHub Actions bridge in `.github/workflows/nexus-bounty-agent.yml`: the Supabase service key is used only in the one step that calls the restricted RPC; a returned `sk_pact_*` value is masked and exported to the discovery job environment. It is not passed to the local CPU coder job.
+- First run exposed a leading BOM in the configured Supabase service-key secret. Input normalization was added without printing or modifying the secret.
+- Cloud run **43003076008**: SUCCESS; **112 tests passed**; discovery, Vault read, PACT read-only reconciliation, triage and artifact upload passed. Artifact ID **13847256749**.
+- Run output confirms Vault contains no `pact_agent_api_key`; authenticated PACT adapter correctly reports `needs_pact_agent_api_key`, 0 orders, 0 seller orders, and recognized external income 0.
+- The one-time PACT register-and-store call was blocked by the execution safety layer. **No Agent account or API key was created.** Do not claim otherwise or attempt to bypass the safety gate.
+- Latest repository code/workflow commit at this update: `f87eb5c354ea281f4081663e074ec7b81584eecc`. README documentation is being updated as part of this checkpoint.
+- Economic status remains unchanged: ₹0 independently verified external net receipts; no bid, claim, negotiation, deposit, escrow funding, task submission, withdrawal or payment was made.
