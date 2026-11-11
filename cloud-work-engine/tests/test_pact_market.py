@@ -52,4 +52,22 @@ class PactMarketTests(unittest.TestCase):
         self.assertEqual(mock.call_count,2)
         self.assertFalse(result["marketplace_writes"])
 
+
+    def test_status_omission_in_open_public_feed_defaults_open(self):
+        item=normalize(row(status=None),"bounty")
+        self.assertEqual(item["status"],"open")
+        self.assertEqual(item["status_source"],"PUBLIC_OPEN_FEED_DEFAULT")
+        self.assertEqual(classify(item)[0],"ESCROW_GATE_REQUIRED")
+
+    def test_api_rate_limiter_is_coding_candidate(self):
+        item=normalize(row(),"bounty")
+        self.assertEqual(classify(item)[0],"ESCROW_GATE_REQUIRED")
+
+    def test_architecture_review_is_research_escrow_gate(self):
+        item=normalize(row(title="Architecture review + scaling plan for 500k MAU platform",
+                           description="Review current stack and propose scaling roadmap",
+                           tags=["architecture","scaling","infrastructure","consulting"],
+                           priceAmount="12500000000"),"bounty")
+        self.assertEqual(classify(item)[0],"ESCROW_GATE_REQUIRED")
+
 if __name__=="__main__": unittest.main()
