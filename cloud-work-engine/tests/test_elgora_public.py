@@ -34,7 +34,7 @@ def detail(
             "payout_policy": "winner_take_all",
             "spec_commitment": "0xabc",
         },
-        "challenge": "# Evidence-level map for 10 research peptides\\n",
+        "challenge": "# Evidence-level map for 10 research peptides",
         "verification_record": {"status": "pending", "winner": None},
     }
 
