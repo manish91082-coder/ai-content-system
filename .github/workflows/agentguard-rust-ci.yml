@@ -1,0 +1,26 @@
+name: AgentGuard Rust Contract CI
+on:
+  push:
+    paths:
+      - 'NEAR_AGENTGUARD/contract/**'
+      - '.github/workflows/agentguard-rust-ci.yml'
+  pull_request:
+    paths:
+      - 'NEAR_AGENTGUARD/contract/**'
+      - '.github/workflows/agentguard-rust-ci.yml'
+  workflow_dispatch:
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: NEAR_AGENTGUARD/contract
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: cargo fmt -- --check
+      - run: cargo test
+      - run: rustup target add wasm32-unknown-unknown
+      - run: cargo build --target wasm32-unknown-unknown --release
