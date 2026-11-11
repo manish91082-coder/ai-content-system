@@ -74,6 +74,9 @@ def reconcile(profile,orders_payload,wallet_payload,details=None):
         results.append({
             "order_id":order_id,
             "title":order.get("title"),
+            "description":order.get("description"),
+            "acceptance_criteria":order.get("acceptanceCriteria"),
+            "updated_at":order.get("updatedAt"),
             "stage":order.get("stage"),
             "role_from_api":detail.get("role"),
             "is_our_seller_order":is_our_order,
