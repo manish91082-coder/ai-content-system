@@ -85,3 +85,24 @@ A budget field in a bid-flow Bounty is only a pricing signal. Only the accepted 
 
 ### Economic rule
 A task budget, source feed escrow label, API registration, bid acceptance, or completed work event is not revenue. Only an actual transfer to an authorized payout destination, matched to the task and net of fees/costs, counts as realized income.
+
+
+## Phase 5 — Local open-weight coder and credential-safe separation
+
+- Replaced the active Bounty workflow OpenRouter dependency with a local CPU model worker. The active workflow no longer requires OPENROUTER_API_KEY.
+- Added cloud-work-engine/bundle_active.py. It exports only already-hired work (status=claimed, claim_status=active), with complete task fields and no secrets. Test Bounties, incomplete records and tasks with un-ingested attachments are excluded.
+- Added cloud-work-engine/local_coder.py. It uses local Ollama inference with Qwen2.5-Coder 7B on the public GitHub Actions CPU runner. No hosted inference API or model-provider key is used.
+- Workflow .github/workflows/nexus-bounty-agent.yml is now a two-job design:
+  1. discover-and-triage: carries the Bounty API secret, performs read-only discovery, lifecycle recovery, cash/escrow filtering and exports a sanitized task bundle.
+  2. local-cpu-coder: runs only when the sanitized bundle contains an already-hired active task. It receives no Bounty API key, no OpenRouter key and no GitHub write credential.
+- The local worker clones a public source repository from a GitHub issue URL, reads a bounded source context, asks the local model for a unified diff, rejects unsafe file paths, secret-file/workflow edits, symlinks, submodules and binary patches, runs git apply --check and git diff --check, then uploads a patch and review note.
+- The local coder does not execute task-provided shell commands, tests or arbitrary scripts in this release. It reports test commands recommended by the model as NOT RUN. It never creates PRs, claims, bids, messages or submissions.
+- Public GitHub-hosted standard runners are free for public repositories; the local model download/run happens only after the active-work gate is true. Model download/cache optimization remains future work.
+- Latest verified Bounty workflow run 42952254773: SUCCESS; 91/91 tests passed; all discovery and reconciliation steps completed; local CPU worker correctly skipped because there was no active hired assignment. No API key was present, so Bounty authenticated reads/events remained in clean idle state.
+- Latest verified Jobbi workflow run 42952254948: SUCCESS; 91/91 tests passed; 643 feed records, 324 indexed source-review candidates; 216 met the current higher-confidence cash filter. One live source check returned 404 for a source issue; cached records were retained as unverified, not promoted.
+- This worker produces a reviewable patch artifact, not an accepted or paid submission. Revenue remains zero until actual settlement is independently reconciled.
+
+### Bounty credential bootstrap gate
+- Current official Bounty documentation says the Agent is created in the Bounty Agents dashboard (New agent), where the privileged Agent API key is generated. Complete the Agent Card, then store the key server-side as BOUNTY_AGENT_API_KEY. The documented connection flow requires account-owner dashboard access; no public self-service registration endpoint is documented in the connection guide.
+- Payout setup is optional to start work. Bounty currently lists India among supported Stripe Connect countries; payout is held until Stripe confirms the Operator's account. Any Stripe KYC or identity attestations remain owner-controlled.
+- A secure browser connector has been suggested to finish the dashboard step and transfer the key directly into GitHub Actions Secrets without displaying it in chat. It is not yet connected. Do not ask the user to paste the raw API key into chat.
