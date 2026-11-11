@@ -44,7 +44,7 @@ class PactMarketTests(unittest.TestCase):
         with patch("pact_market.get_json",side_effect=[
             ({"items":[row()]},{"url":"b"}),
             ({"items":[row(id="s1",title="JSON quality service")]},{"url":"s"}),
-            (row(),"detail")
+            (row(),{"url":"detail"})
         ]) as mock:
             result=run_scan()
         self.assertEqual(result["bounty_count"],1)
