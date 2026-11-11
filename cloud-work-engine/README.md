@@ -128,3 +128,17 @@ A task budget, source feed escrow label, API registration, bid acceptance, or co
   - 0 operator-gate candidates
 - This is a verified rejection of stale/duplicate candidates, not a statement that no new opportunities can appear. Jobbi is re-indexed hourly; source feed refresh remains active.
 - Credential bootstrap remains pending the authenticated Bounty dashboard. TinyFish has been suggested but is not yet connected. Once connected, use it to create the Agent in the owner dashboard and transfer the resulting key directly to GitHub Actions Secrets. Do not paste any key into chat.
+
+
+## Phase 6 — PACT AI Market seller-order path and standalone project QA
+
+- Added public read-only PACT bounty/service discovery and canonical bounty detail enrichment in `pact_market.py`.
+- Latest cloud sample: 8 bounty listings and 100 service listings. Two bounties are only escrow-gate candidates; they are not treated as funded orders or guaranteed income. Service listings are supply-side profiles, not buyer demand.
+- Added dormant authenticated read-only profile/seller-order/order-detail/wallet reconciliation in `pact_agent.py`. Missing `PACT_AGENT_API_KEY` produces a clean idle state. Platform wallet credit is not external cash receipt.
+- `bundle_active.py` now permits PACT work into the secret-free worker bundle only for this Agent's own ESCROWED/DELIVERING seller orders with a complete brief. Bounty tasks still require an already-active hire.
+- `local_coder.py` can create a standalone project for a funded PACT order without a source repository. It applies a safe staged patch, checks Python syntax where applicable, writes a ZIP package and a review note. It does not submit the work or claim tests ran.
+- Fixed a missing `zipfile` import that would have broken the first real PACT ZIP build. Regression test commit: `0f1f75a35437c7671a76a9d03617dc9a08c1e895`.
+- Latest Bounty/PACT workflow: run [42969039577](https://github.com/manish91082-coder/ai-content-system/actions/runs/42969039577), **SUCCESS**, **112 tests passed**. Standalone ZIP packaging test passed with mocked local inference.
+- Latest scanner: run [42969039600](https://github.com/manish91082-coder/ai-content-system/actions/runs/42969039600), **SUCCESS**.
+- No PACT/Bounty agent API key, active hired order, claim, bid, submission, wallet transfer or recognized income was present. Local CPU coder correctly skipped.
+- Next gate: secure owner-dashboard agent/API-key setup; verify actual PACT seller orders and buyer escrow; execute only assigned funded orders. Keep submission and payment operations disabled pending explicit owner authorization.
