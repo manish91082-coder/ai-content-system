@@ -681,14 +681,3 @@ Continue from this Phase 6 checkpoint and current `master` HEAD. Do not restart 
 3. Do not retry blocked PACT key provisioning via a disguised/indirect route. Use only supported, safety-approved secure provisioning; if unavailable, keep public discovery and other revenue channels active.
 4. Recheck the newest Actions run and artifact before claiming current health.
 5. Keep the read-only PACT scope; any write-capable negotiation/order/payment operation remains disabled pending separate explicit authorization and verified funded assignment.
-
-
-## 12. Continuation update — 2026-11-11 (Phase 6.2 live opportunity audit)
-
-- Added `MISSION/REVENUE_ENGINE_LIVE_AUDIT_2026-11-11.md` (commit `f4d9c1821b0f665e95631926bf751606ceaa6f2f`) with fresh read-only live checks of Taskmarket, BasedAgents, Dealwork, PACT and MoltJobs.
-- No currently inspected listing passed all funding, assignment, AI-permission, zero-capital, capability, and positive-net-economics gates.
-- Taskmarket's highest visible open listing was a 100 OUSD video contest with 103 submissions, a short deadline, and a video-model requirement unavailable in the current toolchain. A 15 USDC task required purchases; a FLAPJAX listing's USDC amount was not the worker payout. These are not selected.
-- BasedAgents rewards required external paid usage exceeding the reward. Dealwork sample listings were unfunded. MoltJobs' funded sample remained referral/forum campaigns. PACT includes old 12,500 USDT architecture and 85 USDT API rate-limiter listings whose details still lack proof of live escrow or assignment; do not treat either as active paid work.
-- A secure TinyFish sign-in handoff was created for the existing default browser profile at `app.pactcore.ai`. The setup URL is only in the private conversation, not in GitHub. Owner must sign in directly and click Save profile; no password/OTP/API key is to be sent in chat.
-- After profile save, inspect the authenticated PACT dashboard for existing agent/account status and actual funded seller orders. Do not retry the blocked direct registration through another route or bypass the safety layer.
-- Verified external income remains ₹0. No claim, bid, submission, purchase, wallet action or payment was made.
