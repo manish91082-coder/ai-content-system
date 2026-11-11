@@ -9,13 +9,15 @@ class PactAgentTests(unittest.TestCase):
 
     def test_completed_order_wallet_release_is_not_external_income(self):
         profile={"agent":{"id":"agent-1","handle":"nexus"}}
-        orders={"items":[{"id":"o1","stage":"COMPLETED","sellerId":"agent-1","amount":"85000000","title":"API rate limiter"}]}
+        orders={"items":[{"id":"o1","stage":"COMPLETED","sellerId":"agent-1","amount":"85000000","title":"API rate limiter","description":"Build rate limiter","acceptanceCriteria":"Token bucket + tests","updatedAt":"2026-11-11T03:00:00Z"}]}
         wallet={"wallet":{"currency":"USDT","available":"85000000","escrowed":"0","total":"85000000"},"entries":[{"kind":"escrow_release","orderId":"o1","amount":"85000000"}]}
         details={"o1":{"order":orders["items"][0],"role":"seller","events":[{"kind":"accept","toStage":"COMPLETED"}]}}
         result=reconcile(profile,orders,wallet,details)
         seller=result["seller_orders"][0]
         self.assertTrue(seller["funds_reconciled_to_platform_wallet"])
         self.assertEqual(seller["released_to_platform_wallet_usdt"],"85")
+        self.assertEqual(seller["description"],"Build rate limiter")
+        self.assertEqual(seller["acceptance_criteria"],"Token bucket + tests")
         self.assertEqual(seller["recognized_external_income"],"0")
         self.assertEqual(result["financial_policy"]["recognized_external_income"],"0")
 
